@@ -320,14 +320,16 @@ void DCM::Parser::parseHeader(std::vector<std::string> lineStrip)
 	}
 	case TYPE::ARRAY:
 	{
-		pCurrentElement = new Array(currentIndex, currentOrder, lineStrip.at(1));
+		
 		if (lineStrip.size() > 4)
 		{
-			((Array*)pCurrentElement)->size_x = std::stoi(lineStrip.at(2));
-			((Array*)pCurrentElement)->size_y = std::stoi(lineStrip.at(4));
+			pCurrentElement = new Matrix(currentIndex, currentOrder, lineStrip.at(1));
+			((Matrix*)pCurrentElement)->size_x = std::stoi(lineStrip.at(2));
+			((Matrix*)pCurrentElement)->size_y = std::stoi(lineStrip.at(4));
 		}
 		else if (lineStrip.size() > 2)
 		{
+			pCurrentElement = new Array(currentIndex, currentOrder, lineStrip.at(1));
 			((Array*)pCurrentElement)->size_x = std::stoi(lineStrip.at(2));
 		}
 		break;
@@ -444,13 +446,7 @@ void DCM::Parser::parseComponent(std::vector<std::string> lineStrip)
 	case TYPE::UNIT_X:
 	{
 		switch (pCurrentElement->type)
-		{
-		case TYPE::ARRAY:
-		case TYPE::MATRIX:
-		{
-			((ArrayBaseParameter*)pCurrentElement)->unit_x = lineStrip.at(1);
-			break;
-		}
+		{		
 		case TYPE::CHARLINE:
 		case TYPE::CHARMAP:
 		case TYPE::FIXEDCHARLINE:
@@ -467,12 +463,7 @@ void DCM::Parser::parseComponent(std::vector<std::string> lineStrip)
 	case TYPE::UNIT_Y:
 	{
 		switch (pCurrentElement->type)
-		{		
-		case TYPE::MATRIX:
-		{
-			((ArrayBaseParameter*)pCurrentElement)->unit_y = lineStrip.at(1);
-			break;
-		}
+		{				
 		case TYPE::CHARMAP:
 		case TYPE::FIXEDCHARMAP:
 		case TYPE::GROUPCHARMAP:
@@ -531,14 +522,31 @@ void DCM::Parser::parseComponent(std::vector<std::string> lineStrip)
 			break;
 		}
 		case TYPE::ARRAY:
-		{
-			for(int i=1; i<lineStrip.size(); i++)
-				((Array*)pCurrentElement)->values.push_back(std::stod(lineStrip.at(i)));
-			break;
-		}
 		case TYPE::MATRIX:
 		{
-
+			std::vector<double> values;
+			for(int i=1; i<lineStrip.size(); i++)
+				values.push_back(std::stod(lineStrip.at(i)));
+			((ArrayBaseParameter*)pCurrentElement)->values.push_back(values);
+			break;
+		}
+		case CHARLINE:
+		case FIXEDCHARLINE:
+		case GROUPCHARLINE:
+		{
+			for (int i = 1; i < lineStrip.size(); i++)
+				((LineBaseParameter*)pCurrentElement)->values.push_back(std::stod(lineStrip.at(i)));
+			break;
+		}
+		case CHARMAP:
+		case FIXEDCHARMAP:
+		case GROUPCHARMAP:
+		{
+			std::vector<double> values;
+			for (int i = 1; i < lineStrip.size(); i++)
+				values.push_back(std::stod(lineStrip.at(i)));
+			((MapBaseParameter*)pCurrentElement)->values.push_back(values);
+			break;
 		}
 		}
 		break;
@@ -708,6 +716,71 @@ std::string DCM::Parser::rebuildParameter(Parameter* parameter)
 
 }
 
+std::string DCM::Parser::rebuildArray(Array* arr)
+{
+	std::string text = "";
+	if (arr->type != TYPE::ARRAY)
+		return text;
+
+	text += "FESTWERTEBLOCK " + arr->name;
+	if (arr->size_x)
+		text += " " + std::to_string(arr->size_x);
+	text += "\n";
+	if (!arr->langname.empty())
+		text += "   LANGNAME " + arr->langname + "\n";
+	if (!arr->displayname.empty())
+		text += "   DISPLAYNAME " + arr->displayname + "\n";
+	if (!arr->variant.empty())
+		text += "   VAR " + arr->variant + "\n";
+	if (!arr->function.empty())
+		text += "   FUNKTION " + arr->function + "\n";
+	if (!arr->unit.empty())
+		text += "   EINHEIT_W " + arr->unit + "\n";
+	
+	for (auto values : arr->values)
+	{
+		text += "   WERT";
+		for (auto value : values)
+			text += " " + std::to_string(value);
+		text += "\n";
+	}
+	text += "END";
+
+	return text;
+}
+std::string DCM::Parser::rebuildMatrix(Matrix* matrix)
+{
+	std::string text = "";
+	if (matrix->type != TYPE::MATRIX)
+		return text;
+
+	text += "FESTWERTEBLOCK " + matrix->name;
+	if (matrix->size_x && matrix->size_y)
+		text += " " + std::to_string(matrix->size_x) + " @ " + std::to_string(matrix->size_y);
+	text += "\n";
+	if (!matrix->langname.empty())
+		text += "   LANGNAME " + matrix->langname + "\n";
+	if (!matrix->displayname.empty())
+		text += "   DISPLAYNAME " + matrix->displayname + "\n";
+	if (!matrix->variant.empty())
+		text += "   VAR " + matrix->variant + "\n";
+	if (!matrix->function.empty())
+		text += "   FUNKTION " + matrix->function + "\n";
+	if (!matrix->unit.empty())
+		text += "   EINHEIT_W " + matrix->unit + "\n";
+
+	for (auto values : matrix->values)
+	{
+		text += "   WERT";
+		for (auto value : values)
+			text += " " + std::to_string(value);
+		text += "\n";
+	}
+	text += "END";
+
+	return text;
+}
+
 
 bool DCM::Parser::test()
 {
@@ -843,6 +916,29 @@ bool DCM::Parser::rebuildParameterTest()
 	for (auto element : parser->elements)
 	{
 		std::cout << parser->rebuildParameter((Parameter*)element) << std::endl;
+	}
+
+	return true;
+}
+
+bool DCM::Parser::rebuildArrayTest()
+{
+	auto parser = new Parser();
+	parser->open("Test_DCM2.dcm");
+	for (auto element : parser->elements)
+	{
+		std::cout << parser->rebuildArray((Array*)element) << std::endl;
+	}
+
+	return true;
+}
+bool DCM::Parser::rebuildMatrixTest()
+{
+	auto parser = new Parser();
+	parser->open("Test_DCM2.dcm");
+	for (auto element : parser->elements)
+	{
+		std::cout << parser->rebuildMatrix((Matrix*)element) << std::endl;
 	}
 
 	return true;

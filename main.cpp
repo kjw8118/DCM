@@ -15,7 +15,8 @@ int main()
     //parser->open("Test_DCM2.dcm");
     //std::cout << parser->getRawString() << std::endl;
 
-    DCM::Parser::rebuildParameterTest();
+    DCM::Parser::rebuildArrayTest();
+    DCM::Parser::rebuildMatrixTest();
     
 
     

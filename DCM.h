@@ -171,9 +171,7 @@ namespace DCM
 		ArrayBaseParameter(int lineIndex, int lineOrder, int type, std::string name, int size_x, int size_y);
 		int size_x;
 		int size_y;
-		std::string unit_x = "";
-		std::string unit_y = "";
-		std::vector<double> values;
+		std::vector<std::vector<double>> values;
 		
 	};
 
@@ -348,6 +346,8 @@ namespace DCM
 		std::string rebuildComment(Comment* comment);
 		std::string rebuildFormat(Format* format);
 		std::string rebuildParameter(Parameter* parameter);
+		std::string rebuildArray(Array* arr);
+		std::string rebuildMatrix(Matrix* matrix);
 
 		
 
@@ -364,6 +364,8 @@ namespace DCM
 		static bool rebuildCommentTest();
 		static bool rebuildFormatTest();
 		static bool rebuildParameterTest();
+		static bool rebuildArrayTest();
+		static bool rebuildMatrixTest();
 
 		static bool parseDCM1Test();
 		static bool parseDCM2Test();
