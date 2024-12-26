@@ -13,7 +13,7 @@ int main()
     
     //auto parser = new DCM::Parser();
 
-    DCM::Parser::rebuildCommentTest();
+    DCM::Parser::rebuildFunctionsTest();
 
     
     return 0;

@@ -346,6 +346,7 @@ namespace DCM
 		static bool typeEnumTest();
 		static bool stripQuotationTest();
 		static bool rebuildCommentTest();
+		static bool rebuildFunctionsTest();
 
 		static bool parseDCM1Test();
 		static bool parseDCM2Test();

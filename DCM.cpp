@@ -625,7 +625,17 @@ std::string DCM::Parser::rebuildComment(Comment* comment)
 }
 std::string DCM::Parser::rebuildFunctions(Functions* functions)
 {
-	return "";
+	std::string text = "";
+	if (functions->type != TYPE::FUNCTIONS)
+		return text;
+
+	text += "FUNKTIONEN\n";
+	for (auto fkt : functions->functions)
+	{
+		text += "   FKT " + fkt.name + " " + fkt.version + " " + fkt.longname + "\n";
+	}
+	text += "END";
+	return text;
 }
 
 
@@ -721,7 +731,17 @@ bool DCM::Parser::rebuildCommentTest()
 
 	return true;
 }
+bool DCM::Parser::rebuildFunctionsTest()
+{
+	auto parser = new Parser();
+	parser->open("functionsTest.dcm");
+	for (auto element : parser->elements)
+	{
+		std::cout << parser->rebuildFunctions((Functions*)element) << std::endl;
+	}
 
+	return true;
+}
 bool DCM::Parser::parseDCM1Test()
 {
 	auto parser = new Parser();

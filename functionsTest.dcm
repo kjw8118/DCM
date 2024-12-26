@@ -1,0 +1,11 @@
+FUNKTIONEN
+   FKT function_1 "1.2.3" "4.5.6 This is dummy function 1"
+   FKT function_2 "4.5.6" "7.8.9 This is dummy function 2"
+   FKT function_3 "asd" "fgh This is dummy function 3"
+   FKT function_4 "123" "456 This is dummy function 4"
+   FKT function_5 " " "This is dummy function 5"
+   FKT function_6 " " " "
+   FKT function_7 "" " "
+   FKT function_8 " " ""
+   FKT function_9 "" ""
+END
