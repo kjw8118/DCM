@@ -193,7 +193,7 @@ namespace DCM
 		int size_y;
 		std::string unit_y = "";
 		std::vector<double> point_y;
-		std::vector<std::vector<double>> values;
+		std::vector<double> values;
 	};
 
 	class Parameter : public BaseParameter // FESTWERT
@@ -358,6 +358,7 @@ namespace DCM
 
 		std::string rebuildElement(Element* element);
 		std::string rebuild();
+		void saveAsDCM(std::string fname);
 		bool createDCM();
 		bool createRawDCM();
 

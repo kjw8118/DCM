@@ -543,10 +543,8 @@ void DCM::Parser::parseComponent(std::vector<std::string> lineStrip)
 		case FIXEDCHARMAP:
 		case GROUPCHARMAP:
 		{
-			std::vector<double> values;
 			for (int i = 1; i < lineStrip.size(); i++)
-				values.push_back(std::stod(lineStrip.at(i)));
-			((MapBaseParameter*)pCurrentElement)->values.push_back(values);
+				((MapBaseParameter*)pCurrentElement)->values.push_back(std::stod(lineStrip.at(i)));
 			
 			break;
 		}
@@ -787,10 +785,10 @@ std::string DCM::Parser::rebuildArray(Array* arr)
 	
 	for (int i=0; i<arr->values.size(); i++)
 	{
-		if (i % 7 == 0)
+		if (i % 6 == 0)
 			text += "   WERT";
 		text += " " + std::to_string(arr->values.at(i));
-		if (i % 7 == 6 || i == arr->values.size()-1)
+		if (i % 6 == 5 || i == arr->values.size()-1)
 			text += "\n";
 	}
 	text += "END\n";
@@ -818,14 +816,14 @@ std::string DCM::Parser::rebuildMatrix(Matrix* matrix)
 	if (!matrix->unit.empty())
 		text += "   EINHEIT_W " + matrix->unit + "\n";
 
-	for (int j = 0; j < matrix->size_y; j++)
+	for (int i = 0; i < matrix->size_y; i++)
 	{
-		for (int i = 0; i < matrix->size_x; i++)
+		for (int j = 0; j < matrix->size_x; j++)
 		{
-			if (i % 7 == 0)
+			if (j % 6 == 0)
 				text += "   WERT";
-			text += " " + std::to_string(matrix->values.at(i));
-			if (i % 7 == 6 || i == matrix->values.size() - 1)
+			text += " " + std::to_string(matrix->values.at(i * matrix->size_x + j));
+			if (i % 6 == 5 || i == matrix->size_x - 1)
 				text += "\n";
 		}
 	}
@@ -882,19 +880,19 @@ std::string DCM::Parser::rebuildLineBaseParameter(LineBaseParameter* line)
 	
 	for (int i = 0; i < line->point_x.size(); i++)
 	{
-		if (i % 7 == 0)
+		if (i % 6 == 0)
 			text += "   ST/X";
 		text += " " + std::to_string(line->point_x.at(i));
-		if (i % 7 == 6 || i == line->point_x.size() - 1)
+		if (i % 6 == 5 || i == line->point_x.size() - 1)
 			text += "\n";
 	}
 
 	for (int i = 0; i < line->values.size(); i++)
 	{
-		if (i % 7 == 0)
+		if (i % 6 == 0)
 			text += "   WERT";
 		text += " " + std::to_string(line->values.at(i));
-		if (i % 7 == 6 || i == line->values.size() - 1)
+		if (i % 6 == 5 || i == line->values.size() - 1)
 			text += "\n";
 	}
 	
@@ -954,10 +952,10 @@ std::string DCM::Parser::rebuildMapBaseParameter(MapBaseParameter* map)
 	
 	for (int i = 0; i < map->point_x.size(); i++)
 	{
-		if (i % 7 == 0)
+		if (i % 6 == 0)
 			text += "   ST/X";
 		text += " " + std::to_string(map->point_x.at(i));
-		if (i % 7 == 6 || i == map->point_x.size() - 1)
+		if (i % 6 == 5 || i == map->point_x.size() - 1)
 			text += "\n";
 	}
 
@@ -965,13 +963,12 @@ std::string DCM::Parser::rebuildMapBaseParameter(MapBaseParameter* map)
 	{
 		auto value_y = map->point_y.at(i);
 		text += "   ST/Y " + std::to_string(value_y) + "\n";
-		auto values = map->values.at(i);
-		for (int j = 0; j < values.size(); j++)
+		for (int j = 0; j < map->point_x.size(); j++)
 		{
-			if (i % 7 == 0)
+			if (j % 6 == 0)
 				text += "   WERT";
-			text += " " + std::to_string(values.at(i));
-			if (i % 7 == 6 || i == values.size() - 1)
+			text += " " + std::to_string(map->values.at(i * map->point_x.size() + j));
+			if (j % 6 == 5 || j == map->point_x.size() - 1)
 				text += "\n";
 		}		
 	}
@@ -1004,10 +1001,10 @@ std::string DCM::Parser::rebuildDistribution(Distribution* dist)
 	
 	for (int i = 0; i < dist->point_x.size(); i++)
 	{
-		if (i % 7 == 0)
+		if (i % 6 == 0)
 			text += "   ST/X";
 		text += " " + std::to_string(dist->point_x.at(i));
-		if (i % 7 == 6 || i == dist->point_x.size() - 1)
+		if (i % 6 == 5 || i == dist->point_x.size() - 1)
 			text += "\n";
 	}
 
@@ -1057,6 +1054,19 @@ std::string DCM::Parser::rebuild()
 		text += rebuildElement(element);
 
 	return text;
+}
+
+void DCM::Parser::saveAsDCM(std::string fname)
+{
+	std::fstream wfile;
+	wfile.open(fname.c_str(), std::ios::out);
+	if (!wfile.is_open())
+		return;
+
+	for (auto element : elements)
+		wfile << rebuildElement(element);
+
+	wfile.close();
 }
 
 bool DCM::Parser::createDCM()
