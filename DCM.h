@@ -287,7 +287,7 @@ namespace DCM
 
 		std::vector<Element*> elements;
 		std::vector<ModuleHeader*> moduleHeaders;				
-		
+		std::fstream file;
 		
 
 		
@@ -341,7 +341,7 @@ namespace DCM
 
 	public:
 		Parser();
-		bool open(std::string fpath);
+		bool open(std::string fpath, int mode = std::ios::in);
 
 		std::string rebuildUnknown(Unknown* unknown);
 		std::string rebuildFunctions(Functions* functions);
@@ -358,9 +358,13 @@ namespace DCM
 
 		std::string rebuildElement(Element* element);
 		std::string rebuild();
+		bool createDCM();
+		bool createRawDCM();
 
 		std::vector<Element*> getElements() { return elements; };
 		std::string getRawString() { std::string text = ""; for (auto line : lineHistory) text += line + "\n"; return text; };
+
+		
 
 		static bool test();
 
@@ -380,6 +384,8 @@ namespace DCM
 
 		static bool parseDCM1Test();
 		static bool parseDCM2Test();
+
+		static bool createDCMTest();
 	};
 };
 

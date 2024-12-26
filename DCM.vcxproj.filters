@@ -47,5 +47,8 @@
     <None Include="functionsTest.dcm" />
     <None Include="formatTest.dcm" />
     <None Include="unknownTest.dcm" />
+    <None Include="test.dcm">
+      <Filter>리소스 파일</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -632,9 +632,9 @@ void DCM::Parser::parseLine(std::string lineRaw)
 
 DCM::Parser::Parser() {};
 
-bool DCM::Parser::open(std::string fpath)
+bool DCM::Parser::open(std::string fpath, int mode)
 {
-	std::fstream file(fpath.c_str(), std::ios::in);
+	file.open(fpath.c_str(), mode);
 	if (!file.is_open())
 	{
 		isOpened = false;
@@ -643,20 +643,20 @@ bool DCM::Parser::open(std::string fpath)
 
 	isOpened = true;
 	lineHistory.clear();
-
 	pCurrentElement = nullptr;
 	std::string lineRaw = "";
 	currentIndex = 0;
 
-	while (std::getline(file, lineRaw))
+	if (mode == std::ios::in)
 	{
-		lineHistory.push_back(lineRaw);
-		parseLine(lineRaw);
-		currentIndex++;
+		while (std::getline(file, lineRaw))
+		{
+			lineHistory.push_back(lineRaw);
+			parseLine(lineRaw);
+			currentIndex++;
+		}
 	}
 
-
-	//std::cout << elements.size() << std::endl;
 	return true;
 };
 
@@ -1032,6 +1032,25 @@ std::string DCM::Parser::rebuild()
 	return text;
 }
 
+bool DCM::Parser::createDCM()
+{
+	for (auto element : elements)
+		file << rebuildElement(element);
+
+	file.close();
+	isOpened = false;
+	return true;
+}
+bool DCM::Parser::createRawDCM()
+{
+	for (auto line : lineHistory)
+		file << line;
+
+	file.close();
+	isOpened = false;
+	return true;
+}
+
 bool DCM::Parser::test()
 {
 	bool ret = true;
@@ -1058,7 +1077,6 @@ bool DCM::Parser::test()
 
 	return ret;
 }
-
 bool DCM::Parser::typeEnumTest()
 {
 	auto file = std::ifstream("headerTest.dcm");
@@ -1088,7 +1106,6 @@ bool DCM::Parser::typeEnumTest()
 	std::cout << "\n\n";
 	return true;
 }
-
 bool DCM::Parser::stripQuotationTest()
 {
 	auto file = std::ifstream("quotationMarksTest.dcm");
@@ -1110,7 +1127,6 @@ bool DCM::Parser::stripQuotationTest()
 	std::cout << "\n\n";
 	return true;
 }
-
 bool DCM::Parser::rebuildUnknownTest()
 {
 	auto parser = new Parser();
@@ -1122,7 +1138,6 @@ bool DCM::Parser::rebuildUnknownTest()
 
 	return true;
 }
-
 bool DCM::Parser::rebuildFunctionsTest()
 {
 	auto parser = new Parser();
@@ -1134,7 +1149,6 @@ bool DCM::Parser::rebuildFunctionsTest()
 
 	return true;
 }
-
 bool DCM::Parser::rebuildCommentTest()
 {
 	auto parser = new Parser();
@@ -1146,7 +1160,6 @@ bool DCM::Parser::rebuildCommentTest()
 
 	return true;
 }
-
 bool DCM::Parser::rebuildFormatTest()
 {
 	auto parser = new Parser();
@@ -1158,7 +1171,6 @@ bool DCM::Parser::rebuildFormatTest()
 
 	return true;
 }
-
 bool DCM::Parser::rebuildParameterTest()
 {
 	auto parser = new Parser();
@@ -1170,7 +1182,6 @@ bool DCM::Parser::rebuildParameterTest()
 
 	return true;
 }
-
 bool DCM::Parser::rebuildArrayTest()
 {
 	auto parser = new Parser();
@@ -1226,7 +1237,6 @@ bool DCM::Parser::rebuildDistributionTest()
 
 	return true;
 }
-
 bool DCM::Parser::parseDCM1Test()
 {
 	auto parser = new Parser();
@@ -1239,7 +1249,6 @@ bool DCM::Parser::parseDCM1Test()
 	return result;
 
 }
-
 bool DCM::Parser::parseDCM2Test()
 {
 	auto parser = new Parser();
@@ -1250,4 +1259,55 @@ bool DCM::Parser::parseDCM2Test()
 	std::cout << parser->rebuild();
 	
 	return result;
+}
+
+bool DCM::Parser::createDCMTest()
+{
+	auto generator = new Parser();
+	generator->open("test.dcm", std::ios::out);
+
+	
+	int index = 0;
+	int order = 0;
+	generator->elements.push_back(new Comment(index++, order++, "* DAMOS format"));
+	generator->elements.push_back(new Comment(index++, order++, "* Created by ASCET"));
+	generator->elements.push_back(new Comment(index++, order++, "* Creation date: 21.11.2012 17:06:25"));
+	generator->elements.push_back(new Comment(index++, order++, "*"));
+	generator->elements.push_back(new Comment(index++, order++, "* DamosDataFilePath: 'new.dcm'"));
+	generator->elements.push_back(new Comment(index++, order++, "* DamosExtensionForOutput: 'dcm'"));
+	generator->elements.push_back(new Comment(index++, order++, "* DamosFormatVersion: '2'"));
+	generator->elements.push_back(new Comment(index++, order++, "* DamosCaseSensitiveNames: true"));
+	generator->elements.push_back(new Comment(index++, order++, "* DamosIncludeBooleans: true"));
+	generator->elements.push_back(new Comment(index++, order++, "* DamosIncludeDependentParameter: true"));
+	generator->elements.push_back(new Comment(index++, order++, "* DamosBooleanFormat: 'String'"));
+	generator->elements.push_back(new Comment(index++, order++, "* DamosEnumerationFormat: 'String'"));
+	generator->elements.push_back(new Comment(index++, order++, "* DamosShowInputLogFile: true"));
+	generator->elements.push_back(new Comment(index++, order++, "* DamosInputLogFile: 'c:\ETAS\LogFiles\ASCET\filein.log'"));
+	generator->elements.push_back(new Comment(index++, order++, "* DamosShowOutputLogFile: false"));
+	generator->elements.push_back(new Comment(index++, order++, "* DamosOutputLogFile: 'c:\ETAS\LogFiles\ASCET\fileout.log'"));
+	generator->elements.push_back(new Unknown(index++, order++, ""));
+	generator->elements.push_back(new Format(index++, order++, "2.0"));
+	generator->elements.push_back(new Unknown(index++, order++, ""));
+	
+	auto func = new Functions(index++, order++);
+	for (int i = 0; i < 40; i++)
+	{
+		func->functions.push_back(Function("func" + std::to_string(index), "\"ver" + std::to_string(index) + "\"", "\"longname" + std::to_string(index) + "\"")); index++;
+	}
+	generator->elements.push_back(func);
+
+	for (int i = 0; i < 5000; i++)
+	{
+		auto para = new Parameter(index++, order++, "test" + std::to_string(order));
+		para->function = "func" + std::to_string(order); index++;
+		para->displayname = "\"displayname" + std::to_string(order)+"\""; index++;
+		para->unit = "\"unit" + std::to_string(order)+"\""; index++;
+		para->langname = "\"langname" + std::to_string(order)+"\""; index++;
+		para->value = (double)(order); index++;
+		generator->elements.push_back(para);
+	}
+
+	generator->createDCM();
+
+	return generator->isOpened;
 }
