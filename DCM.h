@@ -339,6 +339,7 @@ namespace DCM
 		std::string rebuildComment(Comment* comment);
 		std::string rebuildFunctions(Functions* functions);
 
+		std::vector<Element*> getElements() { return elements; };
 
 		static bool test();
 
