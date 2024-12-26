@@ -280,7 +280,7 @@ namespace DCM
 
 		std::vector<Element*> elements;
 		std::vector<ModuleHeader*> moduleHeaders;				
-
+		
 		
 
 		
@@ -326,15 +326,27 @@ namespace DCM
 	*/
 		void parseHeader(std::vector<std::string> lineStrip);
 		void parseComponent(std::vector<std::string> lineStrip);
-		void parseLine(std::string lineRaw);		
+		void parseLine(std::string lineRaw);	
+
+
+		
+
+
 	public:
 		Parser();
 		bool open(std::string fpath);
+
+		std::string rebuildComment(Comment* comment);
+		std::string rebuildFunctions(Functions* functions);
+
+
 		static bool test();
 
 		// Test Code
 		static bool typeEnumTest();
 		static bool stripQuotationTest();
+		static bool rebuildCommentTest();
+
 		static bool parseDCM1Test();
 		static bool parseDCM2Test();
 	};

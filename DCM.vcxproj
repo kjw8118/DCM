@@ -134,6 +134,7 @@
     <ClInclude Include="DCM.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="commentTest.dcm" />
     <None Include="headerTest.dcm" />
     <None Include="quotationMarksTest.dcm" />
     <None Include="Test_DCM1ex.dcm" />

@@ -43,5 +43,6 @@
     <None Include="Test_DCM1ex.dcm">
       <Filter>리소스 파일</Filter>
     </None>
+    <None Include="commentTest.dcm" />
   </ItemGroup>
 </Project>

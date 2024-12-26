@@ -257,8 +257,9 @@ void DCM::Parser::parseHeader(std::vector<std::string> lineStrip)
 		std::string lineComment = "";
 		lineComment += lineStrip.at(0);
 		for (int i = 1; i < lineStrip.size(); i++)
-			lineComment = " " + lineStrip.at(i);
+			lineComment += " " + lineStrip.at(i);
 		pCurrentElement = new Comment(currentIndex, currentOrder, lineComment);
+		
 		elements.push_back(pCurrentElement);
 		pCurrentElement = nullptr;
 		break;
@@ -607,10 +608,25 @@ bool DCM::Parser::open(std::string fpath)
 	}
 
 
-	std::cout << elements.size() << std::endl;
+	//std::cout << elements.size() << std::endl;
 	return true;
 };
 
+
+
+std::string DCM::Parser::rebuildComment(Comment* comment)
+{
+	std::string text = "";
+	if (comment->type != TYPE::COMMENT)
+		return text;
+
+	return comment->text;
+
+}
+std::string DCM::Parser::rebuildFunctions(Functions* functions)
+{
+	return "";
+}
 
 
 
@@ -691,6 +707,18 @@ bool DCM::Parser::stripQuotationTest()
 		std::cout << std::endl;
 	}
 	std::cout << "\n\n";
+	return true;
+}
+
+bool DCM::Parser::rebuildCommentTest()
+{
+	auto parser = new Parser();
+	parser->open("commentTest.dcm");
+	for (auto element : parser->elements)
+	{
+		std::cout << parser->rebuildComment((Comment*)element) << std::endl;
+	}
+
 	return true;
 }
 
