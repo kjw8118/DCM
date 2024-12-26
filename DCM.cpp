@@ -393,6 +393,11 @@ void DCM::Parser::parseComponent(std::vector<std::string> lineStrip)
 	{
 		break;
 	}
+	case TYPE::FUNCTION:
+	{
+		((Functions*)pCurrentElement)->functions.emplace_back(lineStrip.at(1), lineStrip.at(2), lineStrip.at(3));
+		break;
+	}
 	case TYPE::VARIANT:
 	{
 		Variant variant(lineStrip.at(1));
@@ -402,8 +407,8 @@ void DCM::Parser::parseComponent(std::vector<std::string> lineStrip)
 		break;
 	}
 	case TYPE::FUNKTION:
-	{
-		((Functions*)pCurrentElement)->functions.emplace_back(lineStrip.at(1), lineStrip.at(2), lineStrip.at(3));
+	{		
+		((BaseParameter*)pCurrentElement)->function = lineStrip.at(1);
 		break;
 	}
 	case TYPE::VAR:
