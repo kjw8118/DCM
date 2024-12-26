@@ -613,16 +613,6 @@ bool DCM::Parser::open(std::string fpath)
 };
 
 
-
-std::string DCM::Parser::rebuildComment(Comment* comment)
-{
-	std::string text = "";
-	if (comment->type != TYPE::COMMENT)
-		return text;
-
-	return comment->text;
-
-}
 std::string DCM::Parser::rebuildFunctions(Functions* functions)
 {
 	std::string text = "";
@@ -638,7 +628,25 @@ std::string DCM::Parser::rebuildFunctions(Functions* functions)
 	return text;
 }
 
+std::string DCM::Parser::rebuildComment(Comment* comment)
+{
+	std::string text = "";
+	if (comment->type != TYPE::COMMENT)
+		return text;
 
+	return comment->text;
+
+}
+
+std::string DCM::Parser::rebuildFormat(Format* format)
+{
+	std::string text = "";
+	if (format->type != TYPE::FORMAT)
+		return text;
+
+	text += "KONSERVIERUNG_FORMAT " + format->version;
+	return text;
+}
 
 
 bool DCM::Parser::test()
@@ -720,17 +728,6 @@ bool DCM::Parser::stripQuotationTest()
 	return true;
 }
 
-bool DCM::Parser::rebuildCommentTest()
-{
-	auto parser = new Parser();
-	parser->open("commentTest.dcm");
-	for (auto element : parser->elements)
-	{
-		std::cout << parser->rebuildComment((Comment*)element) << std::endl;
-	}
-
-	return true;
-}
 bool DCM::Parser::rebuildFunctionsTest()
 {
 	auto parser = new Parser();
@@ -742,6 +739,32 @@ bool DCM::Parser::rebuildFunctionsTest()
 
 	return true;
 }
+
+bool DCM::Parser::rebuildCommentTest()
+{
+	auto parser = new Parser();
+	parser->open("commentTest.dcm");
+	for (auto element : parser->elements)
+	{
+		std::cout << parser->rebuildComment((Comment*)element) << std::endl;
+	}
+
+	return true;
+}
+
+bool DCM::Parser::rebuildFormatTest()
+{
+	auto parser = new Parser();
+	parser->open("formatTest.dcm");
+	for (auto element : parser->elements)
+	{
+		std::cout << parser->rebuildFormat((Format*)element) << std::endl;
+	}
+
+	return true;
+}
+
+
 bool DCM::Parser::parseDCM1Test()
 {
 	auto parser = new Parser();

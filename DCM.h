@@ -336,18 +336,23 @@ namespace DCM
 		Parser();
 		bool open(std::string fpath);
 
-		std::string rebuildComment(Comment* comment);
 		std::string rebuildFunctions(Functions* functions);
+		std::string rebuildComment(Comment* comment);
+		std::string rebuildFormat(Format* format);
+
+		
 
 		std::vector<Element*> getElements() { return elements; };
+		std::string getRawString() { std::string text = ""; for (auto line : lineHistory) text += line + "\n"; return text; };
 
 		static bool test();
 
 		// Test Code
 		static bool typeEnumTest();
-		static bool stripQuotationTest();
-		static bool rebuildCommentTest();
+		static bool stripQuotationTest();		
 		static bool rebuildFunctionsTest();
+		static bool rebuildCommentTest();
+		static bool rebuildFormatTest();
 
 		static bool parseDCM1Test();
 		static bool parseDCM2Test();

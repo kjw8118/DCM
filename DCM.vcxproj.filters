@@ -45,5 +45,6 @@
     </None>
     <None Include="commentTest.dcm" />
     <None Include="functionsTest.dcm" />
+    <None Include="formatTest.dcm" />
   </ItemGroup>
 </Project>
