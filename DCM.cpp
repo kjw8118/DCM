@@ -527,10 +527,8 @@ void DCM::Parser::parseComponent(std::vector<std::string> lineStrip)
 		case TYPE::ARRAY:
 		case TYPE::MATRIX:
 		{
-			std::vector<double> values;
 			for(int i=1; i<lineStrip.size(); i++)
-				values.push_back(std::stod(lineStrip.at(i)));
-			((ArrayBaseParameter*)pCurrentElement)->values.push_back(values);
+				((ArrayBaseParameter*)pCurrentElement)->values.push_back(std::stod(lineStrip.at(i)));
 			break;
 		}
 		case CHARLINE:
@@ -549,6 +547,7 @@ void DCM::Parser::parseComponent(std::vector<std::string> lineStrip)
 			for (int i = 1; i < lineStrip.size(); i++)
 				values.push_back(std::stod(lineStrip.at(i)));
 			((MapBaseParameter*)pCurrentElement)->values.push_back(values);
+			
 			break;
 		}
 		}
@@ -785,12 +784,14 @@ std::string DCM::Parser::rebuildArray(Array* arr)
 	if (!arr->unit.empty())
 		text += "   EINHEIT_W " + arr->unit + "\n";
 	
-	for (auto values : arr->values)
+	
+	for (int i=0; i<arr->values.size(); i++)
 	{
-		text += "   WERT";
-		for (auto value : values)
-			text += " " + std::to_string(value);
-		text += "\n";
+		if (i % 7 == 0)
+			text += "   WERT";
+		text += " " + std::to_string(arr->values.at(i));
+		if (i % 7 == 6 || i == arr->values.size()-1)
+			text += "\n";
 	}
 	text += "END\n";
 
@@ -817,12 +818,16 @@ std::string DCM::Parser::rebuildMatrix(Matrix* matrix)
 	if (!matrix->unit.empty())
 		text += "   EINHEIT_W " + matrix->unit + "\n";
 
-	for (auto values : matrix->values)
+	for (int j = 0; j < matrix->size_y; j++)
 	{
-		text += "   WERT";
-		for (auto value : values)
-			text += " " + std::to_string(value);
-		text += "\n";
+		for (int i = 0; i < matrix->size_x; i++)
+		{
+			if (i % 7 == 0)
+				text += "   WERT";
+			text += " " + std::to_string(matrix->values.at(i));
+			if (i % 7 == 6 || i == matrix->values.size() - 1)
+				text += "\n";
+		}
 	}
 	text += "END\n";
 
@@ -874,15 +879,25 @@ std::string DCM::Parser::rebuildLineBaseParameter(LineBaseParameter* line)
 	if (line->type == TYPE::GROUPCHARLINE)
 		if(!((GroupCharLine*)line)->dist_x.empty()) text += "*SSTX " + ((GroupCharLine*)line)->dist_x + "\n";
 
-	text += "   ST/X";
-	for (auto value : line->point_x)
-		text += " " + std::to_string(value);
-	text += "\n";
+	
+	for (int i = 0; i < line->point_x.size(); i++)
+	{
+		if (i % 7 == 0)
+			text += "   ST/X";
+		text += " " + std::to_string(line->point_x.at(i));
+		if (i % 7 == 6 || i == line->point_x.size() - 1)
+			text += "\n";
+	}
 
-	text += "   WERT";
-	for (auto value : line->values)
-		text += " " + std::to_string(value);
-	text += "\n";
+	for (int i = 0; i < line->values.size(); i++)
+	{
+		if (i % 7 == 0)
+			text += "   WERT";
+		text += " " + std::to_string(line->values.at(i));
+		if (i % 7 == 6 || i == line->values.size() - 1)
+			text += "\n";
+	}
+	
 
 	text += "END\n";
 
@@ -936,20 +951,29 @@ std::string DCM::Parser::rebuildMapBaseParameter(MapBaseParameter* map)
 		if (!((GroupCharMap*)map)->dist_x.empty()) text += "*SSTX " + ((GroupCharMap*)map)->dist_x + "\n";
 		if (!((GroupCharMap*)map)->dist_y.empty()) text += "*SSTY " + ((GroupCharMap*)map)->dist_y + "\n";
 	}
-	text += "   ST/X";
-	for (auto value : map->point_x)
-		text += " " + std::to_string(value);
-	text += "\n";
+	
+	for (int i = 0; i < map->point_x.size(); i++)
+	{
+		if (i % 7 == 0)
+			text += "   ST/X";
+		text += " " + std::to_string(map->point_x.at(i));
+		if (i % 7 == 6 || i == map->point_x.size() - 1)
+			text += "\n";
+	}
 
-	for(int i=0; i<std::min(map->values.size(), map->point_y.size()); i++)
+	for(int i=0; i<map->point_y.size(); i++)
 	{
 		auto value_y = map->point_y.at(i);
 		text += "   ST/Y " + std::to_string(value_y) + "\n";
-		text += "   WERT";
 		auto values = map->values.at(i);
-		for (auto value : values)
-			text += " " + std::to_string(value);
-		text += "\n";
+		for (int j = 0; j < values.size(); j++)
+		{
+			if (i % 7 == 0)
+				text += "   WERT";
+			text += " " + std::to_string(values.at(i));
+			if (i % 7 == 6 || i == values.size() - 1)
+				text += "\n";
+		}		
 	}
 
 	text += "END\n";
@@ -978,10 +1002,14 @@ std::string DCM::Parser::rebuildDistribution(Distribution* dist)
 	if (!dist->unit_x.empty())
 		text += "   EINHEIT_X " + dist->unit_x + "\n";
 	
-	text += "   ST/X";
-	for (auto value : dist->point_x)
-		text += " " + std::to_string(value);
-	text += "\n";
+	for (int i = 0; i < dist->point_x.size(); i++)
+	{
+		if (i % 7 == 0)
+			text += "   ST/X";
+		text += " " + std::to_string(dist->point_x.at(i));
+		if (i % 7 == 6 || i == dist->point_x.size() - 1)
+			text += "\n";
+	}
 
 	text += "END\n";
 

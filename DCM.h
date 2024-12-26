@@ -172,7 +172,7 @@ namespace DCM
 		ArrayBaseParameter(int lineIndex, int lineOrder, int type, std::string name, int size_x, int size_y);
 		int size_x;
 		int size_y;
-		std::vector<std::vector<double>> values;
+		std::vector<double> values;
 		
 	};
 
