@@ -16,6 +16,7 @@ int main()
     //std::cout << parser->getRawString() << std::endl;
 
     DCM::Parser::rebuildUnknownTest();
+    DCM::Parser::rebuildCommentTest();
 
     
     return 0;

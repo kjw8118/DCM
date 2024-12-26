@@ -251,22 +251,22 @@ void DCM::Parser::parseHeader(std::vector<std::string> lineStrip)
 	{
 	case TYPE::UNKNOWN:
 	{
-		std::string lineString = "";
-		lineString = lineStrip.at(0);
-		for (int i = 1; i < lineStrip.size(); i++)
-			lineString += " " + lineStrip.at(i);
-		pCurrentElement = new Unknown(currentIndex, currentOrder, lineString);
+		//std::string lineString = "";
+		//lineString = lineStrip.at(0);
+		//for (int i = 1; i < lineStrip.size(); i++)
+		//	lineString += " " + lineStrip.at(i);
+		pCurrentElement = new Unknown(currentIndex, currentOrder, lineHistory.back());
 		elements.push_back(pCurrentElement);
 		pCurrentElement = nullptr;
 		break;
 	}
 	case TYPE::COMMENT:
 	{
-		std::string lineComment = "";
-		lineComment += lineStrip.at(0);
-		for (int i = 1; i < lineStrip.size(); i++)
-			lineComment += " " + lineStrip.at(i);
-		pCurrentElement = new Comment(currentIndex, currentOrder, lineComment);
+		//std::string lineComment = "";
+		//lineComment += lineStrip.at(0);
+		//for (int i = 1; i < lineStrip.size(); i++)
+		//	lineComment += " " + lineStrip.at(i);
+		pCurrentElement = new Comment(currentIndex, currentOrder, lineHistory.back());
 		
 		elements.push_back(pCurrentElement);
 		pCurrentElement = nullptr;
@@ -577,7 +577,12 @@ void DCM::Parser::parseLine(std::string lineRaw)
 	auto lineStrip = stripLine(lineRaw);
 
 	if (lineStrip.empty())
+	{
+		pCurrentElement = new Unknown(currentIndex, currentOrder, lineHistory.back());
+		elements.push_back(pCurrentElement);
+		pCurrentElement = nullptr;
 		return;
+	}
 	if (pCurrentElement == nullptr)
 	{
 		parseHeader(lineStrip);
