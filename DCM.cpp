@@ -746,6 +746,18 @@ bool DCM::Parser::stripQuotationTest()
 	return true;
 }
 
+bool DCM::Parser::rebuildUnknownTest()
+{
+	auto parser = new Parser();
+	parser->open("unknownTest.dcm");
+	for (auto element : parser->elements)
+	{
+		std::cout << parser->rebuildUnknown((Unknown*)element) << std::endl;
+	}
+
+	return true;
+}
+
 bool DCM::Parser::rebuildFunctionsTest()
 {
 	auto parser = new Parser();

@@ -142,6 +142,7 @@
     <None Include="Test_DCM1ex.dcm" />
     <None Include="Test_DCM2.dcm" />
     <None Include="unit_blank.dcm" />
+    <None Include="unknownTest.dcm" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

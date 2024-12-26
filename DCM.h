@@ -357,6 +357,7 @@ namespace DCM
 		// Test Code
 		static bool typeEnumTest();
 		static bool stripQuotationTest();		
+		static bool rebuildUnknownTest();
 		static bool rebuildFunctionsTest();
 		static bool rebuildCommentTest();
 		static bool rebuildFormatTest();
