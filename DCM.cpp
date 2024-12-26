@@ -422,12 +422,8 @@ void DCM::Parser::parseComponent(std::vector<std::string> lineStrip)
 	}
 	case TYPE::VAR:
 	{
-		if (lineStrip.size() > 2)
-			((BaseParameter*)pCurrentElement)->variant = { lineStrip.at(1), lineStrip.at(2) };
-		else
-		{
-			// <v-name>=<v-val_i> '=' seperate case
-		}
+		if (lineStrip.size() > 2)		
+			((BaseParameter*)pCurrentElement)->variant = lineStrip.at(1);		
 		break;
 	}
 	case TYPE::LANGNAME:
@@ -527,7 +523,24 @@ void DCM::Parser::parseComponent(std::vector<std::string> lineStrip)
 	}
 	case TYPE::VALUE:
 	{
+		switch (pCurrentElement->type)
+		{
+		case TYPE::PARAMETER:
+		{
+			((Parameter*)pCurrentElement)->value = std::stod(lineStrip.at(1));
+			break;
+		}
+		case TYPE::ARRAY:
+		{
+			for(int i=1; i<lineStrip.size(); i++)
+				((Array*)pCurrentElement)->values.push_back(std::stod(lineStrip.at(i)));
+			break;
+		}
+		case TYPE::MATRIX:
+		{
 
+		}
+		}
 		break;
 	}
 	case TYPE::DIST_X:
@@ -671,6 +684,30 @@ std::string DCM::Parser::rebuildFormat(Format* format)
 	return text;
 }
 
+std::string DCM::Parser::rebuildParameter(Parameter* parameter)
+{
+	std::string text = "";
+	if (parameter->type != TYPE::PARAMETER)
+		return text;
+
+	text += "FESTWERT " + parameter->name + "\n";
+	if (!parameter->langname.empty())
+		text += "   LANGNAME " + parameter->langname + "\n";
+	if (!parameter->displayname.empty())
+		text += "   DISPLAYNAME " + parameter->displayname + "\n";
+	if (!parameter->variant.empty())
+		text += "   VAR " + parameter->variant + "\n";
+	if (!parameter->function.empty())
+		text += "   FUNKTION " + parameter->function + "\n";
+	if (!parameter->unit.empty())
+		text += "   EINHEIT_W " + parameter->unit + "\n";
+	text += "   WERT " + std::to_string(parameter->value) + "\n";
+	text += "END";
+	
+	return text;
+
+}
+
 
 bool DCM::Parser::test()
 {
@@ -799,6 +836,17 @@ bool DCM::Parser::rebuildFormatTest()
 	return true;
 }
 
+bool DCM::Parser::rebuildParameterTest()
+{
+	auto parser = new Parser();
+	parser->open("Test_DCM2.dcm");
+	for (auto element : parser->elements)
+	{
+		std::cout << parser->rebuildParameter((Parameter*)element) << std::endl;
+	}
+
+	return true;
+}
 
 bool DCM::Parser::parseDCM1Test()
 {

@@ -156,7 +156,8 @@ namespace DCM
 		std::string langname = "";
 		std::string displayname = "";
 		//Variant* variant = nullptr;
-		std::pair<std::string, std::string> variant;
+		//std::pair<std::string, std::string> variant;
+		std::string variant = "";		
 		//Function* function = nullptr;
 		std::string function;
 		std::string unit = "";
@@ -346,6 +347,7 @@ namespace DCM
 		std::string rebuildFunctions(Functions* functions);
 		std::string rebuildComment(Comment* comment);
 		std::string rebuildFormat(Format* format);
+		std::string rebuildParameter(Parameter* parameter);
 
 		
 
@@ -361,6 +363,7 @@ namespace DCM
 		static bool rebuildFunctionsTest();
 		static bool rebuildCommentTest();
 		static bool rebuildFormatTest();
+		static bool rebuildParameterTest();
 
 		static bool parseDCM1Test();
 		static bool parseDCM2Test();
