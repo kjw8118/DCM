@@ -940,14 +940,13 @@ std::string DCM::Parser::rebuildMapBaseParameter(MapBaseParameter* map)
 	for (auto value : map->point_x)
 		text += " " + std::to_string(value);
 	text += "\n";
-	text += "   ST/Y";
-	for (auto value : map->point_y)
-		text += " " + std::to_string(value);
-	text += "\n";
 
-	for (auto values : map->values)
+	for(int i=0; i<std::min(map->values.size(), map->point_y.size()); i++)
 	{
+		auto value_y = map->point_y.at(i);
+		text += "   ST/Y " + std::to_string(value_y) + "\n";
 		text += "   WERT";
+		auto values = map->values.at(i);
 		for (auto value : values)
 			text += " " + std::to_string(value);
 		text += "\n";
