@@ -325,7 +325,7 @@ void DCM::Parser::parseHeader(std::vector<std::string> lineStrip)
 		{
 			pCurrentElement = new Matrix(currentIndex, currentOrder, lineStrip.at(1));
 			((Matrix*)pCurrentElement)->size_x = std::stoi(lineStrip.at(2));
-			((Matrix*)pCurrentElement)->size_y = std::stoi(lineStrip.at(4));
+			((Matrix*)pCurrentElement)->size_y = std::stoi(lineStrip.at(4)); // have @
 		}
 		else if (lineStrip.size() > 2)
 		{
@@ -344,10 +344,10 @@ void DCM::Parser::parseHeader(std::vector<std::string> lineStrip)
 	case TYPE::CHARMAP:
 	{
 		pCurrentElement = new CharMap(currentIndex, currentOrder, lineStrip.at(1));
-		if (lineStrip.size() > 4)
+		if (lineStrip.size() > 3)
 		{
 			((CharMap*)pCurrentElement)->size_x = std::stoi(lineStrip.at(2));
-			((CharMap*)pCurrentElement)->size_y = std::stoi(lineStrip.at(3)); // no have @
+			((CharMap*)pCurrentElement)->size_y = std::stoi(lineStrip.at(3)); // no have @			
 		}
 		break;
 	}
@@ -361,7 +361,7 @@ void DCM::Parser::parseHeader(std::vector<std::string> lineStrip)
 	case TYPE::FIXEDCHARMAP:
 	{
 		pCurrentElement = new FixedCharMap(currentIndex, currentOrder, lineStrip.at(1));
-		if (lineStrip.size() > 4)
+		if (lineStrip.size() > 3)
 		{
 			((FixedCharMap*)pCurrentElement)->size_x = std::stoi(lineStrip.at(2));
 			((FixedCharMap*)pCurrentElement)->size_y = std::stoi(lineStrip.at(3)); // no have @
@@ -378,7 +378,7 @@ void DCM::Parser::parseHeader(std::vector<std::string> lineStrip)
 	case TYPE::GROUPCHARMAP:
 	{
 		pCurrentElement = new GroupCharMap(currentIndex, currentOrder, lineStrip.at(1));
-		if (lineStrip.size() > 4)
+		if (lineStrip.size() > 3)
 		{
 			((GroupCharMap*)pCurrentElement)->size_x = std::stoi(lineStrip.at(2));
 			((GroupCharMap*)pCurrentElement)->size_y = std::stoi(lineStrip.at(3)); // no have @
@@ -782,6 +782,135 @@ std::string DCM::Parser::rebuildMatrix(Matrix* matrix)
 }
 
 
+std::string DCM::Parser::rebuildLineBaseParameter(LineBaseParameter* line)
+{
+	std::string text = "";
+	switch (line->type)
+	{
+	case TYPE::CHARLINE:
+	{
+		text += "KENNLINIE " + line->name;
+		break;
+	}
+	case TYPE::FIXEDCHARLINE:
+	{
+		text += "FESTKENNLINIE " + line->name;
+		break;
+	}
+	case TYPE::GROUPCHARLINE:
+	{
+		text += "GRUPPENKENNLINIE " + line->name;
+		break;
+	}
+	default:
+		return text;
+	}	
+
+	
+	if (line->size_x)
+		text += " " + std::to_string(line->size_x);
+	text += "\n";
+	if (!line->langname.empty())
+		text += "   LANGNAME " + line->langname + "\n";
+	if (!line->displayname.empty())
+		text += "   DISPLAYNAME " + line->displayname + "\n";
+	if (!line->variant.empty())
+		text += "   VAR " + line->variant + "\n";
+	if (!line->function.empty())
+		text += "   FUNKTION " + line->function + "\n";
+	if (!line->unit_x.empty())
+		text += "   EINHEIT_X " + line->unit_x + "\n";
+	if (!line->unit.empty())
+		text += "   EINHEIT_W " + line->unit + "\n";
+	
+	if (line->type == TYPE::GROUPCHARLINE)
+		if(!((GroupCharLine*)line)->dist_x.empty()) text += "*SSTX " + ((GroupCharLine*)line)->dist_x + "\n";
+
+	text += "   ST/X";
+	for (auto value : line->point_x)
+		text += " " + std::to_string(value);
+	text += "\n";
+
+	text += "   WERT";
+	for (auto value : line->values)
+		text += " " + std::to_string(value);
+	text += "\n";
+
+	text += "END";
+
+	return text;
+}
+std::string DCM::Parser::rebuildMapBaseParameter(MapBaseParameter* map)
+{
+	std::string text = "";
+	switch (map->type)
+	{
+	case TYPE::CHARMAP:
+	{
+		text += "KENNFELD " + map->name;
+		break;
+	}
+	case TYPE::FIXEDCHARMAP:
+	{
+		text += "FESTKENNFELD " + map->name;
+		break;
+	}
+	case TYPE::GROUPCHARMAP:
+	{
+		text += "GRUPPENKENNFELD " + map->name;
+		break;
+	}
+	default:
+		return text;
+	}
+
+
+	if (map->size_x && map->size_y)
+		text += " " + std::to_string(map->size_x) + " " + std::to_string(map->size_y);
+	text += "\n";
+	if (!map->langname.empty())
+		text += "   LANGNAME " + map->langname + "\n";
+	if (!map->displayname.empty())
+		text += "   DISPLAYNAME " + map->displayname + "\n";
+	if (!map->variant.empty())
+		text += "   VAR " + map->variant + "\n";
+	if (!map->function.empty())
+		text += "   FUNKTION " + map->function + "\n";
+	if (!map->unit_x.empty())
+		text += "   EINHEIT_X " + map->unit_x + "\n";
+	if (!map->unit_y.empty())
+		text += "   EINHEIT_Y " + map->unit_y + "\n";
+	if (!map->unit.empty())
+		text += "   EINHEIT_W " + map->unit + "\n";
+
+	if (map->type == TYPE::GROUPCHARLINE)
+	{
+		if (!((GroupCharMap*)map)->dist_x.empty()) text += "*SSTX " + ((GroupCharMap*)map)->dist_x + "\n";
+		if (!((GroupCharMap*)map)->dist_y.empty()) text += "*SSTY " + ((GroupCharMap*)map)->dist_y + "\n";
+	}
+	text += "   ST/X";
+	for (auto value : map->point_x)
+		text += " " + std::to_string(value);
+	text += "\n";
+	text += "   ST/Y";
+	for (auto value : map->point_y)
+		text += " " + std::to_string(value);
+	text += "\n";
+
+	for (auto values : map->values)
+	{
+		text += "   WERT";
+		for (auto value : values)
+			text += " " + std::to_string(value);
+		text += "\n";
+	}
+
+	text += "END";
+
+	return text;
+}
+
+
 bool DCM::Parser::test()
 {
 	bool ret = true;
@@ -939,6 +1068,28 @@ bool DCM::Parser::rebuildMatrixTest()
 	for (auto element : parser->elements)
 	{
 		std::cout << parser->rebuildMatrix((Matrix*)element) << std::endl;
+	}
+
+	return true;
+}
+bool DCM::Parser::rebuildLineBaseParameterTest()
+{
+	auto parser = new Parser();
+	parser->open("Test_DCM2.dcm");
+	for (auto element : parser->elements)
+	{
+		std::cout << parser->rebuildLineBaseParameter((LineBaseParameter*)element) << std::endl;
+	}
+
+	return true;
+}
+bool DCM::Parser::rebuildMapBaseParameterTest()
+{
+	auto parser = new Parser();
+	parser->open("Test_DCM2.dcm");
+	for (auto element : parser->elements)
+	{
+		std::cout << parser->rebuildMapBaseParameter((MapBaseParameter*)element) << std::endl;
 	}
 
 	return true;

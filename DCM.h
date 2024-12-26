@@ -348,6 +348,8 @@ namespace DCM
 		std::string rebuildParameter(Parameter* parameter);
 		std::string rebuildArray(Array* arr);
 		std::string rebuildMatrix(Matrix* matrix);
+		std::string rebuildLineBaseParameter(LineBaseParameter* line);
+		std::string rebuildMapBaseParameter(MapBaseParameter* map);
 
 		
 
@@ -366,6 +368,8 @@ namespace DCM
 		static bool rebuildParameterTest();
 		static bool rebuildArrayTest();
 		static bool rebuildMatrixTest();
+		static bool rebuildLineBaseParameterTest();
+		static bool rebuildMapBaseParameterTest();
 
 		static bool parseDCM1Test();
 		static bool parseDCM2Test();
