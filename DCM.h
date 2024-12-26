@@ -344,6 +344,8 @@ namespace DCM
 		std::string rebuildUnknown(Unknown* unknown);
 		std::string rebuildFunctions(Functions* functions);
 		std::string rebuildComment(Comment* comment);
+		std::string rebuildVariantCoding(VariantCoding* variantCoding);
+		std::string rebuildModuleHeader(ModuleHeader* moduleHeader);
 		std::string rebuildFormat(Format* format);
 		std::string rebuildParameter(Parameter* parameter);
 		std::string rebuildArray(Array* arr);

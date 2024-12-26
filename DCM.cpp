@@ -684,6 +684,37 @@ std::string DCM::Parser::rebuildComment(Comment* comment)
 
 }
 
+std::string DCM::Parser::rebuildVariantCoding(VariantCoding* variantCoding)
+{
+	std::string text = "";
+	if (variantCoding->type != TYPE::VARIANTCODING)
+		return text;
+
+	text += "VARIANTENKODIERUNG\n";
+	for (auto variant : variantCoding->variants)
+	{
+		text += "   KRITERIUM " + variant.name;
+		for (auto value : variant.values)
+			text += " " + value;
+		text += "\n";
+	}
+	text += "END";
+	return text;
+}
+
+std::string DCM::Parser::rebuildModuleHeader(ModuleHeader* moduleHeader)
+{
+	std::string text = "";
+	if (moduleHeader->type != TYPE::MODULEHEADER)
+		return text;
+
+	text += "MODULKOPF " + moduleHeader->name + " " + moduleHeader->texts.at(0) + "\n";
+	for(int i=1; i<moduleHeader->texts.size(); i++)
+		text += "MODULKOPF " + moduleHeader->texts.at(i) + "\n";	
+	text += "END";
+	return text;
+}
+
 std::string DCM::Parser::rebuildFormat(Format* format)
 {
 	std::string text = "";
