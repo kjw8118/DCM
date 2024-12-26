@@ -93,6 +93,12 @@ namespace DCM
 		int type = 0;
 
 	};
+	class Unknown : public Element
+	{
+	public:
+		Unknown(int lineIndex, int lineOrder, std::string text);
+		std::string text;
+	};
 	class Comment: public Element
 	{
 	public:
@@ -336,6 +342,7 @@ namespace DCM
 		Parser();
 		bool open(std::string fpath);
 
+		std::string rebuildUnknown(Unknown* unknown);
 		std::string rebuildFunctions(Functions* functions);
 		std::string rebuildComment(Comment* comment);
 		std::string rebuildFormat(Format* format);

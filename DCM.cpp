@@ -53,7 +53,8 @@ DCM::Element::Element(int lineIndex, int& lineOrder, int type)
 	lineOrder++;
 };
 		
-	
+DCM::Unknown::Unknown(int lineIndex, int lineOrder, std::string text)
+	: Element(lineIndex, lineOrder, TYPE::UNKNOWN), text(text) {};
 	
 DCM::Comment::Comment(int lineIndex, int lineOrder, std::string text)
 	: Element(lineIndex, lineOrder, TYPE::COMMENT), text(text) {};
