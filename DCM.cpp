@@ -39,6 +39,7 @@ namespace DCM {
 		{"ST/X", TYPE::POINT_X},
 		{"ST/Y", TYPE::POINT_Y},
 		{"WERT", TYPE::VALUE},
+		{"TEXT", TYPE::TEXT},
 		{"*SSTX", TYPE::DIST_X},
 		{"*SSTY", TYPE::DIST_Y},
 		{"END", TYPE::END},
@@ -553,6 +554,17 @@ void DCM::Parser::parseComponent(std::vector<std::string> lineStrip)
 		}
 		break;
 	}
+	case TYPE::TEXT:
+	{
+		switch (pCurrentElement->type)
+		{
+		case TYPE::PARAMETER:
+		{
+			((Parameter*)pCurrentElement)->text = lineStrip.at(1);
+			break;
+		}
+		}
+	}
 	case TYPE::DIST_X:
 	{
 		switch (pCurrentElement->type)
@@ -742,7 +754,10 @@ std::string DCM::Parser::rebuildParameter(Parameter* parameter)
 		text += "   FUNKTION " + parameter->function + "\n";
 	if (!parameter->unit.empty())
 		text += "   EINHEIT_W " + parameter->unit + "\n";
-	text += "   WERT " + std::to_string(parameter->value) + "\n";
+	if(!parameter->text.empty())
+		text += "   TEXT " + parameter->text + "\n";
+	else
+		text += "   WERT " + std::to_string(parameter->value) + "\n";
 	text += "END\n";
 	
 	return text;

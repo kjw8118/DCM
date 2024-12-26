@@ -72,6 +72,7 @@ namespace DCM
 		UNIT_X,
 		UNIT_Y,
 		VALUE,
+		TEXT,
 		POINT_X,
 		POINT_Y,
 		DIST_X,
@@ -200,7 +201,7 @@ namespace DCM
 	public:
 		Parameter(int lineIndex, int lineOrder, std::string name);
 		double value;
-		
+		std::string text;
 	};
 
 	class Array : public ArrayBaseParameter // FESTWERTEBLOCK
