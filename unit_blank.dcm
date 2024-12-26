@@ -1,0 +1,11 @@
+KENNFELD Two_D 3 2
+   LANGNAME "voltage"
+   EINHEIT_X ""
+   EINHEIT_Y ""
+   EINHEIT_W "V"
+   ST/X 0.0 1.0 2.0
+   ST/Y 0.0
+   WERT 0.0 0.4 0.8
+   ST/Y 1.0
+   WERT 1.0 2.0 3.0
+END
