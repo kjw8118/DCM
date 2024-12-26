@@ -251,6 +251,13 @@ void DCM::Parser::parseHeader(std::vector<std::string> lineStrip)
 	{
 	case TYPE::UNKNOWN:
 	{
+		std::string lineString = "";
+		lineString = lineStrip.at(0);
+		for (int i = 1; i < lineStrip.size(); i++)
+			lineString += " " + lineStrip.at(i);
+		pCurrentElement = new Unknown(currentIndex, currentOrder, lineString);
+		elements.push_back(pCurrentElement);
+		pCurrentElement = nullptr;
 		break;
 	}
 	case TYPE::COMMENT:
