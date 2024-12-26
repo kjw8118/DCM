@@ -132,7 +132,7 @@ DCM::FixedCharMap::FixedCharMap(int lineIndex, int lineOrder, std::string name, 
 	: MapBaseParameter(lineIndex, lineOrder, TYPE::FIXEDCHARMAP, name, size_x, size_y) {};
 
 	
-DCM::Distrubution::Distrubution(int lineIndex, int lineOrder, std::string name, int size_x)
+DCM::Distribution::Distribution(int lineIndex, int lineOrder, std::string name, int size_x)
 	: LineBaseParameter(lineIndex, lineOrder, TYPE::DISTRIBUTION, name, size_x) {};
 		
 
@@ -387,9 +387,9 @@ void DCM::Parser::parseHeader(std::vector<std::string> lineStrip)
 	}
 	case TYPE::DISTRIBUTION:
 	{
-		pCurrentElement = new Distrubution(currentIndex, currentOrder, lineStrip.at(1));
+		pCurrentElement = new Distribution(currentIndex, currentOrder, lineStrip.at(1));
 		if (lineStrip.size() > 2)
-			((Distrubution*)pCurrentElement)->size_x = std::stoi(lineStrip.at(2));
+			((Distribution*)pCurrentElement)->size_x = std::stoi(lineStrip.at(2));
 		break;
 	}
 	}
@@ -481,6 +481,7 @@ void DCM::Parser::parseComponent(std::vector<std::string> lineStrip)
 		case TYPE::CHARLINE:
 		case TYPE::FIXEDCHARLINE:
 		case TYPE::GROUPCHARLINE:
+		case TYPE::DISTRIBUTION:
 		{
 			for (int i = 1; i < lineStrip.size(); i++)
 				((LineBaseParameter*)pCurrentElement)->point_x.push_back(std::stod(lineStrip.at(i)));
@@ -494,6 +495,7 @@ void DCM::Parser::parseComponent(std::vector<std::string> lineStrip)
 				((MapBaseParameter*)pCurrentElement)->point_x.push_back(std::stod(lineStrip.at(i)));
 			break;
 		}
+
 		}
 		break;
 	}
@@ -564,7 +566,7 @@ void DCM::Parser::parseComponent(std::vector<std::string> lineStrip)
 		{
 			((GroupCharMap*)pCurrentElement)->dist_x = lineStrip.at(1);
 			break;
-		}
+		}		
 		}
 		break;
 	}
@@ -910,6 +912,36 @@ std::string DCM::Parser::rebuildMapBaseParameter(MapBaseParameter* map)
 	return text;
 }
 
+std::string DCM::Parser::rebuildDistribution(Distribution* dist)
+{
+	std::string text = "";
+	if (dist->type != TYPE::DISTRIBUTION)
+		return text;
+
+	text += "STUETZSTELLENVERTEILUNG " + dist->name;
+	if (dist->size_x)
+		text += " " + std::to_string(dist->size_x);
+	text += "\n";
+	if (!dist->langname.empty())
+		text += "   LANGNAME " + dist->langname + "\n";
+	if (!dist->displayname.empty())
+		text += "   DISPLAYNAME " + dist->displayname + "\n";
+	if (!dist->variant.empty())
+		text += "   VAR " + dist->variant + "\n";
+	if (!dist->function.empty())
+		text += "   FUNKTION " + dist->function + "\n";
+	if (!dist->unit_x.empty())
+		text += "   EINHEIT_X " + dist->unit_x + "\n";
+	
+	text += "   ST/X";
+	for (auto value : dist->point_x)
+		text += " " + std::to_string(value);
+	text += "\n";
+
+	text += "END";
+
+	return text;
+}
 
 bool DCM::Parser::test()
 {
@@ -1090,6 +1122,17 @@ bool DCM::Parser::rebuildMapBaseParameterTest()
 	for (auto element : parser->elements)
 	{
 		std::cout << parser->rebuildMapBaseParameter((MapBaseParameter*)element) << std::endl;
+	}
+
+	return true;
+}
+bool DCM::Parser::rebuildDistributionTest()
+{
+	auto parser = new Parser();
+	parser->open("Test_DCM2.dcm");
+	for (auto element : parser->elements)
+	{
+		std::cout << parser->rebuildDistribution((Distribution*)element) << std::endl;
 	}
 
 	return true;

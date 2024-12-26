@@ -19,7 +19,7 @@ int main()
     //DCM::Parser::rebuildMatrixTest();
     //DCM::Parser::rebuildLineBaseParameterTest();
     //DCM::Parser::rebuildMapBaseParameterTest();
-    
+    DCM::Parser::rebuildDistributionTest();
     return 0;
 
 }

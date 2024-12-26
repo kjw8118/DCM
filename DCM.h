@@ -244,10 +244,10 @@ namespace DCM
 
 	};
 
-	class Distrubution : public LineBaseParameter
+	class Distribution : public LineBaseParameter
 	{
 	public:
-		Distrubution(int lineIndex, int lineOrder, std::string name, int size_x = 0);		
+		Distribution(int lineIndex, int lineOrder, std::string name, int size_x = 0);
 		
 	};
 
@@ -350,6 +350,7 @@ namespace DCM
 		std::string rebuildMatrix(Matrix* matrix);
 		std::string rebuildLineBaseParameter(LineBaseParameter* line);
 		std::string rebuildMapBaseParameter(MapBaseParameter* map);
+		std::string rebuildDistribution(Distribution* dist);
 
 		
 
@@ -370,6 +371,7 @@ namespace DCM
 		static bool rebuildMatrixTest();
 		static bool rebuildLineBaseParameterTest();
 		static bool rebuildMapBaseParameterTest();
+		static bool rebuildDistributionTest();
 
 		static bool parseDCM1Test();
 		static bool parseDCM2Test();
