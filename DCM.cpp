@@ -621,6 +621,16 @@ bool DCM::Parser::open(std::string fpath)
 };
 
 
+std::string DCM::Parser::rebuildUnknown(Unknown* unknown)
+{
+	std::string text = "";
+	if (unknown->type != TYPE::UNKNOWN)
+		return text;
+
+	return unknown->text;
+
+}
+
 std::string DCM::Parser::rebuildFunctions(Functions* functions)
 {
 	std::string text = "";
