@@ -655,7 +655,7 @@ std::string DCM::Parser::rebuildUnknown(Unknown* unknown)
 	if (unknown->type != TYPE::UNKNOWN)
 		return text;
 
-	return unknown->text;
+	return unknown->text + "\n";
 
 }
 
@@ -670,7 +670,7 @@ std::string DCM::Parser::rebuildFunctions(Functions* functions)
 	{
 		text += "   FKT " + fkt.name + " " + fkt.version + " " + fkt.longname + "\n";
 	}
-	text += "END";
+	text += "END\n";
 	return text;
 }
 
@@ -680,7 +680,7 @@ std::string DCM::Parser::rebuildComment(Comment* comment)
 	if (comment->type != TYPE::COMMENT)
 		return text;
 
-	return comment->text;
+	return comment->text + "\n";
 
 }
 
@@ -698,7 +698,7 @@ std::string DCM::Parser::rebuildVariantCoding(VariantCoding* variantCoding)
 			text += " " + value;
 		text += "\n";
 	}
-	text += "END";
+	text += "END\n";
 	return text;
 }
 
@@ -711,7 +711,7 @@ std::string DCM::Parser::rebuildModuleHeader(ModuleHeader* moduleHeader)
 	text += "MODULKOPF " + moduleHeader->name + " " + moduleHeader->texts.at(0) + "\n";
 	for(int i=1; i<moduleHeader->texts.size(); i++)
 		text += "MODULKOPF " + moduleHeader->texts.at(i) + "\n";	
-	text += "END";
+	text += "END\n";
 	return text;
 }
 
@@ -721,7 +721,7 @@ std::string DCM::Parser::rebuildFormat(Format* format)
 	if (format->type != TYPE::FORMAT)
 		return text;
 
-	text += "KONSERVIERUNG_FORMAT " + format->version;
+	text += "KONSERVIERUNG_FORMAT " + format->version + "\n";
 	return text;
 }
 
@@ -743,7 +743,7 @@ std::string DCM::Parser::rebuildParameter(Parameter* parameter)
 	if (!parameter->unit.empty())
 		text += "   EINHEIT_W " + parameter->unit + "\n";
 	text += "   WERT " + std::to_string(parameter->value) + "\n";
-	text += "END";
+	text += "END\n";
 	
 	return text;
 
@@ -777,7 +777,7 @@ std::string DCM::Parser::rebuildArray(Array* arr)
 			text += " " + std::to_string(value);
 		text += "\n";
 	}
-	text += "END";
+	text += "END\n";
 
 	return text;
 }
@@ -809,7 +809,7 @@ std::string DCM::Parser::rebuildMatrix(Matrix* matrix)
 			text += " " + std::to_string(value);
 		text += "\n";
 	}
-	text += "END";
+	text += "END\n";
 
 	return text;
 }
@@ -869,7 +869,7 @@ std::string DCM::Parser::rebuildLineBaseParameter(LineBaseParameter* line)
 		text += " " + std::to_string(value);
 	text += "\n";
 
-	text += "END";
+	text += "END\n";
 
 	return text;
 }
@@ -938,7 +938,7 @@ std::string DCM::Parser::rebuildMapBaseParameter(MapBaseParameter* map)
 		text += "\n";
 	}
 
-	text += "END";
+	text += "END\n";
 
 	return text;
 }
@@ -969,7 +969,50 @@ std::string DCM::Parser::rebuildDistribution(Distribution* dist)
 		text += " " + std::to_string(value);
 	text += "\n";
 
-	text += "END";
+	text += "END\n";
+
+	return text;
+}
+
+std::string DCM::Parser::rebuildElement(Element* element)
+{
+	switch (element->type)
+	{
+	case TYPE::UNKNOWN:
+		return rebuildUnknown((Unknown*)element);		
+	case TYPE::FUNCTIONS:
+		return rebuildFunctions((Functions*)element);
+	case TYPE::COMMENT:
+		return rebuildComment((Comment*)element);
+	case TYPE::VARIANTCODING:
+		return rebuildVariantCoding((VariantCoding*)element);
+	case TYPE::MODULEHEADER:
+		return rebuildModuleHeader((ModuleHeader*)element);
+	case TYPE::FORMAT:
+		return rebuildFormat((Format*)element);
+	case TYPE::PARAMETER:
+		return rebuildParameter((Parameter*)element);
+	case TYPE::ARRAY:
+		return rebuildArray((Array*)element);
+	case TYPE::MATRIX:
+		return rebuildMatrix((Matrix*)element);
+	case TYPE::CHARLINE:
+	case TYPE::FIXEDCHARLINE:
+	case TYPE::GROUPCHARLINE:
+		return rebuildLineBaseParameter((LineBaseParameter*)element);
+	case TYPE::CHARMAP:
+	case TYPE::FIXEDCHARMAP:
+	case TYPE::GROUPCHARMAP:
+		return rebuildMapBaseParameter((MapBaseParameter*)element);
+	case TYPE::DISTRIBUTION:
+		return rebuildDistribution((Distribution*)element);
+	}
+}
+std::string DCM::Parser::rebuild()
+{
+	std::string text = "";
+	for (auto element : elements)
+		text += rebuildElement(element);
 
 	return text;
 }
@@ -977,12 +1020,12 @@ std::string DCM::Parser::rebuildDistribution(Distribution* dist)
 bool DCM::Parser::test()
 {
 	bool ret = true;
-	{
+	if(false){
 		bool result = typeEnumTest();
 		std::cout << "typeEnumTest " << result << std::endl;
 		ret &= result;
 	}	
-	{
+	if(false){
 		bool result = stripQuotationTest();
 		std::cout << "stripQuoationTest " << result << std::endl;
 		ret &= result;
@@ -1172,13 +1215,24 @@ bool DCM::Parser::rebuildDistributionTest()
 bool DCM::Parser::parseDCM1Test()
 {
 	auto parser = new Parser();
-	return parser->open("Test_DCM1ex.dcm");
+	bool result = parser->open("Test_DCM1ex.dcm");
+
+	std::cout << "\n\n\t\tRebuild\n\n";
+
+	std::cout << parser->rebuild();
+
+	return result;
 
 }
 
 bool DCM::Parser::parseDCM2Test()
 {
 	auto parser = new Parser();
-	return parser->open("Test_DCM2.dcm");
+	bool result = parser->open("Test_DCM2.dcm");
+
+	std::cout << "\n\n\t\tRebuild\n\n";
+
+	std::cout << parser->rebuild();
 	
+	return result;
 }

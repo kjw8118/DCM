@@ -200,6 +200,7 @@ namespace DCM
 	public:
 		Parameter(int lineIndex, int lineOrder, std::string name);
 		double value;
+		
 	};
 
 	class Array : public ArrayBaseParameter // FESTWERTEBLOCK
@@ -354,7 +355,8 @@ namespace DCM
 		std::string rebuildMapBaseParameter(MapBaseParameter* map);
 		std::string rebuildDistribution(Distribution* dist);
 
-		
+		std::string rebuildElement(Element* element);
+		std::string rebuild();
 
 		std::vector<Element*> getElements() { return elements; };
 		std::string getRawString() { std::string text = ""; for (auto line : lineHistory) text += line + "\n"; return text; };
