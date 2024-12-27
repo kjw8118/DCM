@@ -352,11 +352,13 @@ namespace DCM
 		void parse();
 
 		std::vector<BaseParameter*> collectAllTypeParameters();
-		std::vector<Parameter*> collectParameters();
-		std::vector<Array*> collectArrays();
-		std::vector<Matrix*> collectMatrice();
-		std::vector<LineBaseParameter*> collectLineParameters();
-		std::vector<MapBaseParameter*> collectMapParameters();
+		std::vector<Distribution*> collectAxispoint();
+		std::vector<Array*> collectValueBlock();
+		std::vector<Matrix*> collectValueMatrix();
+		std::vector<Parameter*> collectValue();
+		std::vector<Parameter*> collectValueBoolean();
+		std::vector<LineBaseParameter*> collectCurve();
+		std::vector<MapBaseParameter*> collectMap();
 
 		std::string rebuildUnknown(Unknown* unknown);
 		std::string rebuildFunctions(Functions* functions);
