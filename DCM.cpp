@@ -178,7 +178,7 @@ std::vector<std::string> DCM::stripLine(std::string lineRaw)
 
 			continue;
 		}
-		else if ((c == ' ' && !isQuoOpen) || (c == '\n'))
+		else if ((c == ' ' && !isQuoOpen) || (c == '\t' && !isQuoOpen) || (c == '\n'))
 		{
 			if (!buffer.empty())
 			{
@@ -453,6 +453,7 @@ void DCM::Manager::parseComponent(std::vector<std::string> lineStrip)
 		case TYPE::FIXEDCHARMAP:
 		case TYPE::GROUPCHARLINE:
 		case TYPE::GROUPCHARMAP:
+		case TYPE::DISTRIBUTION:
 		{
 			((LineBaseParameter*)pCurrentElement)->unit_x = lineStrip.at(1);
 			break;
@@ -929,7 +930,7 @@ std::string DCM::Manager::rebuildLineBaseParameter(LineBaseParameter* line)
 		text += "   EINHEIT_W " + line->unit + "\n";
 	
 	if (line->type == TYPE::GROUPCHARLINE)
-		if(!((GroupCharLine*)line)->dist_x.empty()) text += "*SSTX " + ((GroupCharLine*)line)->dist_x + "\n";
+		if(!((GroupCharLine*)line)->dist_x.empty()) text += "*SSTX\t" + ((GroupCharLine*)line)->dist_x + "\n";
 
 	
 	for (int i = 0; i < line->point_x.size(); i++)
@@ -998,10 +999,10 @@ std::string DCM::Manager::rebuildMapBaseParameter(MapBaseParameter* map)
 	if (!map->unit.empty())
 		text += "   EINHEIT_W " + map->unit + "\n";
 
-	if (map->type == TYPE::GROUPCHARLINE)
+	if (map->type == TYPE::GROUPCHARMAP)
 	{
-		if (!((GroupCharMap*)map)->dist_x.empty()) text += "*SSTX " + ((GroupCharMap*)map)->dist_x + "\n";
-		if (!((GroupCharMap*)map)->dist_y.empty()) text += "*SSTY " + ((GroupCharMap*)map)->dist_y + "\n";
+		if (!((GroupCharMap*)map)->dist_x.empty()) text += "*SSTX\t" + ((GroupCharMap*)map)->dist_x + "\n";
+		if (!((GroupCharMap*)map)->dist_y.empty()) text += "*SSTY\t" + ((GroupCharMap*)map)->dist_y + "\n";
 	}
 	
 	for (int i = 0; i < map->point_x.size(); i++)
@@ -1042,6 +1043,7 @@ std::string DCM::Manager::rebuildDistribution(Distribution* dist)
 	if (dist->size_x)
 		text += " " + std::to_string(dist->size_x);
 	text += "\n";
+	text += "*SST\n";
 	if (!dist->langname.empty())
 		text += "   LANGNAME " + dist->langname + "\n";
 	if (!dist->displayname.empty())
