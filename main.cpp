@@ -1,12 +1,15 @@
 ﻿
 #include <iostream>
 
-//#include "DCM.h"
+#include "DCM.h"
 
 
 
 int main()
 {
+    auto manager = new DCM::Manager();
+    manager->createDCM();
+    manager->saveAsDCM("new1.dcm");
     //std::cout << "Hello World!\n";
     
     //std::cout << "DCM Parser General Test\t" << (bool)DCM::Parser::test() << std::endl;

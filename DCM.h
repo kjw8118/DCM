@@ -297,6 +297,7 @@ namespace DCM
 	public:
 		Manager();
 		bool open(std::string fpath, int mode = std::ios::in);
+		void createDCM();
 		void parse();
 
 		std::vector<BaseParameter*> collectAllTypeParameters();

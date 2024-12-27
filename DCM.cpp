@@ -2,7 +2,9 @@
 
 
 #include <algorithm>
-
+#include <sstream>
+#include <iomanip>
+#include <chrono>
 #include <iostream>
 
 namespace DCM {
@@ -570,7 +572,10 @@ void DCM::Manager::parseLine(std::string lineRaw)
 
 }
 
-DCM::Manager::Manager() {};
+DCM::Manager::Manager()
+{
+
+}
 
 bool DCM::Manager::open(std::string fpath, int mode)
 {
@@ -585,7 +590,23 @@ bool DCM::Manager::open(std::string fpath, int mode)
 	
 	return true;
 };
+void DCM::Manager::createDCM()
+{
+	clear();
+	std::tm localTime;
+	std::time_t now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());  localtime_s(&localTime, &now);
+	std::ostringstream oss;	oss << std::put_time(&localTime, "%Y-%m-%d %H:%M:%S");
+	putElement((Element*)(new Comment(currentIndex++, currentOrder, "* encoding=\"euc-kr\"")));
+	putElement((Element*)(new Comment(currentIndex++, currentOrder, "* DAMOS format")));
+	putElement((Element*)(new Comment(currentIndex++, currentOrder, "* Created by DCM Manager")));
+	putElement((Element*)(new Comment(currentIndex++, currentOrder, "* Creation date: " + oss.str())));
+	putElement((Element*)(new Comment(currentIndex++, currentOrder, "*")));
+	putElement((Element*)(new Unknown(currentIndex++, currentOrder, "")));
+	putElement((Element*)(new Format(currentIndex++, currentOrder, "2.0")));
+	putElement((Element*)(new Unknown(currentIndex++, currentOrder, "")));
 
+	
+}
 void DCM::Manager::parse()
 {
 	if (isOpened)
@@ -617,6 +638,9 @@ void DCM::Manager::clear()
 	}
 	elements.clear();
 	moduleHeaders.clear();
+	isOpened = false;
+	if (file.is_open())
+		file.close();
 
 }
 std::vector<DCM::Element*> DCM::Manager::getElements()
