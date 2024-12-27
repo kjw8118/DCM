@@ -622,6 +622,10 @@ void DCM::Manager::clear()
 	moduleHeaders.clear();
 
 }
+std::vector<DCM::Element*> DCM::Manager::getElements()
+{
+	return elements; 
+};
 void DCM::Manager::putElement(Element* element)
 {
 	elements.push_back(element);	

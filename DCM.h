@@ -327,7 +327,7 @@ namespace DCM
 		
 		void clear();
 
-		std::vector<Element*> getElements() { return elements; };
+		std::vector<Element*> getElements();
 		std::string getRawString() { std::string text = ""; for (auto line : lineHistory) text += line + "\n"; return text; };
 
 		
