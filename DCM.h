@@ -359,9 +359,7 @@ namespace DCM
 		std::string rebuildElement(Element* element);
 		std::string rebuild();
 		void saveAsDCM(std::string fname);
-		bool createDCM();
-		bool createRawDCM();
-
+		
 		std::vector<Element*> getElements() { return elements; };
 		std::string getRawString() { std::string text = ""; for (auto line : lineHistory) text += line + "\n"; return text; };
 
