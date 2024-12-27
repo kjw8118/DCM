@@ -6,7 +6,6 @@
 #include <vector>
 #include <map>
 
-#include <iostream>
 
 namespace DCM
 {
@@ -328,6 +327,7 @@ namespace DCM
 		void clear();
 
 		std::vector<Element*> getElements();
+		Element* findElement(std::string name, bool exactmatch=false);
 		std::string getRawString() { std::string text = ""; for (auto line : lineHistory) text += line + "\n"; return text; };
 
 		

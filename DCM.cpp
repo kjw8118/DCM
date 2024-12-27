@@ -1,11 +1,7 @@
 #include "DCM.h"
 
 
-#include <fstream>
-
-#include <string>
-#include <vector>
-#include <map>
+#include <algorithm>
 
 #include <iostream>
 
@@ -626,6 +622,28 @@ std::vector<DCM::Element*> DCM::Manager::getElements()
 {
 	return elements; 
 };
+DCM::Element* DCM::Manager::findElement(std::string name, bool exactmatch)
+{
+	if (name.empty())
+		return nullptr;	
+	
+	std::string name_trnsf = name;
+	if(!exactmatch)
+		std::transform(name_trnsf.begin(), name_trnsf.end(), name_trnsf.begin(), std::tolower);
+	for (auto &itr : elementIndex)
+	{
+			
+		std::string key_trnsf = itr.first;
+		if (!exactmatch)							
+			std::transform(key_trnsf.begin(), key_trnsf.end(), key_trnsf.begin(), std::tolower);
+			
+		if (key_trnsf.compare(name_trnsf) == 0)
+			return itr.second; // Found
+	}
+	// Not found
+	return nullptr;
+	
+}
 void DCM::Manager::putElement(Element* element)
 {
 	elements.push_back(element);	
@@ -681,7 +699,7 @@ std::string DCM::Manager::rebuildFunctions(Functions* functions)
 		return text;
 
 	text += "FUNKTIONEN\n";
-	for (auto fkt : functions->functions)
+	for (auto &fkt : functions->functions)
 	{
 		text += "   FKT " + fkt.name + " " + fkt.version + " " + fkt.longname + "\n";
 	}
@@ -706,10 +724,10 @@ std::string DCM::Manager::rebuildVariantCoding(VariantCoding* variantCoding)
 		return text;
 
 	text += "VARIANTENKODIERUNG\n";
-	for (auto variant : variantCoding->variants)
+	for (auto &variant : variantCoding->variants)
 	{
 		text += "   KRITERIUM " + variant.name;
-		for (auto value : variant.values)
+		for (auto &value : variant.values)
 			text += " " + value;
 		text += "\n";
 	}
@@ -1235,7 +1253,7 @@ bool DCM::Manager::stripQuotationTest()
 	{
 		auto lineStrip = stripLine(line);
 		std::cout << line << "\t>> ";
-		for (auto strip : lineStrip)
+		for (auto &strip : lineStrip)
 		{
 			std::cout << strip << ", ";
 		}
