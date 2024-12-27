@@ -355,7 +355,8 @@ namespace DCM
 		std::vector<Parameter*> collectParameters();
 		std::vector<Array*> collectArrays();
 		std::vector<Matrix*> collectMatrice();
-		std::vector<
+		std::vector<LineBaseParameter*> collectLineParameters();
+		std::vector<MapBaseParameter*> collectMapParameters();
 
 		std::string rebuildUnknown(Unknown* unknown);
 		std::string rebuildFunctions(Functions* functions);

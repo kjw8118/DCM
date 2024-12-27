@@ -1125,6 +1125,95 @@ void DCM::Manager::saveAsDCM(std::string fname)
 	wfile.close();
 }
 
+std::vector<DCM::BaseParameter*> DCM::Manager::collectAllTypeParameters() 
+{
+	return parameters; 
+}
+std::vector<DCM::Distribution*> DCM::Manager::collectAxispoint()
+{
+	std::vector<DCM::Distribution*> ret;
+	for (auto para : parameters)
+	{
+		if (para->type == DCM::TYPE::DISTRIBUTION)
+			ret.push_back((DCM::Distribution*)para);
+	}
+	return ret;
+}
+std::vector<DCM::Array*> DCM::Manager::collectValueBlock()
+{
+	std::vector<DCM::Array*> ret;
+	for (auto para : parameters)
+	{
+		if (para->type == DCM::TYPE::ARRAY)
+			ret.push_back((DCM::Array*)para);
+	}
+	return ret;
+}
+std::vector<DCM::Matrix*> DCM::Manager::collectValueMatrix()
+{
+	std::vector<DCM::Matrix*> ret;
+	for (auto para : parameters)
+	{
+		if (para->type == DCM::TYPE::MATRIX)
+			ret.push_back((DCM::Matrix*)para);
+	}
+	return ret;
+}
+std::vector<DCM::Parameter*> DCM::Manager::collectValue()
+{
+	std::vector<DCM::Parameter*> ret;
+	for (auto para : parameters)
+	{
+		if (para->type == DCM::TYPE::PARAMETER)
+			if(((DCM::Parameter*)para)->text.empty())
+				ret.push_back((DCM::Parameter*)para);
+	}
+	return ret;
+}
+std::vector<DCM::Parameter*> DCM::Manager::collectValueBoolean()
+{
+	std::vector<DCM::Parameter*> ret;
+	for (auto para : parameters)
+	{
+		if (para->type == DCM::TYPE::PARAMETER)
+			if (!((DCM::Parameter*)para)->text.empty())
+				ret.push_back((DCM::Parameter*)para);
+	}
+	return ret;
+}
+std::vector<DCM::LineBaseParameter*> DCM::Manager::collectCurve()
+{
+	std::vector<DCM::LineBaseParameter*> ret;
+	for (auto para : parameters)
+	{
+		switch (para->type)
+		{
+		case DCM::TYPE::CHARLINE:
+		case DCM::TYPE::FIXEDCHARLINE:
+		case DCM::TYPE::GROUPCHARLINE:
+		case DCM::TYPE::DISTRIBUTION:
+			ret.push_back((DCM::LineBaseParameter*)para);
+		}
+	}
+	return ret;
+}
+std::vector<DCM::MapBaseParameter*> DCM::Manager::collectMap()
+{
+	std::vector<DCM::MapBaseParameter*> ret;
+	for (auto para : parameters)
+	{
+		switch (para->type)
+		{
+		case DCM::TYPE::CHARMAP:
+		case DCM::TYPE::FIXEDCHARMAP:
+		case DCM::TYPE::GROUPCHARMAP:		
+			ret.push_back((DCM::MapBaseParameter*)para);
+		}
+	}
+	return ret;
+}
+
+
 
 bool DCM::Manager::test()
 {
