@@ -245,7 +245,7 @@ Distribution Y	: *SSTY
 End				: END
 
 */
-void DCM::Parser::parseHeader(std::vector<std::string> lineStrip)
+void DCM::Manager::parseHeader(std::vector<std::string> lineStrip)
 {
 	int headerType = Header[lineStrip.at(0)];
 	switch (headerType)
@@ -395,7 +395,7 @@ void DCM::Parser::parseHeader(std::vector<std::string> lineStrip)
 	}
 	}
 }
-void DCM::Parser::parseComponent(std::vector<std::string> lineStrip)
+void DCM::Manager::parseComponent(std::vector<std::string> lineStrip)
 {
 	
 	int componentType = Header[lineStrip.at(0)];	
@@ -604,7 +604,7 @@ void DCM::Parser::parseComponent(std::vector<std::string> lineStrip)
 	}
 	}
 }
-void DCM::Parser::parseLine(std::string lineRaw)
+void DCM::Manager::parseLine(std::string lineRaw)
 {
 	auto lineStrip = stripLine(lineRaw);
 
@@ -627,9 +627,9 @@ void DCM::Parser::parseLine(std::string lineRaw)
 
 }
 
-DCM::Parser::Parser() {};
+DCM::Manager::Manager() {};
 
-bool DCM::Parser::open(std::string fpath, int mode)
+bool DCM::Manager::open(std::string fpath, int mode)
 {
 	file.open(fpath.c_str(), mode);
 	if (!file.is_open())
@@ -658,7 +658,7 @@ bool DCM::Parser::open(std::string fpath, int mode)
 };
 
 
-std::string DCM::Parser::rebuildUnknown(Unknown* unknown)
+std::string DCM::Manager::rebuildUnknown(Unknown* unknown)
 {
 	std::string text = "";
 	if (unknown->type != TYPE::UNKNOWN)
@@ -668,7 +668,7 @@ std::string DCM::Parser::rebuildUnknown(Unknown* unknown)
 
 }
 
-std::string DCM::Parser::rebuildFunctions(Functions* functions)
+std::string DCM::Manager::rebuildFunctions(Functions* functions)
 {
 	std::string text = "";
 	if (functions->type != TYPE::FUNCTIONS)
@@ -683,7 +683,7 @@ std::string DCM::Parser::rebuildFunctions(Functions* functions)
 	return text;
 }
 
-std::string DCM::Parser::rebuildComment(Comment* comment)
+std::string DCM::Manager::rebuildComment(Comment* comment)
 {
 	std::string text = "";
 	if (comment->type != TYPE::COMMENT)
@@ -693,7 +693,7 @@ std::string DCM::Parser::rebuildComment(Comment* comment)
 
 }
 
-std::string DCM::Parser::rebuildVariantCoding(VariantCoding* variantCoding)
+std::string DCM::Manager::rebuildVariantCoding(VariantCoding* variantCoding)
 {
 	std::string text = "";
 	if (variantCoding->type != TYPE::VARIANTCODING)
@@ -711,7 +711,7 @@ std::string DCM::Parser::rebuildVariantCoding(VariantCoding* variantCoding)
 	return text;
 }
 
-std::string DCM::Parser::rebuildModuleHeader(ModuleHeader* moduleHeader)
+std::string DCM::Manager::rebuildModuleHeader(ModuleHeader* moduleHeader)
 {
 	std::string text = "";
 	if (moduleHeader->type != TYPE::MODULEHEADER)
@@ -724,7 +724,7 @@ std::string DCM::Parser::rebuildModuleHeader(ModuleHeader* moduleHeader)
 	return text;
 }
 
-std::string DCM::Parser::rebuildFormat(Format* format)
+std::string DCM::Manager::rebuildFormat(Format* format)
 {
 	std::string text = "";
 	if (format->type != TYPE::FORMAT)
@@ -734,7 +734,7 @@ std::string DCM::Parser::rebuildFormat(Format* format)
 	return text;
 }
 
-std::string DCM::Parser::rebuildParameter(Parameter* parameter)
+std::string DCM::Manager::rebuildParameter(Parameter* parameter)
 {
 	std::string text = "";
 	if (parameter->type != TYPE::PARAMETER)
@@ -761,7 +761,7 @@ std::string DCM::Parser::rebuildParameter(Parameter* parameter)
 
 }
 
-std::string DCM::Parser::rebuildArray(Array* arr)
+std::string DCM::Manager::rebuildArray(Array* arr)
 {
 	std::string text = "";
 	if (arr->type != TYPE::ARRAY)
@@ -795,7 +795,7 @@ std::string DCM::Parser::rebuildArray(Array* arr)
 
 	return text;
 }
-std::string DCM::Parser::rebuildMatrix(Matrix* matrix)
+std::string DCM::Manager::rebuildMatrix(Matrix* matrix)
 {
 	std::string text = "";
 	if (matrix->type != TYPE::MATRIX)
@@ -833,7 +833,7 @@ std::string DCM::Parser::rebuildMatrix(Matrix* matrix)
 }
 
 
-std::string DCM::Parser::rebuildLineBaseParameter(LineBaseParameter* line)
+std::string DCM::Manager::rebuildLineBaseParameter(LineBaseParameter* line)
 {
 	std::string text = "";
 	switch (line->type)
@@ -901,7 +901,7 @@ std::string DCM::Parser::rebuildLineBaseParameter(LineBaseParameter* line)
 
 	return text;
 }
-std::string DCM::Parser::rebuildMapBaseParameter(MapBaseParameter* map)
+std::string DCM::Manager::rebuildMapBaseParameter(MapBaseParameter* map)
 {
 	std::string text = "";
 	switch (map->type)
@@ -978,7 +978,7 @@ std::string DCM::Parser::rebuildMapBaseParameter(MapBaseParameter* map)
 	return text;
 }
 
-std::string DCM::Parser::rebuildDistribution(Distribution* dist)
+std::string DCM::Manager::rebuildDistribution(Distribution* dist)
 {
 	std::string text = "";
 	if (dist->type != TYPE::DISTRIBUTION)
@@ -1013,7 +1013,7 @@ std::string DCM::Parser::rebuildDistribution(Distribution* dist)
 	return text;
 }
 
-std::string DCM::Parser::rebuildElement(Element* element)
+std::string DCM::Manager::rebuildElement(Element* element)
 {
 	switch (element->type)
 	{
@@ -1047,7 +1047,7 @@ std::string DCM::Parser::rebuildElement(Element* element)
 		return rebuildDistribution((Distribution*)element);
 	}
 }
-std::string DCM::Parser::rebuild()
+std::string DCM::Manager::rebuild()
 {
 	std::string text = "";
 	for (auto element : elements)
@@ -1056,7 +1056,7 @@ std::string DCM::Parser::rebuild()
 	return text;
 }
 
-void DCM::Parser::saveAsDCM(std::string fname)
+void DCM::Manager::saveAsDCM(std::string fname)
 {
 	std::fstream wfile;
 	wfile.open(fname.c_str(), std::ios::out);
@@ -1070,7 +1070,7 @@ void DCM::Parser::saveAsDCM(std::string fname)
 }
 
 
-bool DCM::Parser::test()
+bool DCM::Manager::test()
 {
 	bool ret = true;
 	if(false){
@@ -1096,7 +1096,7 @@ bool DCM::Parser::test()
 
 	return ret;
 }
-bool DCM::Parser::typeEnumTest()
+bool DCM::Manager::typeEnumTest()
 {
 	auto file = std::ifstream("headerTest.dcm");
 	if (!file.is_open())
@@ -1125,7 +1125,7 @@ bool DCM::Parser::typeEnumTest()
 	std::cout << "\n\n";
 	return true;
 }
-bool DCM::Parser::stripQuotationTest()
+bool DCM::Manager::stripQuotationTest()
 {
 	auto file = std::ifstream("quotationMarksTest.dcm");
 	if (!file.is_open())
@@ -1146,136 +1146,136 @@ bool DCM::Parser::stripQuotationTest()
 	std::cout << "\n\n";
 	return true;
 }
-bool DCM::Parser::rebuildUnknownTest()
+bool DCM::Manager::rebuildUnknownTest()
 {
-	auto parser = new Parser();
-	parser->open("unknownTest.dcm");
-	for (auto element : parser->elements)
+	auto manager = new Manager();
+	manager->open("unknownTest.dcm");
+	for (auto element : manager->elements)
 	{
-		std::cout << parser->rebuildUnknown((Unknown*)element) << std::endl;
+		std::cout << manager->rebuildUnknown((Unknown*)element) << std::endl;
 	}
 
 	return true;
 }
-bool DCM::Parser::rebuildFunctionsTest()
+bool DCM::Manager::rebuildFunctionsTest()
 {
-	auto parser = new Parser();
-	parser->open("functionsTest.dcm");
-	for (auto element : parser->elements)
+	auto manager = new Manager();
+	manager->open("functionsTest.dcm");
+	for (auto element : manager->elements)
 	{
-		std::cout << parser->rebuildFunctions((Functions*)element) << std::endl;
+		std::cout << manager->rebuildFunctions((Functions*)element) << std::endl;
 	}
 
 	return true;
 }
-bool DCM::Parser::rebuildCommentTest()
+bool DCM::Manager::rebuildCommentTest()
 {
-	auto parser = new Parser();
-	parser->open("commentTest.dcm");
-	for (auto element : parser->elements)
+	auto manager = new Manager();
+	manager->open("commentTest.dcm");
+	for (auto element : manager->elements)
 	{
-		std::cout << parser->rebuildComment((Comment*)element) << std::endl;
+		std::cout << manager->rebuildComment((Comment*)element) << std::endl;
 	}
 
 	return true;
 }
-bool DCM::Parser::rebuildFormatTest()
+bool DCM::Manager::rebuildFormatTest()
 {
-	auto parser = new Parser();
-	parser->open("formatTest.dcm");
-	for (auto element : parser->elements)
+	auto manager = new Manager();
+	manager->open("formatTest.dcm");
+	for (auto element : manager->elements)
 	{
-		std::cout << parser->rebuildFormat((Format*)element) << std::endl;
+		std::cout << manager->rebuildFormat((Format*)element) << std::endl;
 	}
 
 	return true;
 }
-bool DCM::Parser::rebuildParameterTest()
+bool DCM::Manager::rebuildParameterTest()
 {
-	auto parser = new Parser();
-	parser->open("Test_DCM2.dcm");
-	for (auto element : parser->elements)
+	auto manager = new Manager();
+	manager->open("Test_DCM2.dcm");
+	for (auto element : manager->elements)
 	{
-		std::cout << parser->rebuildParameter((Parameter*)element) << std::endl;
+		std::cout << manager->rebuildParameter((Parameter*)element) << std::endl;
 	}
 
 	return true;
 }
-bool DCM::Parser::rebuildArrayTest()
+bool DCM::Manager::rebuildArrayTest()
 {
-	auto parser = new Parser();
-	parser->open("Test_DCM2.dcm");
-	for (auto element : parser->elements)
+	auto manager = new Manager();
+	manager->open("Test_DCM2.dcm");
+	for (auto element : manager->elements)
 	{
-		std::cout << parser->rebuildArray((Array*)element) << std::endl;
+		std::cout << manager->rebuildArray((Array*)element) << std::endl;
 	}
 
 	return true;
 }
-bool DCM::Parser::rebuildMatrixTest()
+bool DCM::Manager::rebuildMatrixTest()
 {
-	auto parser = new Parser();
-	parser->open("Test_DCM2.dcm");
-	for (auto element : parser->elements)
+	auto manager = new Manager();
+	manager->open("Test_DCM2.dcm");
+	for (auto element : manager->elements)
 	{
-		std::cout << parser->rebuildMatrix((Matrix*)element) << std::endl;
+		std::cout << manager->rebuildMatrix((Matrix*)element) << std::endl;
 	}
 
 	return true;
 }
-bool DCM::Parser::rebuildLineBaseParameterTest()
+bool DCM::Manager::rebuildLineBaseParameterTest()
 {
-	auto parser = new Parser();
-	parser->open("Test_DCM2.dcm");
-	for (auto element : parser->elements)
+	auto manager = new Manager();
+	manager->open("Test_DCM2.dcm");
+	for (auto element : manager->elements)
 	{
-		std::cout << parser->rebuildLineBaseParameter((LineBaseParameter*)element) << std::endl;
+		std::cout << manager->rebuildLineBaseParameter((LineBaseParameter*)element) << std::endl;
 	}
 
 	return true;
 }
-bool DCM::Parser::rebuildMapBaseParameterTest()
+bool DCM::Manager::rebuildMapBaseParameterTest()
 {
-	auto parser = new Parser();
-	parser->open("Test_DCM2.dcm");
-	for (auto element : parser->elements)
+	auto manager = new Manager();
+	manager->open("Test_DCM2.dcm");
+	for (auto element : manager->elements)
 	{
-		std::cout << parser->rebuildMapBaseParameter((MapBaseParameter*)element) << std::endl;
+		std::cout << manager->rebuildMapBaseParameter((MapBaseParameter*)element) << std::endl;
 	}
 
 	return true;
 }
-bool DCM::Parser::rebuildDistributionTest()
+bool DCM::Manager::rebuildDistributionTest()
 {
-	auto parser = new Parser();
-	parser->open("Test_DCM2.dcm");
-	for (auto element : parser->elements)
+	auto manager = new Manager();
+	manager->open("Test_DCM2.dcm");
+	for (auto element : manager->elements)
 	{
-		std::cout << parser->rebuildDistribution((Distribution*)element) << std::endl;
+		std::cout << manager->rebuildDistribution((Distribution*)element) << std::endl;
 	}
 
 	return true;
 }
-bool DCM::Parser::parseDCM1Test()
+bool DCM::Manager::parseDCM1Test()
 {
-	auto parser = new Parser();
-	bool result = parser->open("Test_DCM1ex.dcm");
+	auto manager = new Manager();
+	bool result = manager->open("Test_DCM1ex.dcm");
 
 	std::cout << "\n\n\t\tRebuild\n\n";
 
-	std::cout << parser->rebuild();
+	std::cout << manager->rebuild();
 
 	return result;
 
 }
-bool DCM::Parser::parseDCM2Test()
+bool DCM::Manager::parseDCM2Test()
 {
-	auto parser = new Parser();
-	bool result = parser->open("Test_DCM2.dcm");
+	auto manager = new Manager();
+	bool result = manager->open("Test_DCM2.dcm");
 
 	std::cout << "\n\n\t\tRebuild\n\n";
 
-	std::cout << parser->rebuild();
+	std::cout << manager->rebuild();
 	
 	return result;
 }

@@ -275,7 +275,7 @@ namespace DCM
 
 	std::vector<std::string> stripLine(std::string lineRaw);
 
-	class Parser
+	class Manager
 	{
 	private:
 		bool isOpened = false;
@@ -340,7 +340,7 @@ namespace DCM
 
 
 	public:
-		Parser();
+		Manager();
 		bool open(std::string fpath, int mode = std::ios::in);
 
 		std::string rebuildUnknown(Unknown* unknown);
