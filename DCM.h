@@ -286,7 +286,14 @@ namespace DCM
 		Element* pCurrentElement = nullptr;
 
 		std::vector<Element*> elements;
-		std::vector<ModuleHeader*> moduleHeaders;				
+		std::vector<ModuleHeader*> moduleHeaders;
+		std::vector<Comment*> comments;
+		std::vector<Functions*> functions;
+		std::vector<Unknown*> unknowns;
+		std::vector<Format*> formats;
+		std::vector<VariantCoding*> variantCodings;
+		std::vector<BaseParameter*> parameters;
+
 		std::fstream file;
 		
 
@@ -336,7 +343,7 @@ namespace DCM
 		void parseLine(std::string lineRaw);	
 
 
-		
+		void putElement(Element* element);
 
 
 	public:
@@ -361,6 +368,8 @@ namespace DCM
 		std::string rebuild();
 		void saveAsDCM(std::string fname);
 		
+		void clear();
+
 		std::vector<Element*> getElements() { return elements; };
 		std::string getRawString() { std::string text = ""; for (auto line : lineHistory) text += line + "\n"; return text; };
 

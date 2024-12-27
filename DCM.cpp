@@ -257,7 +257,7 @@ void DCM::Manager::parseHeader(std::vector<std::string> lineStrip)
 		//for (int i = 1; i < lineStrip.size(); i++)
 		//	lineString += " " + lineStrip.at(i);
 		pCurrentElement = new Unknown(currentIndex, currentOrder, lineHistory.back());
-		elements.push_back(pCurrentElement);
+		putElement(pCurrentElement);
 		pCurrentElement = nullptr;
 		break;
 	}
@@ -268,15 +268,14 @@ void DCM::Manager::parseHeader(std::vector<std::string> lineStrip)
 		//for (int i = 1; i < lineStrip.size(); i++)
 		//	lineComment += " " + lineStrip.at(i);
 		pCurrentElement = new Comment(currentIndex, currentOrder, lineHistory.back());
-		
-		elements.push_back(pCurrentElement);
+		putElement(pCurrentElement);
 		pCurrentElement = nullptr;
 		break;
 	}
 	case TYPE::FORMAT:
 	{
 		pCurrentElement = new Format(currentIndex, currentOrder, lineStrip.at(1));
-		elements.push_back(pCurrentElement);
+		putElement(pCurrentElement);
 		pCurrentElement = nullptr;
 		break;
 	}
@@ -593,7 +592,7 @@ void DCM::Manager::parseComponent(std::vector<std::string> lineStrip)
 	}
 	case TYPE::END:
 	{
-		elements.push_back(pCurrentElement);
+		putElement(pCurrentElement);
 		switch (pCurrentElement->type)
 		{
 
@@ -611,7 +610,7 @@ void DCM::Manager::parseLine(std::string lineRaw)
 	if (lineStrip.empty())
 	{
 		pCurrentElement = new Unknown(currentIndex, currentOrder, lineHistory.back());
-		elements.push_back(pCurrentElement);
+		putElement(pCurrentElement);
 		pCurrentElement = nullptr;
 		return;
 	}
@@ -661,7 +660,58 @@ void DCM::Manager::parse()
 	}
 }
 
+void DCM::Manager::clear()
+{
+	lineHistory.clear();
+	currentIndex = 0;
+	currentOrder = 0;
+	pCurrentElement = nullptr;
+	for (auto element : elements)
+	{
+		if (element != nullptr)
+			delete element;
+	}
+	elements.clear();
+	moduleHeaders.clear();
 
+}
+void DCM::Manager::putElement(Element* element)
+{
+	elements.push_back(element);
+	switch (element->type)
+	{
+	case TYPE::UNKNOWN:
+		unknowns.push_back((Unknown*)element);
+		break;
+	case TYPE::COMMENT:
+		comments.push_back((Comment*)element);
+		break;
+	case TYPE::FORMAT:
+		formats.push_back((Format*)element);
+		break;
+	case TYPE::FUNCTIONS:
+		functions.push_back((Functions*)element);
+		break;
+	case TYPE::VARIANTCODING:
+		variantCodings.push_back((VariantCoding*)element);
+		break;
+	case TYPE::MODULEHEADER:
+		moduleHeaders.push_back((ModuleHeader*)element);
+		break;
+	case TYPE::PARAMETER:
+	case TYPE::ARRAY:
+	case TYPE::MATRIX:
+	case TYPE::CHARLINE:
+	case TYPE::CHARMAP:
+	case TYPE::FIXEDCHARLINE:
+	case TYPE::FIXEDCHARMAP:
+	case TYPE::GROUPCHARLINE:
+	case TYPE::GROUPCHARMAP:
+	case TYPE::DISTRIBUTION:
+		parameters.push_back((BaseParameter*)element);
+		break;
+	}
+}
 std::string DCM::Manager::rebuildUnknown(Unknown* unknown)
 {
 	std::string text = "";
@@ -827,7 +877,7 @@ std::string DCM::Manager::rebuildMatrix(Matrix* matrix)
 			if (j % 6 == 0)
 				text += "   WERT";
 			text += "   " + std::to_string(matrix->values.at(i * matrix->size_x + j));
-			if (i % 6 == 5 || i == matrix->size_x - 1)
+			if (j % 6 == 5 || j == matrix->size_x - 1)
 				text += "\n";
 		}
 	}

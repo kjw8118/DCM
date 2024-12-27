@@ -11,9 +11,10 @@ int main()
     
     //std::cout << "DCM Parser General Test\t" << (bool)DCM::Parser::test() << std::endl;
     
-    auto parser = new DCM::Parser();
-    parser->open("test.dcm");
-    std::cout << parser->rebuild() << std::endl;
+    auto manager = new DCM::Manager();
+    manager->open("Test_DCM2.dcm");
+    manager->parse();
+    std::cout << manager->rebuild() << std::endl;
 
     //DCM::Parser::rebuildArrayTest();
     //DCM::Parser::rebuildMatrixTest();
