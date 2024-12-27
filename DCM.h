@@ -244,7 +244,7 @@ namespace DCM
 
 		std::fstream file;
 		
-
+		std::map<std::string, Element*> elementIndex;
 		
 
 	/*

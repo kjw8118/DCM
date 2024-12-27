@@ -624,7 +624,7 @@ void DCM::Manager::clear()
 }
 void DCM::Manager::putElement(Element* element)
 {
-	elements.push_back(element);
+	elements.push_back(element);	
 	switch (element->type)
 	{
 	case TYPE::UNKNOWN:
@@ -656,6 +656,7 @@ void DCM::Manager::putElement(Element* element)
 	case TYPE::GROUPCHARMAP:
 	case TYPE::DISTRIBUTION:
 		parameters.push_back((BaseParameter*)element);
+		elementIndex[((BaseParameter*)element)->name] = element;
 		break;
 	}
 }
