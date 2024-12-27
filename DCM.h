@@ -11,42 +11,6 @@
 namespace DCM
 {
 	
-	/*
-	
-	Comment			: *
-	Format			: KONSERVIERUNG_FORMAT
-	Functions		: FUNKTIONEN
-	Function		: FKT
-	VariantCoding	: VARIANTENKODIERUNG
-	Variant			: KRITERIUM
-	ModuleHeader	: MODULKOPF
-	Parameter		: FESTWERT
-	Array			: FESTWERTEBLOCK
-	Matrix			: FESTWERTEBLOCK
-	CharLine		: KENNLINIE
-	CharMap			: KENNFELD
-	FixedCharLine	: FESTKENNLINIE
-	FixedCharMap	: FESTKENNFELD
-	GroupCharLine	: GRUPPENKENNLINIE
-	GroupCharMap	: GRUPPENKENNFELD
-	Distribution	: STUETZSTELLENVERTEILUNG
-
-	Langname		: LANGNAME
-	Displayname		: DISPLAYNAME
-	Variant			: VAR
-	Function		: FUNKTION
-	Unit X			: EINHEIT_X
-	Unit Y			: EINHEIT_Y
-	Unit Z			: EINHEIT_W
-	Point X			: ST/X
-	Point Y			: ST/Y
-	Value			: WERT
-
-	Distribution X	: *SSTX
-	Distribution Y	: *SSTY
-	
-	*/
-
 	enum TYPE
 	{
 		UNKNOWN = 0,
@@ -126,7 +90,6 @@ namespace DCM
 		Functions(int lineIndex, int lineOrder);
 		std::vector<Function> functions;
 	};
-
 	class Variant
 	{
 	public:
@@ -140,7 +103,6 @@ namespace DCM
 		VariantCoding(int lineIndex, int lineOrder);
 		std::vector<Variant> variants;
 	};
-
 	class ModuleHeader : public Element
 	{
 	public:
@@ -148,7 +110,6 @@ namespace DCM
 		std::string name;
 		std::vector<std::string> texts;
 	};
-
 	class BaseParameter : public Element
 	{
 	public:
@@ -165,7 +126,6 @@ namespace DCM
 		
 		
 	};
-
 	class ArrayBaseParameter : public BaseParameter
 	{
 	public:
@@ -175,7 +135,6 @@ namespace DCM
 		std::vector<double> values;
 		
 	};
-
 	class LineBaseParameter : public BaseParameter
 	{
 	public:
@@ -185,7 +144,6 @@ namespace DCM
 		std::vector<double> point_x;
 		std::vector<double> values;
 	};
-
 	class MapBaseParameter : public LineBaseParameter
 	{
 	public:
@@ -195,7 +153,6 @@ namespace DCM
 		std::vector<double> point_y;
 		std::vector<double> values;
 	};
-
 	class Parameter : public BaseParameter // FESTWERT
 	{
 	public:
@@ -203,56 +160,48 @@ namespace DCM
 		double value;
 		std::string text;
 	};
-
 	class Array : public ArrayBaseParameter // FESTWERTEBLOCK
 	{
 	public:
 		Array(int lineIndex, int lineOrder, std::string name, int size_x = 0);
 		
 	};
-
 	class Matrix : public ArrayBaseParameter // FESTWERTEBLOCK
 	{
 	public:
 		Matrix(int lineIndex, int lineOrder, std::string name, int size_x = 0, int size_y = 0);
 		
 	};
-
 	class CharLine : public LineBaseParameter // KENNLINIE
 	{
 	public:
 		CharLine(int lineIndex, int lineOrder, std::string name, int size_x = 0);
 		
 	};
-
 	class CharMap : public MapBaseParameter // KENNFELD
 	{
 	public:
 		CharMap(int lineIndex, int lineOrder, std::string name, int size_x = 0, int size_y = 0);		
 		
 	};
-
 	class FixedCharLine : public LineBaseParameter // FESTKENNLINIE
 	{
 	public:
 		FixedCharLine(int lineIndex, int lineOrder, std::string name, int size_x = 0);
 		
 	};
-
 	class FixedCharMap : public MapBaseParameter // FESTKENNFELD
 	{
 	public:
 		FixedCharMap(int lineIndex, int lineOrder, std::string name, int size_x = 0, int size_y = 0);
 
 	};
-
 	class Distribution : public LineBaseParameter
 	{
 	public:
 		Distribution(int lineIndex, int lineOrder, std::string name, int size_x = 0);
 		
 	};
-
 	class GroupCharLine : public LineBaseParameter
 	{
 	public:
@@ -261,7 +210,6 @@ namespace DCM
 		std::string dist_x = "";
 		
 	};
-
 	class GroupCharMap : public MapBaseParameter
 	{
 	public:
