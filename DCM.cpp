@@ -151,7 +151,7 @@ DCM::GroupCharMap::GroupCharMap(int lineIndex, int lineOrder, std::string name, 
 	
 std::vector<std::string> DCM::stripLine(std::string lineRaw)
 {
-	bool isOpen = false;
+	bool isQuoOpen = false;
 	std::vector<std::string> lineStrip;
 	std::string buffer;
 
@@ -159,7 +159,7 @@ std::vector<std::string> DCM::stripLine(std::string lineRaw)
 	{
 		if (c == '\"')
 		{
-			if (!isOpen)
+			if (!isQuoOpen)
 			{
 				if (!buffer.empty())
 				{
@@ -174,18 +174,18 @@ std::vector<std::string> DCM::stripLine(std::string lineRaw)
 				lineStrip.push_back(buffer);
 				buffer.clear();
 			}
-			isOpen = !isOpen;
+			isQuoOpen = !isQuoOpen;
 
 			continue;
 		}
-		else if ((c == ' ' && !isOpen) || (c == '\n'))
+		else if ((c == ' ' && !isQuoOpen) || (c == '\n'))
 		{
 			if (!buffer.empty())
 			{
 				lineStrip.push_back(buffer);
 				buffer.clear();
 			}
-			isOpen = false;
+			isQuoOpen = false;
 
 			continue;
 		}
@@ -639,13 +639,19 @@ bool DCM::Manager::open(std::string fpath, int mode)
 	}
 
 	isOpened = true;
-	lineHistory.clear();
-	pCurrentElement = nullptr;
-	std::string lineRaw = "";
-	currentIndex = 0;
+	
+	return true;
+};
 
-	if (mode == std::ios::in)
+void DCM::Manager::parse()
+{
+	if (isOpened)
 	{
+		lineHistory.clear();
+		pCurrentElement = nullptr;
+		std::string lineRaw = "";
+		currentIndex = 0;
+
 		while (std::getline(file, lineRaw))
 		{
 			lineHistory.push_back(lineRaw);
@@ -653,9 +659,7 @@ bool DCM::Manager::open(std::string fpath, int mode)
 			currentIndex++;
 		}
 	}
-
-	return true;
-};
+}
 
 
 std::string DCM::Manager::rebuildUnknown(Unknown* unknown)

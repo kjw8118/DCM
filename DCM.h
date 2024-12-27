@@ -342,6 +342,7 @@ namespace DCM
 	public:
 		Manager();
 		bool open(std::string fpath, int mode = std::ios::in);
+		void parse();
 
 		std::string rebuildUnknown(Unknown* unknown);
 		std::string rebuildFunctions(Functions* functions);
