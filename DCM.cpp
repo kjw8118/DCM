@@ -505,6 +505,7 @@ void DCM::Manager::parseComponent(std::vector<std::string> lineStrip)
 		case TYPE::PARAMETER:
 		{
 			((Parameter*)pCurrentElement)->text = lineStrip.at(1);
+			((Parameter*)pCurrentElement)->type = TYPE::BOOLEAN;
 			break;
 		}
 		}
@@ -644,6 +645,16 @@ DCM::Element* DCM::Manager::findElement(std::string name, bool exactmatch)
 	return nullptr;
 	
 }
+std::vector<DCM::Element*> DCM::Manager::findElements(std::string name, bool exactmatch)
+{
+	std::vector<DCM::Element*> ret;
+	if (name.empty())
+		return ret;
+
+	std::string name_trnsf = name;
+	if (!exactmatch)
+		std::transform(name_trnsf.begin(), name_trnsf.end(), name_trnsf.begin(), std::tolower);
+}
 void DCM::Manager::putElement(Element* element)
 {
 	elements.push_back(element);	
@@ -668,6 +679,7 @@ void DCM::Manager::putElement(Element* element)
 		moduleHeaders.push_back((ModuleHeader*)element);
 		break;
 	case TYPE::PARAMETER:
+	case TYPE::BOOLEAN:
 	case TYPE::ARRAY:
 	case TYPE::MATRIX:
 	case TYPE::CHARLINE:
@@ -761,7 +773,7 @@ std::string DCM::Manager::rebuildFormat(Format* format)
 std::string DCM::Manager::rebuildParameter(Parameter* parameter)
 {
 	std::string text = "";
-	if (parameter->type != TYPE::PARAMETER)
+	if (parameter->type != TYPE::PARAMETER && parameter->type != TYPE::BOOLEAN)
 		return text;
 
 	text += "FESTWERT " + parameter->name + "\n";
@@ -775,7 +787,7 @@ std::string DCM::Manager::rebuildParameter(Parameter* parameter)
 		text += "   FUNKTION " + parameter->function + "\n";
 	if (!parameter->unit.empty())
 		text += "   EINHEIT_W " + parameter->unit + "\n";
-	if(!parameter->text.empty())
+	if(parameter->type == TYPE::BOOLEAN)
 		text += "   TEXT " + parameter->text + "\n";
 	else
 		text += "   WERT " + std::to_string(parameter->value) + "\n";
@@ -1055,6 +1067,7 @@ std::string DCM::Manager::rebuildElement(Element* element)
 	case TYPE::FORMAT:
 		return rebuildFormat((Format*)element);
 	case TYPE::PARAMETER:
+	case TYPE::BOOLEAN:
 		return rebuildParameter((Parameter*)element);
 	case TYPE::ARRAY:
 		return rebuildArray((Array*)element);
@@ -1136,8 +1149,7 @@ std::vector<DCM::Parameter*> DCM::Manager::collectValue()
 	for (auto para : parameters)
 	{
 		if (para->type == DCM::TYPE::PARAMETER)
-			if(((DCM::Parameter*)para)->text.empty())
-				ret.push_back((DCM::Parameter*)para);
+			ret.push_back((DCM::Parameter*)para);
 	}
 	return ret;
 }
@@ -1146,9 +1158,8 @@ std::vector<DCM::Parameter*> DCM::Manager::collectValueBoolean()
 	std::vector<DCM::Parameter*> ret;
 	for (auto para : parameters)
 	{
-		if (para->type == DCM::TYPE::PARAMETER)
-			if (!((DCM::Parameter*)para)->text.empty())
-				ret.push_back((DCM::Parameter*)para);
+		if (para->type == DCM::TYPE::BOOLEAN)
+			ret.push_back((DCM::Parameter*)para);
 	}
 	return ret;
 }

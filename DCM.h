@@ -44,6 +44,7 @@ namespace DCM
 		VAR,
 		END,
 		MATRIX,
+		BOOLEAN,
 
 	};
 	
@@ -328,6 +329,7 @@ namespace DCM
 
 		std::vector<Element*> getElements();
 		Element* findElement(std::string name, bool exactmatch=false);
+		std::vector<Element*> findElements(std::string name, bool exactmatch = false);
 		std::string getRawString() { std::string text = ""; for (auto line : lineHistory) text += line + "\n"; return text; };
 
 		
@@ -351,7 +353,7 @@ namespace DCM
 		static bool parseDCM1Test();
 		static bool parseDCM2Test();
 
-		static bool createDCMTest();
+		//static bool createDCMTest();
 	};
 };
 

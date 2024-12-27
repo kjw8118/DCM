@@ -1,7 +1,7 @@
 ﻿
 #include <iostream>
 
-#include "DCM.h"
+//#include "DCM.h"
 
 
 
@@ -11,7 +11,7 @@ int main()
     
     //std::cout << "DCM Parser General Test\t" << (bool)DCM::Parser::test() << std::endl;
     
-    auto manager = new DCM::Manager();
+    /*auto manager = new DCM::Manager();
     manager->open("Test_DCM2.dcm");
     manager->parse();
     std::cout << manager->rebuild() << std::endl;
@@ -21,7 +21,7 @@ int main()
     //DCM::Parser::rebuildLineBaseParameterTest();
     //DCM::Parser::rebuildMapBaseParameterTest();
     //DCM::Parser::rebuildDistributionTest();
-    //DCM::Parser::createDCMTest();
+    //DCM::Parser::createDCMTest();*/
     
     return 0;
 
