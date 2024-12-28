@@ -8,8 +8,10 @@
 int main()
 {
     auto manager = new DCM::Manager();
-    manager->createDCM();
-    manager->saveAsDCM("new1.dcm");
+    manager->open("Test_DCM2.dcm");
+    //manager->createDCM();
+    manager->parse();
+    manager->saveAsDCM("Test_DCM2_rebuild.dcm");
     //std::cout << "Hello World!\n";
     
     //std::cout << "DCM Parser General Test\t" << (bool)DCM::Parser::test() << std::endl;
