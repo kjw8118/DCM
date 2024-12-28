@@ -800,7 +800,7 @@ std::string DCM::Manager::rebuildFormat(Format* format)
 std::string DCM::Manager::rebuildParameter(Parameter* parameter)
 {
 	std::string text = "";
-	if (parameter->type != TYPE::PARAMETER && parameter->type != TYPE::BOOLEAN)
+	if (parameter->type != TYPE::PARAMETER)
 		return text;
 
 	text += "FESTWERT " + parameter->name + "\n";
@@ -813,13 +813,34 @@ std::string DCM::Manager::rebuildParameter(Parameter* parameter)
 	if (!parameter->function.empty())
 		text += "   FUNKTION " + parameter->function + "\n";
 	if (!parameter->unit.empty())
-		text += "   EINHEIT_W " + parameter->unit + "\n";
-	if(parameter->type == TYPE::BOOLEAN)
-		text += "   TEXT " + parameter->text + "\n";
-	else
-		text += "   WERT " + std::to_string(parameter->value) + "\n";
+		text += "   EINHEIT_W " + parameter->unit + "\n";	
+	text += "   WERT " + std::to_string(parameter->value) + "\n";
 	text += "END\n";
 	
+	return text;
+
+}
+std::string DCM::Manager::rebuildBoolean(Boolean* boolean)
+{
+	std::string text = "";
+	if (boolean->type != TYPE::BOOLEAN)
+		return text;
+
+	text += "FESTWERT " + boolean->name + "\n";
+	if (!boolean->langname.empty())
+		text += "   LANGNAME " + boolean->langname + "\n";
+	if (!boolean->displayname.empty())
+		text += "   DISPLAYNAME " + boolean->displayname + "\n";
+	if (!boolean->variant.empty())
+		text += "   VAR " + boolean->variant + "\n";
+	if (!boolean->function.empty())
+		text += "   FUNKTION " + boolean->function + "\n";
+	if (!boolean->unit.empty())
+		text += "   EINHEIT_W " + boolean->unit + "\n";
+	if (!boolean->text.empty())
+		text += "   TEXT " + boolean->text + "\n";	
+	text += "END\n";
+
 	return text;
 
 }

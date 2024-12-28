@@ -132,7 +132,10 @@ namespace DCM
 		ArrayBaseParameter(int lineIndex, int lineOrder, int type, std::string name, int size_x, int size_y);
 		int size_x;
 		int size_y;
+		//std::vector<double> values;
 		std::vector<double> values;
+		std::vector<int> dec_values;
+
 		
 	};
 	class LineBaseParameter : public BaseParameter
@@ -143,6 +146,8 @@ namespace DCM
 		std::string unit_x = "";
 		std::vector<double> point_x;
 		std::vector<double> values;
+		std::vector<int> dec_point_x;
+		std::vector<int> dec_values;
 	};
 	class MapBaseParameter : public LineBaseParameter
 	{
@@ -151,20 +156,21 @@ namespace DCM
 		int size_y;
 		std::string unit_y = "";
 		std::vector<double> point_y;
-		//std::vector<double> values;
+		std::vector<int> dec_point_y;
 	};
 	class Parameter : public BaseParameter // FESTWERT
 	{
 	public:
 		Parameter(int lineIndex, int lineOrder, std::string name);
 		double value;
-		std::string text;
+		int dec_value;
+		
 	};
 	class Boolean : public BaseParameter // FESTWERT
 	{
 	public:
 		Boolean(int lineIndex, int lineOrder, std::string name);
-		std::string text;
+		std::string text;		
 	};
 	class Array : public ArrayBaseParameter // FESTWERTEBLOCK
 	{
@@ -322,6 +328,7 @@ namespace DCM
 		std::string rebuildModuleHeader(ModuleHeader* moduleHeader);
 		std::string rebuildFormat(Format* format);
 		std::string rebuildParameter(Parameter* parameter);
+		std::string rebuildBoolean(Boolean* boolean);
 		std::string rebuildArray(Array* arr);
 		std::string rebuildMatrix(Matrix* matrix);
 		std::string rebuildLineBaseParameter(LineBaseParameter* line);
