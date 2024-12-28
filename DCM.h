@@ -151,7 +151,7 @@ namespace DCM
 		int size_y;
 		std::string unit_y = "";
 		std::vector<double> point_y;
-		std::vector<double> values;
+		//std::vector<double> values;
 	};
 	class Parameter : public BaseParameter // FESTWERT
 	{
