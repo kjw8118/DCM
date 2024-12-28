@@ -6,6 +6,7 @@
 #include <iomanip>
 #include <chrono>
 #include <iostream>
+#include <format>
 
 namespace DCM {
 	std::map<std::string, int> Header = {
@@ -77,7 +78,7 @@ DCM::MapBaseParameter::MapBaseParameter(int lineIndex, int lineOrder, int type, 
 DCM::Parameter::Parameter(int lineIndex, int lineOrder, std::string name)
 	: BaseParameter(lineIndex, lineOrder, TYPE::PARAMETER, name), value(0) {};
 DCM::Boolean::Boolean(int lineIndex, int lineOrder, std::string name)
-	: BaseParameter(lineIndex, lineOrder, TYPE::PARAMETER, name), text("") {};
+	: BaseParameter(lineIndex, lineOrder, TYPE::BOOLEAN, name), text("") {};
 DCM::Array::Array(int lineIndex, int lineOrder, std::string name, int size_x)
 	: ArrayBaseParameter(lineIndex, lineOrder, TYPE::ARRAY, name, size_x, 0) {};
 DCM::Matrix::Matrix(int lineIndex, int lineOrder, std::string name, int size_x, int size_y)
@@ -156,7 +157,19 @@ std::vector<std::string> DCM::stripLine(std::string lineRaw)
 
 	return lineStrip;
 }
-
+int DCM::countDecimalPlaces(const std::string& numberStr)
+{
+	size_t dotPos = numberStr.find('.');
+	if (dotPos == std::string::npos) {	
+		return 0;
+	}
+	std::string decimalPart = numberStr.substr(dotPos + 1);
+	return decimalPart.length();
+}
+std::string DCM::toFixed(double value, int precision)
+{
+	return std::format("{:.{}f}", value, precision);
+}
 /*
 
 // Initial Header
@@ -435,20 +448,17 @@ void DCM::Manager::parseComponent(std::vector<std::string> lineStrip)
 		case TYPE::FIXEDCHARLINE:
 		case TYPE::GROUPCHARLINE:
 		case TYPE::DISTRIBUTION:
-		{
-			for (int i = 1; i < lineStrip.size(); i++)
-				((LineBaseParameter*)pCurrentElement)->point_x.push_back(std::stod(lineStrip.at(i)));
-			break;
-		}
 		case TYPE::CHARMAP:
 		case TYPE::FIXEDCHARMAP:
 		case TYPE::GROUPCHARMAP:
 		{
 			for (int i = 1; i < lineStrip.size(); i++)
-				((MapBaseParameter*)pCurrentElement)->point_x.push_back(std::stod(lineStrip.at(i)));
+			{
+				((LineBaseParameter*)pCurrentElement)->point_x.push_back(std::stod(lineStrip.at(i)));
+				((LineBaseParameter*)pCurrentElement)->dec_point_x.push_back(countDecimalPlaces(lineStrip.at(i)));
+			}
 			break;
-		}
-
+		}		
 		}
 		break;
 	}
@@ -461,7 +471,10 @@ void DCM::Manager::parseComponent(std::vector<std::string> lineStrip)
 		case TYPE::GROUPCHARMAP:
 		{
 			for (int i = 1; i < lineStrip.size(); i++)
+			{
 				((MapBaseParameter*)pCurrentElement)->point_y.push_back(std::stod(lineStrip.at(i)));
+				((MapBaseParameter*)pCurrentElement)->dec_point_y.push_back(countDecimalPlaces(lineStrip.at(i)));
+			}
 			break;
 		}
 		}
@@ -474,32 +487,33 @@ void DCM::Manager::parseComponent(std::vector<std::string> lineStrip)
 		case TYPE::PARAMETER:
 		{
 			((Parameter*)pCurrentElement)->value = std::stod(lineStrip.at(1));
+			((Parameter*)pCurrentElement)->dec_value = countDecimalPlaces(lineStrip.at(1));
 			break;
 		}
 		case TYPE::ARRAY:
 		case TYPE::MATRIX:
 		{
-			for(int i=1; i<lineStrip.size(); i++)
+			for (int i = 1; i < lineStrip.size(); i++)
+			{
 				((ArrayBaseParameter*)pCurrentElement)->values.push_back(std::stod(lineStrip.at(i)));
+				((ArrayBaseParameter*)pCurrentElement)->dec_values.push_back(countDecimalPlaces(lineStrip.at(i)));
+			}
 			break;
 		}
 		case CHARLINE:
 		case FIXEDCHARLINE:
 		case GROUPCHARLINE:
-		{
-			for (int i = 1; i < lineStrip.size(); i++)
-				((LineBaseParameter*)pCurrentElement)->values.push_back(std::stod(lineStrip.at(i)));
-			break;
-		}
 		case CHARMAP:
 		case FIXEDCHARMAP:
 		case GROUPCHARMAP:
 		{
 			for (int i = 1; i < lineStrip.size(); i++)
-				((MapBaseParameter*)pCurrentElement)->values.push_back(std::stod(lineStrip.at(i)));
-			
+			{
+				((LineBaseParameter*)pCurrentElement)->values.push_back(std::stod(lineStrip.at(i)));
+				((LineBaseParameter*)pCurrentElement)->dec_values.push_back(countDecimalPlaces(lineStrip.at(i)));
+			}
 			break;
-		}
+		}		
 		}
 		break;
 	}
@@ -507,10 +521,9 @@ void DCM::Manager::parseComponent(std::vector<std::string> lineStrip)
 	{
 		switch (pCurrentElement->type)
 		{
-		case TYPE::PARAMETER:
+		case TYPE::BOOLEAN:
 		{
-			((Parameter*)pCurrentElement)->text = lineStrip.at(1);
-			((Parameter*)pCurrentElement)->type = TYPE::BOOLEAN;
+			((Boolean*)pCurrentElement)->text = lineStrip.at(1);
 			break;
 		}
 		}
@@ -814,7 +827,7 @@ std::string DCM::Manager::rebuildParameter(Parameter* parameter)
 		text += "   FUNKTION " + parameter->function + "\n";
 	if (!parameter->unit.empty())
 		text += "   EINHEIT_W " + parameter->unit + "\n";	
-	text += "   WERT " + std::to_string(parameter->value) + "\n";
+	text += "   WERT " + DCM::toFixed(parameter->value, parameter->dec_value) + "\n";
 	text += "END\n";
 	
 	return text;
@@ -871,7 +884,7 @@ std::string DCM::Manager::rebuildArray(Array* arr)
 	{
 		if (i % 6 == 0)
 			text += "   WERT";
-		text += "   " + std::to_string(arr->values.at(i));
+		text += "   " + DCM::toFixed(arr->values.at(i), arr->dec_values.at(i));
 		if (i % 6 == 5 || i == arr->values.size()-1)
 			text += "\n";
 	}
@@ -906,7 +919,7 @@ std::string DCM::Manager::rebuildMatrix(Matrix* matrix)
 		{
 			if (j % 6 == 0)
 				text += "   WERT";
-			text += "   " + std::to_string(matrix->values.at(i * matrix->size_x + j));
+			text += "   " + DCM::toFixed(matrix->values.at(i * matrix->size_x + j), matrix->dec_values.at(i * matrix->size_x + j));
 			if (j % 6 == 5 || j == matrix->size_x - 1)
 				text += "\n";
 		}
@@ -966,7 +979,7 @@ std::string DCM::Manager::rebuildLineBaseParameter(LineBaseParameter* line)
 	{
 		if (i % 6 == 0)
 			text += "   ST/X";
-		text += "   " + std::to_string(line->point_x.at(i));
+		text += "   " + DCM::toFixed(line->point_x.at(i), line->dec_point_x.at(i));
 		if (i % 6 == 5 || i == line->point_x.size() - 1)
 			text += "\n";
 	}
@@ -975,7 +988,7 @@ std::string DCM::Manager::rebuildLineBaseParameter(LineBaseParameter* line)
 	{
 		if (i % 6 == 0)
 			text += "   WERT";
-		text += "   " + std::to_string(line->values.at(i));
+		text += "   " + DCM::toFixed(line->values.at(i), line->dec_values.at(i));
 		if (i % 6 == 5 || i == line->values.size() - 1)
 			text += "\n";
 	}
@@ -1038,7 +1051,7 @@ std::string DCM::Manager::rebuildMapBaseParameter(MapBaseParameter* map)
 	{
 		if (i % 6 == 0)
 			text += "   ST/X";
-		text += "   " + std::to_string(map->point_x.at(i));
+		text += "   " + DCM::toFixed(map->point_x.at(i), map->dec_point_x.at(i));
 		if (i % 6 == 5 || i == map->point_x.size() - 1)
 			text += "\n";
 	}
@@ -1046,12 +1059,13 @@ std::string DCM::Manager::rebuildMapBaseParameter(MapBaseParameter* map)
 	for(int i=0; i<map->point_y.size(); i++)
 	{
 		auto value_y = map->point_y.at(i);
-		text += "   ST/Y   " + std::to_string(value_y) + "\n";
+		auto dec_value_y = map->dec_point_y.at(i);
+		text += "   ST/Y   " + DCM::toFixed(value_y, dec_value_y) + "\n";
 		for (int j = 0; j < map->point_x.size(); j++)
 		{
 			if (j % 6 == 0)
 				text += "   WERT";
-			text += "    " + std::to_string(map->values.at(i * map->point_x.size() + j));
+			text += "    " + DCM::toFixed(map->values.at(i * map->point_x.size() + j), map->dec_values.at(i * map->point_x.size() + j));
 			if (j % 6 == 5 || j == map->point_x.size() - 1)
 				text += "\n";
 		}		
@@ -1088,7 +1102,7 @@ std::string DCM::Manager::rebuildDistribution(Distribution* dist)
 	{
 		if (i % 6 == 0)
 			text += "   ST/X";
-		text += "   " + std::to_string(dist->point_x.at(i));
+		text += "   " + DCM::toFixed(dist->point_x.at(i), dist->dec_point_x.at(i));
 		if (i % 6 == 5 || i == dist->point_x.size() - 1)
 			text += "\n";
 	}

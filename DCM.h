@@ -234,6 +234,8 @@ namespace DCM
 	};
 
 	std::vector<std::string> stripLine(std::string lineRaw);
+	int countDecimalPlaces(const std::string& numberStr);
+	std::string toFixed(double value, int precision);
 
 	class Manager
 	{
