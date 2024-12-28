@@ -779,7 +779,7 @@ std::string DCM::Manager::rebuildFunctions(Functions* functions)
 	text += "FUNKTIONEN\n";
 	for (auto &fkt : functions->functions)
 	{
-		text += "   FKT " + fkt.name + " " + fkt.version + " " + fkt.longname + "\n";
+		text += "   FKT " + fkt.name + " " + fkt.version + " " + fkt.longname + " \n";
 	}
 	text += "END\n";
 	return text;
@@ -842,15 +842,15 @@ std::string DCM::Manager::rebuildParameter(Parameter* parameter)
 	if (parameter->type != TYPE::PARAMETER)
 		return text;
 
-	text += "FESTWERT " + parameter->name + "\n";
+	text += "FESTWERT " + parameter->name + " \n";
 	if (!parameter->langname.empty())
-		text += "   LANGNAME " + parameter->langname + "\n";
+		text += "   LANGNAME " + parameter->langname + " \n";
 	if (!parameter->displayname.empty())
 		text += "   DISPLAYNAME " + parameter->displayname + "\n";
 	if (!parameter->variant.empty())
 		text += "   VAR " + parameter->variant + "\n";
 	if (!parameter->function.empty())
-		text += "   FUNKTION " + parameter->function + "\n";
+		text += "   FUNKTION " + parameter->function + " \n";
 	if (!parameter->unit.empty())
 		text += "   EINHEIT_W " + parameter->unit + "\n";	
 	text += "   WERT " + DCM::toFixed(parameter->value, parameter->dec_value) + "\n";
@@ -865,15 +865,15 @@ std::string DCM::Manager::rebuildBoolean(Boolean* boolean)
 	if (boolean->type != TYPE::BOOLEAN)
 		return text;
 
-	text += "FESTWERT " + boolean->name + "\n";
+	text += "FESTWERT " + boolean->name + " \n";
 	if (!boolean->langname.empty())
-		text += "   LANGNAME " + boolean->langname + "\n";
+		text += "   LANGNAME " + boolean->langname + " \n";
 	if (!boolean->displayname.empty())
 		text += "   DISPLAYNAME " + boolean->displayname + "\n";
 	if (!boolean->variant.empty())
 		text += "   VAR " + boolean->variant + "\n";
 	if (!boolean->function.empty())
-		text += "   FUNKTION " + boolean->function + "\n";
+		text += "   FUNKTION " + boolean->function + " \n";
 	if (!boolean->unit.empty())
 		text += "   EINHEIT_W " + boolean->unit + "\n";
 	if (!boolean->text.empty())
@@ -890,18 +890,18 @@ std::string DCM::Manager::rebuildArray(Array* arr)
 	if (arr->type != TYPE::ARRAY)
 		return text;
 
-	text += "FESTWERTEBLOCK " + arr->name;
+	text += "FESTWERTEBLOCK " + arr->name + " ";
 	if (arr->size_x)
-		text += " " + std::to_string(arr->size_x);
+		text += std::to_string(arr->size_x);
 	text += "\n";
 	if (!arr->langname.empty())
-		text += "   LANGNAME " + arr->langname + "\n";
+		text += "   LANGNAME " + arr->langname + " \n";
 	if (!arr->displayname.empty())
 		text += "   DISPLAYNAME " + arr->displayname + "\n";
 	if (!arr->variant.empty())
 		text += "   VAR " + arr->variant + "\n";
 	if (!arr->function.empty())
-		text += "   FUNKTION " + arr->function + "\n";
+		text += "   FUNKTION " + arr->function + " \n";
 	if (!arr->unit.empty())
 		text += "   EINHEIT_W " + arr->unit + "\n";
 	
@@ -909,8 +909,8 @@ std::string DCM::Manager::rebuildArray(Array* arr)
 	for (int i=0; i<arr->values.size(); i++)
 	{
 		if (i % 6 == 0)
-			text += "   WERT";
-		text += "   " + DCM::toFixed(arr->values.at(i), arr->dec_values.at(i));
+			text += "   WERT   ";
+		text += DCM::toFixed(arr->values.at(i), arr->dec_values.at(i)) + "   ";
 		if (i % 6 == 5 || i == arr->values.size()-1)
 			text += "\n";
 	}
@@ -924,18 +924,18 @@ std::string DCM::Manager::rebuildMatrix(Matrix* matrix)
 	if (matrix->type != TYPE::MATRIX)
 		return text;
 
-	text += "FESTWERTEBLOCK " + matrix->name;
+	text += "FESTWERTEBLOCK " + matrix->name + " ";
 	if (matrix->size_x && matrix->size_y)
-		text += " " + std::to_string(matrix->size_x) + " @ " + std::to_string(matrix->size_y);
+		text += std::to_string(matrix->size_x) + " @ " + std::to_string(matrix->size_y);
 	text += "\n";
 	if (!matrix->langname.empty())
-		text += "   LANGNAME " + matrix->langname + "\n";
+		text += "   LANGNAME " + matrix->langname + " \n";
 	if (!matrix->displayname.empty())
 		text += "   DISPLAYNAME " + matrix->displayname + "\n";
 	if (!matrix->variant.empty())
 		text += "   VAR " + matrix->variant + "\n";
 	if (!matrix->function.empty())
-		text += "   FUNKTION " + matrix->function + "\n";
+		text += "   FUNKTION " + matrix->function + " \n";
 	if (!matrix->unit.empty())
 		text += "   EINHEIT_W " + matrix->unit + "\n";
 
@@ -944,8 +944,8 @@ std::string DCM::Manager::rebuildMatrix(Matrix* matrix)
 		for (int j = 0; j < matrix->size_x; j++)
 		{
 			if (j % 6 == 0)
-				text += "   WERT";
-			text += "   " + DCM::toFixed(matrix->values.at(i * matrix->size_x + j), matrix->dec_values.at(i * matrix->size_x + j));
+				text += "   WERT   ";
+			text += DCM::toFixed(matrix->values.at(i * matrix->size_x + j), matrix->dec_values.at(i * matrix->size_x + j)) + "   ";
 			if (j % 6 == 5 || j == matrix->size_x - 1)
 				text += "\n";
 		}
@@ -980,18 +980,18 @@ std::string DCM::Manager::rebuildLineBaseParameter(LineBaseParameter* line)
 		return text;
 	}	
 
-	
+	text += " ";
 	if (line->size_x)
-		text += " " + std::to_string(line->size_x);
+		text += std::to_string(line->size_x);
 	text += "\n";
 	if (!line->langname.empty())
-		text += "   LANGNAME " + line->langname + "\n";
+		text += "   LANGNAME " + line->langname + " \n";
 	if (!line->displayname.empty())
 		text += "   DISPLAYNAME " + line->displayname + "\n";
 	if (!line->variant.empty())
 		text += "   VAR " + line->variant + "\n";
 	if (!line->function.empty())
-		text += "   FUNKTION " + line->function + "\n";
+		text += "   FUNKTION " + line->function + " \n";
 	if (!line->unit_x.empty())
 		text += "   EINHEIT_X " + line->unit_x + "\n";
 	if (!line->unit.empty())
@@ -1004,8 +1004,8 @@ std::string DCM::Manager::rebuildLineBaseParameter(LineBaseParameter* line)
 	for (int i = 0; i < line->point_x.size(); i++)
 	{
 		if (i % 6 == 0)
-			text += "   ST/X";
-		text += "   " + DCM::toFixed(line->point_x.at(i), line->dec_point_x.at(i));
+			text += "   ST/X   ";
+		text += DCM::toFixed(line->point_x.at(i), line->dec_point_x.at(i)) + "   ";
 		if (i % 6 == 5 || i == line->point_x.size() - 1)
 			text += "\n";
 	}
@@ -1013,8 +1013,8 @@ std::string DCM::Manager::rebuildLineBaseParameter(LineBaseParameter* line)
 	for (int i = 0; i < line->values.size(); i++)
 	{
 		if (i % 6 == 0)
-			text += "   WERT";
-		text += "   " + DCM::toFixed(line->values.at(i), line->dec_values.at(i));
+			text += "   WERT   ";
+		text += DCM::toFixed(line->values.at(i), line->dec_values.at(i)) + "   ";
 		if (i % 6 == 5 || i == line->values.size() - 1)
 			text += "\n";
 	}
@@ -1048,18 +1048,18 @@ std::string DCM::Manager::rebuildMapBaseParameter(MapBaseParameter* map)
 		return text;
 	}
 
-
+	text += " ";
 	if (map->size_x && map->size_y)
-		text += " " + std::to_string(map->size_x) + " " + std::to_string(map->size_y);
+		text += std::to_string(map->size_x) + " " + std::to_string(map->size_y);
 	text += "\n";
 	if (!map->langname.empty())
-		text += "   LANGNAME " + map->langname + "\n";
+		text += "   LANGNAME " + map->langname + " \n";
 	if (!map->displayname.empty())
 		text += "   DISPLAYNAME " + map->displayname + "\n";
 	if (!map->variant.empty())
 		text += "   VAR " + map->variant + "\n";
 	if (!map->function.empty())
-		text += "   FUNKTION " + map->function + "\n";
+		text += "   FUNKTION " + map->function + " \n";
 	if (!map->unit_x.empty())
 		text += "   EINHEIT_X " + map->unit_x + "\n";
 	if (!map->unit_y.empty())
@@ -1076,8 +1076,8 @@ std::string DCM::Manager::rebuildMapBaseParameter(MapBaseParameter* map)
 	for (int i = 0; i < map->point_x.size(); i++)
 	{
 		if (i % 6 == 0)
-			text += "   ST/X";
-		text += "   " + DCM::toFixed(map->point_x.at(i), map->dec_point_x.at(i));
+			text += "   ST/X   ";
+		text += DCM::toFixed(map->point_x.at(i), map->dec_point_x.at(i)) + "   ";
 		if (i % 6 == 5 || i == map->point_x.size() - 1)
 			text += "\n";
 	}
@@ -1090,8 +1090,8 @@ std::string DCM::Manager::rebuildMapBaseParameter(MapBaseParameter* map)
 		for (int j = 0; j < map->point_x.size(); j++)
 		{
 			if (j % 6 == 0)
-				text += "   WERT";
-			text += "   " + DCM::toFixed(map->values.at(i * map->point_x.size() + j), map->dec_values.at(i * map->point_x.size() + j));
+				text += "   WERT   ";
+			text += DCM::toFixed(map->values.at(i * map->point_x.size() + j), map->dec_values.at(i * map->point_x.size() + j)) + "   ";
 			if (j % 6 == 5 || j == map->point_x.size() - 1)
 				text += "\n";
 		}		
@@ -1108,27 +1108,27 @@ std::string DCM::Manager::rebuildDistribution(Distribution* dist)
 	if (dist->type != TYPE::DISTRIBUTION)
 		return text;
 
-	text += "STUETZSTELLENVERTEILUNG " + dist->name;
+	text += "STUETZSTELLENVERTEILUNG " + dist->name + " ";
 	if (dist->size_x)
-		text += " " + std::to_string(dist->size_x);
+		text += std::to_string(dist->size_x);
 	text += "\n";
 	text += "*SST\n";
 	if (!dist->langname.empty())
-		text += "   LANGNAME " + dist->langname + "\n";
+		text += "   LANGNAME " + dist->langname + " \n";
 	if (!dist->displayname.empty())
 		text += "   DISPLAYNAME " + dist->displayname + "\n";
 	if (!dist->variant.empty())
 		text += "   VAR " + dist->variant + "\n";
 	if (!dist->function.empty())
-		text += "   FUNKTION " + dist->function + "\n";
+		text += "   FUNKTION " + dist->function + " \n";
 	if (!dist->unit_x.empty())
 		text += "   EINHEIT_X " + dist->unit_x + "\n";
 	
 	for (int i = 0; i < dist->point_x.size(); i++)
 	{
 		if (i % 6 == 0)
-			text += "   ST/X";
-		text += "   " + DCM::toFixed(dist->point_x.at(i), dist->dec_point_x.at(i));
+			text += "   ST/X   ";
+		text += DCM::toFixed(dist->point_x.at(i), dist->dec_point_x.at(i)) + "   ";
 		if (i % 6 == 5 || i == dist->point_x.size() - 1)
 			text += "\n";
 	}
