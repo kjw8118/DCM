@@ -1091,7 +1091,7 @@ std::string DCM::Manager::rebuildMapBaseParameter(MapBaseParameter* map)
 		{
 			if (j % 6 == 0)
 				text += "   WERT";
-			text += "    " + DCM::toFixed(map->values.at(i * map->point_x.size() + j), map->dec_values.at(i * map->point_x.size() + j));
+			text += "   " + DCM::toFixed(map->values.at(i * map->point_x.size() + j), map->dec_values.at(i * map->point_x.size() + j));
 			if (j % 6 == 5 || j == map->point_x.size() - 1)
 				text += "\n";
 		}		
