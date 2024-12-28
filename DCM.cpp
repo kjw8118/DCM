@@ -76,6 +76,8 @@ DCM::MapBaseParameter::MapBaseParameter(int lineIndex, int lineOrder, int type, 
 	: LineBaseParameter(lineIndex, lineOrder, type, name, size_x), size_y(size_y) {};
 DCM::Parameter::Parameter(int lineIndex, int lineOrder, std::string name)
 	: BaseParameter(lineIndex, lineOrder, TYPE::PARAMETER, name), value(0) {};
+DCM::Boolean::Boolean(int lineIndex, int lineOrder, std::string name)
+	: BaseParameter(lineIndex, lineOrder, TYPE::PARAMETER, name), text("") {};
 DCM::Array::Array(int lineIndex, int lineOrder, std::string name, int size_x)
 	: ArrayBaseParameter(lineIndex, lineOrder, TYPE::ARRAY, name, size_x, 0) {};
 DCM::Matrix::Matrix(int lineIndex, int lineOrder, std::string name, int size_x, int size_y)
@@ -164,6 +166,7 @@ Functions		: FUNKTIONEN
 VariantCoding	: VARIANTENKODIERUNG
 ModuleHeader	: MODULKOPF
 Parameter		: FESTWERT
+Boolean			: FE
 Array			: FESTWERTEBLOCK
 Matrix			: FESTWERTEBLOCK
 CharLine		: KENNLINIE

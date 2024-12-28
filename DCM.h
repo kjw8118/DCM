@@ -160,6 +160,12 @@ namespace DCM
 		double value;
 		std::string text;
 	};
+	class Boolean : public BaseParameter // FESTWERT
+	{
+	public:
+		Boolean(int lineIndex, int lineOrder, std::string name);
+		std::string text;
+	};
 	class Array : public ArrayBaseParameter // FESTWERTEBLOCK
 	{
 	public:
