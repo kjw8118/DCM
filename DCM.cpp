@@ -6,6 +6,7 @@
 #include <iomanip>
 #include <chrono>
 #include <iostream>
+#include <filesystem>
 
 namespace DCM {
 	std::map<std::string, int> Header = {
@@ -611,20 +612,22 @@ DCM::Manager::Manager()
 {
 
 }
-
-bool DCM::Manager::open(std::string fpath, int mode)
+void DCM::Manager::openWithRepo(std::string _fPath)
 {
-	file.open(fpath.c_str(), mode);
-	if (!file.is_open())
-	{
-		isOpened = false;
-		return false;
-	}
+	std::string fPathAbs = std::filesystem::absolute(_fPath).string();
+	std::string dirPath = std::filesystem::path(fPathAbs).parent_path().string();
+	git = new GIT(dirPath);
 
-	isOpened = true;
+	open(_fPath);
 	
-	return true;
-};
+}
+void DCM::Manager::open(std::string _fPath)
+{
+	fPath = std::filesystem::absolute(_fPath).string();	
+	file.open(fPath.c_str());
+	isOpened = file.is_open();
+}
+
 void DCM::Manager::createDCM()
 {
 	clear();
@@ -689,13 +692,13 @@ DCM::Element* DCM::Manager::findElement(std::string name, bool exactmatch)
 	
 	std::string name_trnsf = name;
 	if(!exactmatch)
-		std::transform(name_trnsf.begin(), name_trnsf.end(), name_trnsf.begin(), std::tolower);
+		std::transform(name_trnsf.begin(), name_trnsf.end(), name_trnsf.begin(), [](unsigned char c) {return std::tolower(c); });
 	for (auto &itr : elementIndex)
 	{
 			
 		std::string key_trnsf = itr.first;
 		if (!exactmatch)							
-			std::transform(key_trnsf.begin(), key_trnsf.end(), key_trnsf.begin(), std::tolower);
+			std::transform(key_trnsf.begin(), key_trnsf.end(), key_trnsf.begin(), [](unsigned char c) {return std::tolower(c); });
 			
 		if (key_trnsf.compare(name_trnsf) == 0)
 			return itr.second; // Found
@@ -712,7 +715,7 @@ std::vector<DCM::Element*> DCM::Manager::findElements(std::string name, bool exa
 
 	std::string name_trnsf = name;
 	if (!exactmatch)
-		std::transform(name_trnsf.begin(), name_trnsf.end(), name_trnsf.begin(), std::tolower);
+		std::transform(name_trnsf.begin(), name_trnsf.end(), name_trnsf.begin(), [](unsigned char c) {return std::tolower(c); });
 }
 void DCM::Manager::putElement(Element* element)
 {
@@ -1494,24 +1497,26 @@ bool DCM::Manager::rebuildDistributionTest()
 bool DCM::Manager::parseDCM1Test()
 {
 	auto manager = new Manager();
-	bool result = manager->open("Test_DCM1ex.dcm");
+	manager->open("Test_DCM1ex.dcm");
 
+	std::string result = manager->rebuild();
+	
 	std::cout << "\n\n\t\tRebuild\n\n";
+	std::cout << result << std::endl;
 
-	std::cout << manager->rebuild();
-
-	return result;
+	return !result.empty();
 
 }
 bool DCM::Manager::parseDCM2Test()
 {
 	auto manager = new Manager();
-	bool result = manager->open("Test_DCM2.dcm");
+	manager->open("Test_DCM2.dcm");
+
+	std::string result = manager->rebuild();
 
 	std::cout << "\n\n\t\tRebuild\n\n";
+	std::cout << result << std::endl;
 
-	std::cout << manager->rebuild();
-	
-	return result;
+	return !result.empty();
 }
 

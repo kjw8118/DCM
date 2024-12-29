@@ -259,6 +259,7 @@ namespace DCM
 		std::vector<VariantCoding*> variantCodings;
 		std::vector<BaseParameter*> parameters;
 
+		std::string fPath = "";
 		std::fstream file;
 		
 		std::map<std::string, Element*> elementIndex;
@@ -313,7 +314,9 @@ namespace DCM
 
 	public:
 		Manager();
-		bool open(std::string fpath, int mode = std::ios::in);
+		void open(std::string _fPath);
+		void openWithRepo(std::string _fPath);
+		
 		void createDCM();
 		void parse();
 

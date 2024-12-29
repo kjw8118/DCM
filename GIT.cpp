@@ -150,16 +150,30 @@ GIT::GIT(std::string repoPath) : repoPath(repoPath)
 
 		appendGitIgnore({ ".vs", "x64" });
 
+		auto fileStatus = collectRepoStatus();
+		std::cout << printRepoStatus(fileStatus) << std::endl;
+		addUntrackedFilesToIndex(fileStatus);
 
 
 
 	}
 	std::cout << "git_repository_open success" << std::endl;
+}
 
-	auto fileStatus = collectRepoStatus();
-	std::cout << printRepoStatus(fileStatus) << std::endl;
-	// addUntrackedFilesToIndex(fileStatus);
 
+bool GIT::isRepoExist(std::string repoPath)
+{
+	bool  ret = false;
+	git_repository* repoTemp = nullptr;
+	git_libgit2_init();
+	int git_ret = git_repository_open(&repoTemp, repoPath.c_str());
+	if (git_ret == GIT_OK)
+		ret = true;
+	else
+		ret = false;
+
+	git_libgit2_shutdown();
+	return ret;
 }
 
 GIT::~GIT()

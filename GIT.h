@@ -44,7 +44,8 @@ private:
 
 public:
 	GIT(std::string repoPath);
-
+	static bool isRepoExist(std::string repoPath);
+	
 	~GIT();
 
 
