@@ -2,6 +2,7 @@
 
 #include <iostream>
 
+
 void GIT::printErrorAndShutdown(std::string text)
 {
 	std::cerr << text << std::endl;
@@ -131,9 +132,62 @@ void GIT::addUntrackedFilesToIndex(const GIT::FileStatus& fileStatus)
 	}
 
 }
+void GIT::addAllUntrackedFilesToIndex()
+{
+	auto fileStatus = collectRepoStatus();	
+	addUntrackedFilesToIndex(fileStatus);
+}
 
+void GIT::commitCurrentStage(std::string commit_message)
+{
+	git_index* index = nullptr;
+	if (git_repository_index(&index, repo) < 0)
+		getLastError("git_repository_index failed: ");
 
-GIT::GIT(std::string repoPath) : repoPath(repoPath)
+	git_oid tree_oid;
+	if (git_index_write_tree(&tree_oid, index) < 0)
+		getLastError("git_index_write_tree");
+
+	git_tree* tree = nullptr;
+	if (git_tree_lookup(&tree, repo, &tree_oid) < 0)
+		getLastError("git_tree_lookup failed: ");
+
+	git_signature* sig = nullptr;
+	if (git_signature_now(&sig, userName.c_str(), userEmail.c_str()) < 0)
+		getLastError("git_signature_now failed: ");
+
+	git_oid parent_commit_oid;
+	git_commit* parent_commit = nullptr;
+	if (git_reference_name_to_id(&parent_commit_oid, repo, "HEAD") == GIT_OK)
+	{
+		if (git_commit_lookup(&parent_commit, repo, &parent_commit_oid) < 0)
+			getLastError("git_commit_lookup failed: ");
+	}
+	git_oid commit_oid;
+	if (git_commit_create_v(
+		&commit_oid,
+		repo,
+		"HEAD",
+		sig,
+		sig,
+		nullptr,
+		commit_message.c_str(),
+		tree,
+		parent_commit ? 1 : 0,
+		parent_commit ? (const git_commit**)&parent_commit : nullptr
+	) < 0)
+		getLastError("git_commit_create_v failed: ");
+
+	git_signature_free(sig);
+	git_tree_free(tree);
+	git_index_free(index);
+	if (parent_commit) git_commit_free(parent_commit);
+
+	
+}
+
+GIT::GIT(std::string repoPath, std::string userName, std::string userEmail)
+	: repoPath(repoPath), userName(userName), userEmail(userEmail)
 {
 
 	git_libgit2_init();
@@ -148,7 +202,7 @@ GIT::GIT(std::string repoPath) : repoPath(repoPath)
 			getLastError("git_repository_init failed: ");
 		std::cout << "git_repository_init success" << std::endl;
 
-		appendGitIgnore({ ".vs", "x64" });
+		appendGitIgnore(ignorePreset);
 
 		auto fileStatus = collectRepoStatus();
 		std::cout << printRepoStatus(fileStatus) << std::endl;

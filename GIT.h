@@ -19,7 +19,8 @@ class GIT
 private:
 	std::string repoPath;
 	git_repository* repo = nullptr;
-	git_oid tree_oid;
+	std::string userName = "";
+	std::string userEmail = "";
 
 	struct FileStatus
 	{
@@ -32,20 +33,23 @@ private:
 
 	void getLastError(std::string info = "");
 
-	void appendGitIgnore(const std::vector<std::string>& ignorePatterns);
-
-
+	
 	FileStatus collectRepoStatus();
 
+	std::vector<std::string> ignorePreset = { ".vs", "x64" };
 
 	std::string printRepoStatus(const FileStatus& fileStatus);
 
 	void addUntrackedFilesToIndex(const FileStatus& fileStatus);
 
 public:
-	GIT(std::string repoPath);
+	GIT(std::string repoPath, std::string userName = "", std::string userEmail = "");
 	static bool isRepoExist(std::string repoPath);
 	
+	void appendGitIgnore(const std::vector<std::string>& ignorePatterns);
+	void addAllUntrackedFilesToIndex();
+	void commitCurrentStage(std::string commit_message);
+
 	~GIT();
 
 

@@ -56,6 +56,7 @@ namespace DCM
 		Element(int lineIndex, int &lineOrder, int type);
 		int lineIndex = -1;
 		int lineOrder = -1;
+		int endIndex = -1;
 		int type = 0;
 
 	};
@@ -311,6 +312,7 @@ namespace DCM
 
 		void putElement(Element* element);
 
+		int calcEndIndex(Element* element);
 
 	public:
 		Manager();

@@ -8,6 +8,8 @@
 #include <iostream>
 #include <filesystem>
 
+#define DCM_WERTDIV 6
+
 namespace DCM {
 	std::map<std::string, int> Header = {
 		{"*", TYPE::COMMENT},
@@ -47,7 +49,7 @@ namespace DCM {
 }
 
 DCM::Element::Element(int lineIndex, int& lineOrder, int type)
-	: lineIndex(lineIndex), lineOrder(lineOrder), type(type)
+	: lineIndex(lineIndex), lineOrder(lineOrder), type(type), endIndex(lineIndex)
 {
 	lineOrder++;
 };	
@@ -547,6 +549,7 @@ void DCM::Manager::parseComponent(std::vector<std::string> lineStrip)
 			break;
 		}
 		}
+		break;
 	}
 	case TYPE::DIST_X:
 	{
@@ -579,6 +582,7 @@ void DCM::Manager::parseComponent(std::vector<std::string> lineStrip)
 	}
 	case TYPE::END:
 	{
+		pCurrentElement->endIndex = currentIndex;
 		putElement(pCurrentElement);		
 		pCurrentElement = nullptr;
 		break;
@@ -614,15 +618,28 @@ DCM::Manager::Manager()
 }
 void DCM::Manager::openWithRepo(std::string _fPath)
 {
+	if (isOpened)
+		return;
+
 	std::string fPathAbs = std::filesystem::absolute(_fPath).string();
 	std::string dirPath = std::filesystem::path(fPathAbs).parent_path().string();
-	git = new GIT(dirPath);
-
+	std::string fName = std::filesystem::path(fPathAbs).filename().string();
+	bool isRepoExist = GIT::isRepoExist(dirPath);
+	git = new GIT(dirPath, "Jinwon", "kjw8118@gmail.com");
+	if (!isRepoExist)
+	{
+		std::string ignoreName = "!" + fName;
+		git->appendGitIgnore({ "*", ignoreName });
+		git->commitCurrentStage("Init");
+	}
 	open(_fPath);
 	
 }
 void DCM::Manager::open(std::string _fPath)
 {
+	if (isOpened)
+		return;
+
 	fPath = std::filesystem::absolute(_fPath).string();	
 	file.open(fPath.c_str());
 	isOpened = file.is_open();
@@ -647,20 +664,21 @@ void DCM::Manager::createDCM()
 }
 void DCM::Manager::parse()
 {
-	if (isOpened)
-	{
-		lineHistory.clear();
-		pCurrentElement = nullptr;
-		std::string lineRaw = "";
-		currentIndex = 0;
+	if (!isOpened)
+		return;
 
-		while (std::getline(file, lineRaw))
-		{
-			lineHistory.push_back(lineRaw);
-			parseLine(lineRaw);
-			currentIndex++;
-		}
+	lineHistory.clear();
+	pCurrentElement = nullptr;
+	std::string lineRaw = "";
+	currentIndex = 0;
+
+	while (std::getline(file, lineRaw))
+	{
+		lineHistory.push_back(lineRaw);
+		parseLine(lineRaw);
+		currentIndex++;
 	}
+	
 }
 
 void DCM::Manager::clear()
@@ -717,8 +735,133 @@ std::vector<DCM::Element*> DCM::Manager::findElements(std::string name, bool exa
 	if (!exactmatch)
 		std::transform(name_trnsf.begin(), name_trnsf.end(), name_trnsf.begin(), [](unsigned char c) {return std::tolower(c); });
 }
+int DCM::Manager::calcEndIndex(Element* element)
+{
+	auto endIndex = element->lineIndex;
+
+	switch (element->type)
+	{
+	case TYPE::UNKNOWN:	
+	case TYPE::COMMENT:
+	case TYPE::FORMAT:
+		break;
+	case TYPE::FUNCTIONS:
+		endIndex += ((Functions*)element)->functions.size() + 1;
+		break;
+	case TYPE::VARIANTCODING:
+		endIndex += ((VariantCoding*)element)->variants.size() + 1;
+		break;
+	case TYPE::MODULEHEADER:
+		endIndex += ((ModuleHeader*)element)->texts.size() + 1;
+		break;
+	case TYPE::PARAMETER:		
+	case TYPE::BOOLEAN:		
+	case TYPE::ARRAY:
+	case TYPE::MATRIX:
+	case TYPE::CHARLINE:
+	case TYPE::CHARMAP:
+	case TYPE::FIXEDCHARLINE:
+	case TYPE::FIXEDCHARMAP:
+	case TYPE::GROUPCHARLINE:
+	case TYPE::GROUPCHARMAP:
+	case TYPE::DISTRIBUTION:
+	{
+		endIndex += (int)(!((BaseParameter*)element)->langname.empty());
+		endIndex += (int)(!((BaseParameter*)element)->displayname.empty());
+		endIndex += (int)(!((BaseParameter*)element)->variant.empty());
+		endIndex += (int)(!((BaseParameter*)element)->function.empty());
+		endIndex += (int)(!((BaseParameter*)element)->unit.empty());		
+		switch (element->type)
+		{
+		case TYPE::PARAMETER:
+		case TYPE::BOOLEAN:
+		{
+			endIndex += 1;
+			break;
+		}
+		case TYPE::ARRAY:
+		case TYPE::MATRIX:
+		{
+			endIndex += (int)(((ArrayBaseParameter*)element)->values.size() / DCM_WERTDIV);
+			endIndex += (int)(((ArrayBaseParameter*)element)->values.size() % DCM_WERTDIV != 0);
+			break;
+		}
+		case TYPE::CHARLINE:
+		case TYPE::FIXEDCHARLINE:
+		case TYPE::DISTRIBUTION:
+		case TYPE::GROUPCHARLINE:
+		{
+			endIndex += (int)(!((LineBaseParameter*)element)->unit_x.empty());			
+			endIndex += (int)(((LineBaseParameter*)element)->point_x.size() / DCM_WERTDIV);
+			endIndex += (int)(((LineBaseParameter*)element)->point_x.size() % DCM_WERTDIV != 0);
+			endIndex += (int)(((LineBaseParameter*)element)->values.size() / DCM_WERTDIV);
+			endIndex += (int)(((LineBaseParameter*)element)->values.size() % DCM_WERTDIV != 0); // Distribution의 경우 size == 0 이므로 += 0
+			switch (element->type)
+			{
+			case TYPE::GROUPCHARLINE:
+			{
+				endIndex += (int)(!((GroupCharLine*)element)->dist_x.empty());
+				break;
+			}
+			}
+
+			break;
+		}
+		case TYPE::CHARMAP:
+		case TYPE::FIXEDCHARMAP:
+		case TYPE::GROUPCHARMAP:
+		{
+			endIndex += (int)(!((MapBaseParameter*)element)->unit_x.empty());
+			endIndex += (int)(!((MapBaseParameter*)element)->unit_y.empty());
+			auto lineNum_x = (int)(((MapBaseParameter*)element)->point_x.size() / DCM_WERTDIV);
+			lineNum_x += (int)(((MapBaseParameter*)element)->point_x.size() % DCM_WERTDIV != 0);
+			auto lineNum_y = (int)(((MapBaseParameter*)element)->point_y.size());
+			auto lineNum_z = lineNum_x * lineNum_y;
+			endIndex += lineNum_x + lineNum_y + lineNum_z;
+			switch (element->type)
+			{
+			case TYPE::GROUPCHARMAP:
+			{
+				endIndex += (int)(!((GroupCharMap*)element)->dist_x.empty());
+				endIndex += (int)(!((GroupCharMap*)element)->dist_y.empty());
+				break;
+			}
+			}
+
+			break;
+		}
+		}
+
+		endIndex += 1;
+
+		break;
+	}
+	}
+
+	return endIndex;
+}
 void DCM::Manager::putElement(Element* element)
 {
+	if (!elements.empty())
+	{
+		auto lastElement = elements.back();
+		auto lastIndex = lastElement->endIndex;
+		auto lastOrder = lastElement->lineOrder;
+
+		element->lineIndex = lastIndex + 1;
+		element->lineOrder = lastOrder + 1;				
+	}
+	else
+	{
+		element->lineIndex = 0;
+		element->lineOrder = 0;
+	}
+	auto endIndex = calcEndIndex(element);
+	element->endIndex = endIndex;
+
+	currentIndex = endIndex + 1;
+	currentOrder = element->lineOrder + 1;
+
 	elements.push_back(element);	
 	switch (element->type)
 	{
