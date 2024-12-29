@@ -136,10 +136,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="DCM.cpp" />
+    <ClCompile Include="GIT.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DCM.h" />
+    <ClInclude Include="GIT.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="commentTest.dcm" />

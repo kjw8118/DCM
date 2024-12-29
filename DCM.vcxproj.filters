@@ -21,9 +21,15 @@
     <ClCompile Include="DCM.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="GIT.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DCM.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="GIT.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
