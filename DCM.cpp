@@ -169,17 +169,11 @@ int DCM::countDecimalPlaces(const std::string& numberStr)
 
 std::string DCM::toFixed(double value, int precision)
 {
-#if __cplusplus >= 202002L
-#include <format>
-	return std::format("{:.{}f}", value, precision);
-}
-#else
-
 	std::ostringstream oss;
 	oss << std::fixed << std::setprecision(precision) << value;
 	return oss.str();
 }
-#endif
+
 
 /*
 
