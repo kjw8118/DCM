@@ -174,8 +174,7 @@ std::string DCM::toFixed(double value, int precision)
 	return std::format("{:.{}f}", value, precision);
 }
 #else
-#include <sstream>
-#include <iomanip>
+
 	std::ostringstream oss;
 	oss << std::fixed << std::setprecision(precision) << value;
 	return oss.str();
@@ -760,382 +759,407 @@ void DCM::Manager::putElement(Element* element)
 		break;
 	}
 }
+
+std::string DCM::Manager::getRawString() 
+{
+	std::ostringstream oss;
+	//std::string text = "";
+	for (auto line : lineHistory)
+		oss << line + "\n";
+	return oss.str();
+};
+
 std::string DCM::Manager::rebuildUnknown(Unknown* unknown)
 {
-	std::string text = "";
+	std::ostringstream oss;
+	//std::string text = "";
 	if (unknown->type != TYPE::UNKNOWN)
-		return text;
-
-	return unknown->text + "\n";
+		return oss.str();
+	oss << unknown->text + "\n";
+	
+	return oss.str();
 
 }
 
 std::string DCM::Manager::rebuildFunctions(Functions* functions)
 {
-	std::string text = "";
+	std::ostringstream oss;
+	//std::string text = "";
 	if (functions->type != TYPE::FUNCTIONS)
-		return text;
+		return oss.str();
 
-	text += "FUNKTIONEN\n";
+	oss << "FUNKTIONEN\n";
 	for (auto &fkt : functions->functions)
 	{
-		text += "   FKT " + fkt.name + " " + fkt.version + " " + fkt.longname + " \n";
+		oss << "   FKT " + fkt.name + " " + fkt.version + " " + fkt.longname + " \n";
 	}
-	text += "END\n";
-	return text;
+	oss << "END\n";
+
+	return oss.str();
 }
 
 std::string DCM::Manager::rebuildComment(Comment* comment)
 {
-	std::string text = "";
+	std::ostringstream oss;
+	//std::string text = "";
 	if (comment->type != TYPE::COMMENT)
-		return text;
+		return oss.str();
+	oss << comment->text + "\n";
 
-	return comment->text + "\n";
-
+	return oss.str();
 }
 
 std::string DCM::Manager::rebuildVariantCoding(VariantCoding* variantCoding)
 {
-	std::string text = "";
+	std::ostringstream oss;
+	//std::string text = "";
 	if (variantCoding->type != TYPE::VARIANTCODING)
-		return text;
+		return oss.str();
 
-	text += "VARIANTENKODIERUNG\n";
+	oss << "VARIANTENKODIERUNG\n";
 	for (auto &variant : variantCoding->variants)
 	{
-		text += "   KRITERIUM " + variant.name;
+		oss << "   KRITERIUM " + variant.name;
 		for (auto &value : variant.values)
-			text += " " + value;
-		text += "\n";
+			oss << " " + value;
+		oss << "\n";
 	}
-	text += "END\n";
-	return text;
+	oss << "END\n";
+	return oss.str();
 }
 
 std::string DCM::Manager::rebuildModuleHeader(ModuleHeader* moduleHeader)
 {
-	std::string text = "";
+	std::ostringstream oss;
+	//std::string text = "";
 	if (moduleHeader->type != TYPE::MODULEHEADER)
-		return text;
+		return oss.str();
 
-	text += "MODULKOPF " + moduleHeader->name + " " + moduleHeader->texts.at(0) + "\n";
+	oss << "MODULKOPF " + moduleHeader->name + " " + moduleHeader->texts.at(0) + "\n";
 	for(int i=1; i<moduleHeader->texts.size(); i++)
-		text += "MODULKOPF " + moduleHeader->texts.at(i) + "\n";	
-	text += "END\n";
-	return text;
+		oss << "MODULKOPF " + moduleHeader->texts.at(i) + "\n";	
+	oss << "END\n";
+	return oss.str();
 }
 
 std::string DCM::Manager::rebuildFormat(Format* format)
 {
-	std::string text = "";
+	std::ostringstream oss;
+	//std::string text = "";
 	if (format->type != TYPE::FORMAT)
-		return text;
+		return oss.str();
 
-	text += "KONSERVIERUNG_FORMAT " + format->version + "\n";
-	return text;
+	oss << "KONSERVIERUNG_FORMAT " + format->version + "\n";
+	return oss.str();
 }
 
 std::string DCM::Manager::rebuildParameter(Parameter* parameter)
 {
-	std::string text = "";
+	std::ostringstream oss;
+	//std::string text = "";
 	if (parameter->type != TYPE::PARAMETER)
-		return text;
+		return oss.str();
 
-	text += "FESTWERT " + parameter->name + " \n";
+	oss << "FESTWERT " + parameter->name + " \n";
 	if (!parameter->langname.empty())
-		text += "   LANGNAME " + parameter->langname + " \n";
+		oss << "   LANGNAME " + parameter->langname + " \n";
 	if (!parameter->displayname.empty())
-		text += "   DISPLAYNAME " + parameter->displayname + "\n";
+		oss << "   DISPLAYNAME " + parameter->displayname + "\n";
 	if (!parameter->variant.empty())
-		text += "   VAR " + parameter->variant + "\n";
+		oss << "   VAR " + parameter->variant + "\n";
 	if (!parameter->function.empty())
-		text += "   FUNKTION " + parameter->function + " \n";
+		oss << "   FUNKTION " + parameter->function + " \n";
 	if (!parameter->unit.empty())
-		text += "   EINHEIT_W " + parameter->unit + "\n";	
-	text += "   WERT " + DCM::toFixed(parameter->value, parameter->dec_value) + "\n";
-	text += "END\n";
+		oss << "   EINHEIT_W " + parameter->unit + "\n";	
+	oss << "   WERT " + DCM::toFixed(parameter->value, parameter->dec_value) + "\n";
+	oss << "END\n";
 	
-	return text;
+	return oss.str();
 
 }
 std::string DCM::Manager::rebuildBoolean(Boolean* boolean)
 {
-	std::string text = "";
+	std::ostringstream oss;
+	//std::string text = "";
 	if (boolean->type != TYPE::BOOLEAN)
-		return text;
+		return oss.str();
 
-	text += "FESTWERT " + boolean->name + " \n";
+	oss << "FESTWERT " + boolean->name + " \n";
 	if (!boolean->langname.empty())
-		text += "   LANGNAME " + boolean->langname + " \n";
+		oss << "   LANGNAME " + boolean->langname + " \n";
 	if (!boolean->displayname.empty())
-		text += "   DISPLAYNAME " + boolean->displayname + "\n";
+		oss << "   DISPLAYNAME " + boolean->displayname + "\n";
 	if (!boolean->variant.empty())
-		text += "   VAR " + boolean->variant + "\n";
+		oss << "   VAR " + boolean->variant + "\n";
 	if (!boolean->function.empty())
-		text += "   FUNKTION " + boolean->function + " \n";
+		oss << "   FUNKTION " + boolean->function + " \n";
 	if (!boolean->unit.empty())
-		text += "   EINHEIT_W " + boolean->unit + "\n";
+		oss << "   EINHEIT_W " + boolean->unit + "\n";
 	if (!boolean->text.empty())
-		text += "   TEXT " + boolean->text + "\n";	
-	text += "END\n";
+		oss << "   TEXT " + boolean->text + "\n";	
+	oss << "END\n";
 
-	return text;
+	return oss.str();
 
 }
 
 std::string DCM::Manager::rebuildArray(Array* arr)
 {
-	std::string text = "";
+	std::ostringstream oss;
+	//std::string text = "";
 	if (arr->type != TYPE::ARRAY)
-		return text;
+		return oss.str();
 
-	text += "FESTWERTEBLOCK " + arr->name + " ";
+	oss << "FESTWERTEBLOCK " + arr->name + " ";
 	if (arr->size_x)
-		text += std::to_string(arr->size_x);
-	text += "\n";
+		oss << std::to_string(arr->size_x);
+	oss << "\n";
 	if (!arr->langname.empty())
-		text += "   LANGNAME " + arr->langname + " \n";
+		oss << "   LANGNAME " + arr->langname + " \n";
 	if (!arr->displayname.empty())
-		text += "   DISPLAYNAME " + arr->displayname + "\n";
+		oss << "   DISPLAYNAME " + arr->displayname + "\n";
 	if (!arr->variant.empty())
-		text += "   VAR " + arr->variant + "\n";
+		oss << "   VAR " + arr->variant + "\n";
 	if (!arr->function.empty())
-		text += "   FUNKTION " + arr->function + " \n";
+		oss << "   FUNKTION " + arr->function + " \n";
 	if (!arr->unit.empty())
-		text += "   EINHEIT_W " + arr->unit + "\n";
+		oss << "   EINHEIT_W " + arr->unit + "\n";
 	
 	
 	for (int i=0; i<arr->values.size(); i++)
 	{
 		if (i % 6 == 0)
-			text += "   WERT   ";
-		text += DCM::toFixed(arr->values.at(i), arr->dec_values.at(i)) + "   ";
+			oss << "   WERT   ";
+		oss << DCM::toFixed(arr->values.at(i), arr->dec_values.at(i)) + "   ";
 		if (i % 6 == 5 || i == arr->values.size()-1)
-			text += "\n";
+			oss << "\n";
 	}
-	text += "END\n";
+	oss << "END\n";
 
-	return text;
+	return oss.str();
 }
 std::string DCM::Manager::rebuildMatrix(Matrix* matrix)
 {
-	std::string text = "";
+	std::ostringstream oss;
+	//std::string text = "";
 	if (matrix->type != TYPE::MATRIX)
-		return text;
+		return oss.str();
 
-	text += "FESTWERTEBLOCK " + matrix->name + " ";
+	oss << "FESTWERTEBLOCK " + matrix->name + " ";
 	if (matrix->size_x && matrix->size_y)
-		text += std::to_string(matrix->size_x) + " @ " + std::to_string(matrix->size_y);
-	text += "\n";
+		oss << std::to_string(matrix->size_x) + " @ " + std::to_string(matrix->size_y);
+	oss << "\n";
 	if (!matrix->langname.empty())
-		text += "   LANGNAME " + matrix->langname + " \n";
+		oss << "   LANGNAME " + matrix->langname + " \n";
 	if (!matrix->displayname.empty())
-		text += "   DISPLAYNAME " + matrix->displayname + "\n";
+		oss << "   DISPLAYNAME " + matrix->displayname + "\n";
 	if (!matrix->variant.empty())
-		text += "   VAR " + matrix->variant + "\n";
+		oss << "   VAR " + matrix->variant + "\n";
 	if (!matrix->function.empty())
-		text += "   FUNKTION " + matrix->function + " \n";
+		oss << "   FUNKTION " + matrix->function + " \n";
 	if (!matrix->unit.empty())
-		text += "   EINHEIT_W " + matrix->unit + "\n";
+		oss << "   EINHEIT_W " + matrix->unit + "\n";
 
 	for (int i = 0; i < matrix->size_y; i++)
 	{
 		for (int j = 0; j < matrix->size_x; j++)
 		{
 			if (j % 6 == 0)
-				text += "   WERT   ";
-			text += DCM::toFixed(matrix->values.at(i * matrix->size_x + j), matrix->dec_values.at(i * matrix->size_x + j)) + "   ";
+				oss << "   WERT   ";
+			oss << DCM::toFixed(matrix->values.at(i * matrix->size_x + j), matrix->dec_values.at(i * matrix->size_x + j)) + "   ";
 			if (j % 6 == 5 || j == matrix->size_x - 1)
-				text += "\n";
+				oss << "\n";
 		}
 	}
-	text += "END\n";
+	oss << "END\n";
 
-	return text;
+	return oss.str();
 }
 
 
 std::string DCM::Manager::rebuildLineBaseParameter(LineBaseParameter* line)
 {
-	std::string text = "";
+	std::ostringstream oss;
+	//std::string text = "";
 	switch (line->type)
 	{
 	case TYPE::CHARLINE:
 	{
-		text += "KENNLINIE " + line->name;
+		oss << "KENNLINIE " + line->name;
 		break;
 	}
 	case TYPE::FIXEDCHARLINE:
 	{
-		text += "FESTKENNLINIE " + line->name;
+		oss << "FESTKENNLINIE " + line->name;
 		break;
 	}
 	case TYPE::GROUPCHARLINE:
 	{
-		text += "GRUPPENKENNLINIE " + line->name;
+		oss << "GRUPPENKENNLINIE " + line->name;
 		break;
 	}
 	default:
-		return text;
+		return oss.str();
 	}	
 
-	text += " ";
+	oss << " ";
 	if (line->size_x)
-		text += std::to_string(line->size_x);
-	text += "\n";
+		oss << std::to_string(line->size_x);
+	oss << "\n";
 	if (!line->langname.empty())
-		text += "   LANGNAME " + line->langname + " \n";
+		oss << "   LANGNAME " + line->langname + " \n";
 	if (!line->displayname.empty())
-		text += "   DISPLAYNAME " + line->displayname + "\n";
+		oss << "   DISPLAYNAME " + line->displayname + "\n";
 	if (!line->variant.empty())
-		text += "   VAR " + line->variant + "\n";
+		oss << "   VAR " + line->variant + "\n";
 	if (!line->function.empty())
-		text += "   FUNKTION " + line->function + " \n";
+		oss << "   FUNKTION " + line->function + " \n";
 	if (!line->unit_x.empty())
-		text += "   EINHEIT_X " + line->unit_x + "\n";
+		oss << "   EINHEIT_X " + line->unit_x + "\n";
 	if (!line->unit.empty())
-		text += "   EINHEIT_W " + line->unit + "\n";
+		oss << "   EINHEIT_W " + line->unit + "\n";
 	
 	if (line->type == TYPE::GROUPCHARLINE)
-		if(!((GroupCharLine*)line)->dist_x.empty()) text += "*SSTX\t" + ((GroupCharLine*)line)->dist_x + "\n";
+		if(!((GroupCharLine*)line)->dist_x.empty()) oss << "*SSTX\t" + ((GroupCharLine*)line)->dist_x + "\n";
 
 	
 	for (int i = 0; i < line->point_x.size(); i++)
 	{
 		if (i % 6 == 0)
-			text += "   ST/X   ";
-		text += DCM::toFixed(line->point_x.at(i), line->dec_point_x.at(i)) + "   ";
+			oss << "   ST/X   ";
+		oss << DCM::toFixed(line->point_x.at(i), line->dec_point_x.at(i)) + "   ";
 		if (i % 6 == 5 || i == line->point_x.size() - 1)
-			text += "\n";
+			oss << "\n";
 	}
 
 	for (int i = 0; i < line->values.size(); i++)
 	{
 		if (i % 6 == 0)
-			text += "   WERT   ";
-		text += DCM::toFixed(line->values.at(i), line->dec_values.at(i)) + "   ";
+			oss << "   WERT   ";
+		oss << DCM::toFixed(line->values.at(i), line->dec_values.at(i)) + "   ";
 		if (i % 6 == 5 || i == line->values.size() - 1)
-			text += "\n";
+			oss << "\n";
 	}
 	
 
-	text += "END\n";
+	oss << "END\n";
 
-	return text;
+	return oss.str();
 }
 std::string DCM::Manager::rebuildMapBaseParameter(MapBaseParameter* map)
 {
-	std::string text = "";
+	std::ostringstream oss;
+	//std::string text = "";
 	switch (map->type)
 	{
 	case TYPE::CHARMAP:
 	{
-		text += "KENNFELD " + map->name;
+		oss << "KENNFELD " + map->name;
 		break;
 	}
 	case TYPE::FIXEDCHARMAP:
 	{
-		text += "FESTKENNFELD " + map->name;
+		oss << "FESTKENNFELD " + map->name;
 		break;
 	}
 	case TYPE::GROUPCHARMAP:
 	{
-		text += "GRUPPENKENNFELD " + map->name;
+		oss << "GRUPPENKENNFELD " + map->name;
 		break;
 	}
 	default:
-		return text;
+		return oss.str();
 	}
 
-	text += " ";
+	oss << " ";
 	if (map->size_x && map->size_y)
-		text += std::to_string(map->size_x) + " " + std::to_string(map->size_y);
-	text += "\n";
+		oss << std::to_string(map->size_x) + " " + std::to_string(map->size_y);
+	oss << "\n";
 	if (!map->langname.empty())
-		text += "   LANGNAME " + map->langname + " \n";
+		oss << "   LANGNAME " + map->langname + " \n";
 	if (!map->displayname.empty())
-		text += "   DISPLAYNAME " + map->displayname + "\n";
+		oss << "   DISPLAYNAME " + map->displayname + "\n";
 	if (!map->variant.empty())
-		text += "   VAR " + map->variant + "\n";
+		oss << "   VAR " + map->variant + "\n";
 	if (!map->function.empty())
-		text += "   FUNKTION " + map->function + " \n";
+		oss << "   FUNKTION " + map->function + " \n";
 	if (!map->unit_x.empty())
-		text += "   EINHEIT_X " + map->unit_x + "\n";
+		oss << "   EINHEIT_X " + map->unit_x + "\n";
 	if (!map->unit_y.empty())
-		text += "   EINHEIT_Y " + map->unit_y + "\n";
+		oss << "   EINHEIT_Y " + map->unit_y + "\n";
 	if (!map->unit.empty())
-		text += "   EINHEIT_W " + map->unit + "\n";
+		oss << "   EINHEIT_W " + map->unit + "\n";
 
 	if (map->type == TYPE::GROUPCHARMAP)
 	{
-		if (!((GroupCharMap*)map)->dist_x.empty()) text += "*SSTX\t" + ((GroupCharMap*)map)->dist_x + "\n";
-		if (!((GroupCharMap*)map)->dist_y.empty()) text += "*SSTY\t" + ((GroupCharMap*)map)->dist_y + "\n";
+		if (!((GroupCharMap*)map)->dist_x.empty()) oss << "*SSTX\t" + ((GroupCharMap*)map)->dist_x + "\n";
+		if (!((GroupCharMap*)map)->dist_y.empty()) oss << "*SSTY\t" + ((GroupCharMap*)map)->dist_y + "\n";
 	}
 	
 	for (int i = 0; i < map->point_x.size(); i++)
 	{
 		if (i % 6 == 0)
-			text += "   ST/X   ";
-		text += DCM::toFixed(map->point_x.at(i), map->dec_point_x.at(i)) + "   ";
+			oss << "   ST/X   ";
+		oss << DCM::toFixed(map->point_x.at(i), map->dec_point_x.at(i)) + "   ";
 		if (i % 6 == 5 || i == map->point_x.size() - 1)
-			text += "\n";
+			oss << "\n";
 	}
 
 	for(int i=0; i<map->point_y.size(); i++)
 	{
 		auto value_y = map->point_y.at(i);
 		auto dec_value_y = map->dec_point_y.at(i);
-		text += "   ST/Y   " + DCM::toFixed(value_y, dec_value_y) + "\n";
+		oss << "   ST/Y   " + DCM::toFixed(value_y, dec_value_y) + "\n";
 		for (int j = 0; j < map->point_x.size(); j++)
 		{
 			if (j % 6 == 0)
-				text += "   WERT   ";
-			text += DCM::toFixed(map->values.at(i * map->point_x.size() + j), map->dec_values.at(i * map->point_x.size() + j)) + "   ";
+				oss << "   WERT   ";
+			oss << DCM::toFixed(map->values.at(i * map->point_x.size() + j), map->dec_values.at(i * map->point_x.size() + j)) + "   ";
 			if (j % 6 == 5 || j == map->point_x.size() - 1)
-				text += "\n";
+				oss << "\n";
 		}		
 	}
 
-	text += "END\n";
+	oss << "END\n";
 
-	return text;
+	return oss.str();
 }
 
 std::string DCM::Manager::rebuildDistribution(Distribution* dist)
 {
-	std::string text = "";
+	std::ostringstream oss;
+	//std::string text = "";
 	if (dist->type != TYPE::DISTRIBUTION)
-		return text;
+		return oss.str();
 
-	text += "STUETZSTELLENVERTEILUNG " + dist->name + " ";
+	oss << "STUETZSTELLENVERTEILUNG " + dist->name + " ";
 	if (dist->size_x)
-		text += std::to_string(dist->size_x);
-	text += "\n";
-	text += "*SST\n";
+		oss << std::to_string(dist->size_x);
+	oss << "\n";
+	oss << "*SST\n";
 	if (!dist->langname.empty())
-		text += "   LANGNAME " + dist->langname + " \n";
+		oss << "   LANGNAME " + dist->langname + " \n";
 	if (!dist->displayname.empty())
-		text += "   DISPLAYNAME " + dist->displayname + "\n";
+		oss << "   DISPLAYNAME " + dist->displayname + "\n";
 	if (!dist->variant.empty())
-		text += "   VAR " + dist->variant + "\n";
+		oss << "   VAR " + dist->variant + "\n";
 	if (!dist->function.empty())
-		text += "   FUNKTION " + dist->function + " \n";
+		oss << "   FUNKTION " + dist->function + " \n";
 	if (!dist->unit_x.empty())
-		text += "   EINHEIT_X " + dist->unit_x + "\n";
+		oss << "   EINHEIT_X " + dist->unit_x + "\n";
 	
 	for (int i = 0; i < dist->point_x.size(); i++)
 	{
 		if (i % 6 == 0)
-			text += "   ST/X   ";
-		text += DCM::toFixed(dist->point_x.at(i), dist->dec_point_x.at(i)) + "   ";
+			oss << "   ST/X   ";
+		oss << DCM::toFixed(dist->point_x.at(i), dist->dec_point_x.at(i)) + "   ";
 		if (i % 6 == 5 || i == dist->point_x.size() - 1)
-			text += "\n";
+			oss << "\n";
 	}
 
-	text += "END\n";
+	oss << "END\n";
 
-	return text;
+	return oss.str();
 }
 
 std::string DCM::Manager::rebuildElement(Element* element)
@@ -1178,11 +1202,12 @@ std::string DCM::Manager::rebuildElement(Element* element)
 }
 std::string DCM::Manager::rebuild()
 {
-	std::string text = "";
+	std::ostringstream oss;
+	//std::string text = "";
 	for (auto element : elements)
-		text += rebuildElement(element);
+		oss << rebuildElement(element);
 
-	return text;
+	return oss.str();
 }
 
 void DCM::Manager::saveAsDCM(std::string fname)

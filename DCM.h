@@ -346,7 +346,7 @@ namespace DCM
 		std::vector<Element*> getElements();
 		Element* findElement(std::string name, bool exactmatch=false);
 		std::vector<Element*> findElements(std::string name, bool exactmatch = false);
-		std::string getRawString() { std::string text = ""; for (auto line : lineHistory) text += line + "\n"; return text; };
+		std::string getRawString();
 
 		
 
