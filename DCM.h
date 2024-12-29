@@ -6,7 +6,7 @@
 #include <vector>
 #include <map>
 
-
+#include "GIT.h"
 
 namespace DCM
 {
@@ -241,6 +241,8 @@ namespace DCM
 	class Manager
 	{
 	private:
+		GIT* git = nullptr;
+
 		bool isOpened = false;
 
 		std::vector<std::string> lineHistory;

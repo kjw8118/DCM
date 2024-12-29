@@ -9,7 +9,7 @@ void GIT::printErrorAndShutdown(std::string text)
 	exit(EXIT_FAILURE);
 }
 
-void GIT::getLastError(std::string info = "")
+void GIT::getLastError(std::string info)
 {
 
 	const git_error* lastError = git_error_last();
