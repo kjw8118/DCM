@@ -58,6 +58,8 @@ namespace DCM
 		int lineOrder = -1;
 		int endIndex = -1;
 		int type = 0;
+		Element(const Element& other)
+			: lineIndex(other.lineIndex), lineOrder(other.lineOrder), endIndex(other.endIndex), type(other.type) {};
 
 	};
 	class Unknown : public Element
@@ -65,18 +67,21 @@ namespace DCM
 	public:
 		Unknown(int lineIndex, int &lineOrder, std::string text);
 		std::string text;
+		Unknown(const Unknown& other) : Element(other), text(other.text) {};
 	};
 	class Comment: public Element
 	{
 	public:
 		Comment(int lineIndex, int &lineOrder, std::string text);
 		std::string text;
+		Comment(const Comment& other) : Element(other), text(other.text) {};
 	};
 	class Format : public Element
 	{
 	public:
 		Format(int lineIndex, int &lineOrder, std::string version);
 		std::string version;
+		Format(const Format& other) : Element(other), version(other.version) {};
 	};
 	class Function
 	{
@@ -85,12 +90,14 @@ namespace DCM
 		std::string name;
 		std::string version;
 		std::string longname;
+		Function(const Function& other) : name(other.name), version(other.version), longname(other.longname) {};
 	};
 	class Functions : public Element
 	{
 	public:
 		Functions(int lineIndex, int &lineOrder);
 		std::vector<Function> functions;
+		Functions(const Functions& other) : Element(other), functions(other.functions) {};
 	};
 	class Variant
 	{
@@ -98,12 +105,14 @@ namespace DCM
 		Variant(std::string name);
 		std::string name;
 		std::vector<std::string> values;
+		Variant(const Variant& other) : name(other.name), values(other.values) {};
 	};
 	class VariantCoding : public Element
 	{
 	public:
 		VariantCoding(int lineIndex, int &lineOrder);
 		std::vector<Variant> variants;
+		VariantCoding(const VariantCoding& other) : Element(other), variants(other.variants) {};
 	};
 	class ModuleHeader : public Element
 	{
@@ -111,6 +120,7 @@ namespace DCM
 		ModuleHeader(int lineIndex, int &lineOrder, std::string name);
 		std::string name;
 		std::vector<std::string> texts;
+		ModuleHeader(const ModuleHeader& other) : Element(other), name(other.name), texts(other.texts) {};
 	};
 	class BaseParameter : public Element
 	{
@@ -125,7 +135,9 @@ namespace DCM
 		//Function* function = nullptr;
 		std::string function;
 		std::string unit = "";
-		
+		BaseParameter(const BaseParameter& other)
+			:Element(other), name(other.name), langname(other.langname), displayname(other.displayname),
+			variant(other.variant), function(other.function), unit(other.unit) {};
 		
 	};
 	class ArrayBaseParameter : public BaseParameter
@@ -137,6 +149,8 @@ namespace DCM
 		//std::vector<double> values;
 		std::vector<double> values;
 		std::vector<int> dec_values;
+		ArrayBaseParameter(const ArrayBaseParameter& other)
+			: BaseParameter(other), size_x(other.size_x), size_y(other.size_y), values(other.values), dec_values(other.dec_values) {};
 
 		
 	};
@@ -150,6 +164,9 @@ namespace DCM
 		std::vector<double> values;
 		std::vector<int> dec_point_x;
 		std::vector<int> dec_values;
+		LineBaseParameter(const LineBaseParameter& other)
+			: BaseParameter(other), size_x(other.size_x), unit_x(other.unit_x), point_x(other.point_x), values(other.values),
+			dec_point_x(other.dec_point_x), dec_values(other.dec_values) {};
 	};
 	class MapBaseParameter : public LineBaseParameter
 	{
@@ -159,6 +176,8 @@ namespace DCM
 		std::string unit_y = "";
 		std::vector<double> point_y;
 		std::vector<int> dec_point_y;
+		MapBaseParameter(const MapBaseParameter& other)
+			: LineBaseParameter(other), size_y(other.size_y), unit_y(other.unit_y), point_y(other.point_y), dec_point_y(other.dec_point_y) {};
 	};
 	class Parameter : public BaseParameter // FESTWERT
 	{
@@ -166,55 +185,58 @@ namespace DCM
 		Parameter(int lineIndex, int &lineOrder, std::string name);
 		double value;
 		int dec_value;
+		Parameter(const Parameter& other) : BaseParameter(other), value(other.value), dec_value(other.dec_value) {};
 		
 	};
 	class Boolean : public BaseParameter // FESTWERT
 	{
 	public:
 		Boolean(int lineIndex, int &lineOrder, std::string name);
-		std::string text;		
+		std::string text;
+		Boolean(const Boolean& other) : BaseParameter(other), text(other.text) {};
 	};
 	class Array : public ArrayBaseParameter // FESTWERTEBLOCK
 	{
 	public:
 		Array(int lineIndex, int &lineOrder, std::string name, int size_x = 0);
+		Array(const Array& other) : ArrayBaseParameter(other) {};
 		
 	};
 	class Matrix : public ArrayBaseParameter // FESTWERTEBLOCK
 	{
 	public:
 		Matrix(int lineIndex, int &lineOrder, std::string name, int size_x = 0, int size_y = 0);
-		
+		Matrix(const Matrix& other) : ArrayBaseParameter(other) {};
 	};
 	class CharLine : public LineBaseParameter // KENNLINIE
 	{
 	public:
 		CharLine(int lineIndex, int &lineOrder, std::string name, int size_x = 0);
-		
+		CharLine(const CharLine& other) : LineBaseParameter(other) {};
 	};
 	class CharMap : public MapBaseParameter // KENNFELD
 	{
 	public:
 		CharMap(int lineIndex, int &lineOrder, std::string name, int size_x = 0, int size_y = 0);		
-		
+		CharMap(const CharMap& other) : MapBaseParameter(other) {};
 	};
 	class FixedCharLine : public LineBaseParameter // FESTKENNLINIE
 	{
 	public:
 		FixedCharLine(int lineIndex, int &lineOrder, std::string name, int size_x = 0);
-		
+		FixedCharLine(const FixedCharLine& other) : LineBaseParameter(other) {};
 	};
 	class FixedCharMap : public MapBaseParameter // FESTKENNFELD
 	{
 	public:
 		FixedCharMap(int lineIndex, int &lineOrder, std::string name, int size_x = 0, int size_y = 0);
-
+		FixedCharMap(const FixedCharMap& other) : MapBaseParameter(other) {};
 	};
 	class Distribution : public LineBaseParameter
 	{
 	public:
 		Distribution(int lineIndex, int &lineOrder, std::string name, int size_x = 0);
-		
+		Distribution(const Distribution& other) : LineBaseParameter(other) {};
 	};
 	class GroupCharLine : public LineBaseParameter
 	{
@@ -222,6 +244,7 @@ namespace DCM
 		GroupCharLine(int lineIndex, int &lineOrder, std::string name, int size_x = 0);
 		//Distrubution* dist_x = nullptr;
 		std::string dist_x = "";
+		GroupCharLine(const GroupCharLine& other) : LineBaseParameter(other), dist_x(other.dist_x) {};
 		
 	};
 	class GroupCharMap : public MapBaseParameter
@@ -232,6 +255,7 @@ namespace DCM
 		std::string dist_x = "";
 		//Distrubution* dist_y = nullptr;
 		std::string dist_y = "";
+		GroupCharMap(const GroupCharMap& other) : MapBaseParameter(other), dist_x(other.dist_x), dist_y(other.dist_y) {};
 		
 	};
 

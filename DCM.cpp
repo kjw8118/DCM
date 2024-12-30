@@ -1443,6 +1443,19 @@ std::vector<std::string> DCM::Manager::getRevisionList()
 {
 	return git->getLocalBranchList();
 }
+
+std::vector<std::pair<DCM::BaseParameter*, DCM::BaseParameter*>> DCM::Manager::pairBaseParametersWith(std::vector<DCM::BaseParameter*>& otherBaseParameters)
+{	
+	std::vector<std::pair<DCM::BaseParameter*, DCM::BaseParameter*>> baseParameterPairs;
+	auto baseParameters = collectAllTypeParameters();
+	
+	std::vector<DCM::BaseParameter*> filteredBaseParameters;
+	for (auto otherPara : otherBaseParameters)
+	{
+		//if (std::find_if(baseParameters.begin(), baseParameters.end(), [=](DCM::BaseParameter* basePara) {return basePara->name == otherPara->name; });
+	}
+	return baseParameterPairs;
+}
 void DCM::Manager::compareWith(DCM::Manager &otherDCM)
 {
 	auto otherBaseParameters = otherDCM.collectAllTypeParameters();
@@ -1474,10 +1487,10 @@ void DCM::Manager::compareWith(std::vector<DCM::Element*> &otherElements)
 }
 void DCM::Manager::compareWith(std::vector<BaseParameter*> &otherBaseParameters)
 {
-	auto thisBaseParameters = collectAllTypeParameters();
-	std::set<std::string> thisParaNames;
-	for (auto thisPara : thisBaseParameters)
-		thisParaNames.insert(thisPara->name);
+	//auto thisBaseParameters = collectAllTypeParameters();
+	//std::vector<DCM::Element*> 
+	//for (auto thisPara : thisBaseParameters)
+	//	thisParaNames.insert(thisPara->name);
 }
 
 bool DCM::Manager::test()
