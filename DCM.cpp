@@ -728,15 +728,42 @@ DCM::Element* DCM::Manager::findElement(std::string name, bool exactmatch)
 std::vector<DCM::Element*> DCM::Manager::findElements(std::string name, bool exactmatch)
 {
 	std::vector<DCM::Element*> ret;
-	if (name.empty())
+	/*if (name.empty())
 		return ret;
 
 	std::string name_trnsf = name;
 	if (!exactmatch)
 		std::transform(name_trnsf.begin(), name_trnsf.end(), name_trnsf.begin(), [](unsigned char c) {return std::tolower(c); });
 
-	
+	auto itr = std::find_if(elements.begin(), elements.end(), [=](const Element* element) {
+		std::string elementName_trnsf;
+		switch (element->type)
+		{
+		case TYPE::PARAMETER:
+		case TYPE::BOOLEAN:
+		case TYPE::ARRAY:
+		case TYPE::MATRIX:
+		case TYPE::CHARLINE:
+		case TYPE::CHARMAP:
+		case TYPE::FIXEDCHARLINE:
+		case TYPE::FIXEDCHARMAP:
+		case TYPE::DISTRIBUTION:
+		case TYPE::GROUPCHARLINE:
+		case TYPE::GROUPCHARMAP:
+		{
+			elementName_trnsf = ((BaseParameter*)element)->name;
+			if (!exactmatch)
+				std::transform(elementName_trnsf.begin(), elementName_trnsf.end(), elementName_trnsf.begin(), [](unsigned char c) {return std::tolower(c); });
+			return name_trnsf == elementName_trnsf;
+			break;
+		}
+		}
+		return false;
+		});
+	if (itr == elements.end())
+		return ret;*/
 
+	return ret;
 }
 int DCM::Manager::calcEndIndex(Element* element)
 {
