@@ -196,7 +196,7 @@ namespace DCM
 			this->variant = other.variant;
 			this->function = other.function;
 			this->unit = other.unit;
-		}
+		}		
 		
 	};
 	class ArrayBaseParameter : public BaseParameter
@@ -219,6 +219,14 @@ namespace DCM
 			this->size_y = other.size_y;
 			this->values = other.values;
 			this->dec_values = other.dec_values;			
+		}
+		void copyValue(const ArrayBaseParameter& other)
+		{
+			if (this->type != other.type)
+				return;
+			if (this->values.size() != other.values.size())
+				return;
+			std::copy(other.values.begin(), other.values.end(), this->values.begin());
 		}
 		
 	};
@@ -247,6 +255,15 @@ namespace DCM
 			this->dec_point_x = other.dec_point_x;
 			this->dec_values = other.dec_values;
 		}
+		void copyValue(const LineBaseParameter& other)
+		{
+			if (this->type != other.type)
+				return;
+			if (this->values.size() != other.values.size() || this->point_x.size() != other.point_x.size())
+				return;
+			std::copy(other.point_x.begin(), other.point_x.end(), this->point_x.begin());
+			std::copy(other.values.begin(), other.values.end(), this->values.begin());
+		}
 	};
 	class MapBaseParameter : public LineBaseParameter
 	{
@@ -268,6 +285,15 @@ namespace DCM
 			this->point_y = other.point_y;
 			this->dec_point_y = other.dec_point_y;			
 		}
+		void copyValue(const MapBaseParameter& other)
+		{
+			if (this->type != other.type)
+				return;
+			LineBaseParameter::copyValue(other);
+			if (this->point_y.size() != other.point_y.size())
+				return;
+			std::copy(other.point_y.begin(), other.point_y.end(), this->point_y.begin());			
+		}
 	};
 	class Parameter : public BaseParameter // FESTWERT
 	{
@@ -284,6 +310,12 @@ namespace DCM
 			this->value = other.value;
 			this->dec_value = other.dec_value;			
 		}
+		void copyValue(const Parameter& other)
+		{
+			if (this->type != other.type)
+				return;
+			this->value = other.value;
+		}
 	};
 	class Boolean : public BaseParameter // FESTWERT
 	{
@@ -298,6 +330,12 @@ namespace DCM
 			BaseParameter::copy(other);
 			this->text = other.text;			
 		}
+		void copyValue(const Boolean& other)
+		{
+			if (this->type != other.type)
+				return;
+			this->text = other.text;
+		}
 	};
 	class Array : public ArrayBaseParameter // FESTWERTEBLOCK
 	{
@@ -308,6 +346,10 @@ namespace DCM
 		{
 			if (this->type != other.type)
 				return;
+			ArrayBaseParameter::copy(other);
+		}
+		void copyValue(const Array& other)
+		{
 			ArrayBaseParameter::copy(other);
 		}
 	};
@@ -322,6 +364,10 @@ namespace DCM
 				return;
 			ArrayBaseParameter::copy(other);
 		}
+		void copyValue(const Matrix& other)
+		{
+			ArrayBaseParameter::copy(other);
+		}
 	};
 	class CharLine : public LineBaseParameter // KENNLINIE
 	{
@@ -332,6 +378,10 @@ namespace DCM
 		{
 			if (this->type != other.type)
 				return;
+			LineBaseParameter::copy(other);
+		}
+		void copyValue(const CharLine& other)
+		{
 			LineBaseParameter::copy(other);
 		}
 	};
@@ -346,6 +396,10 @@ namespace DCM
 				return;
 			MapBaseParameter::copy(other);
 		}
+		void copyValue(const CharMap& other)
+		{
+			MapBaseParameter::copy(other);
+		}
 	};
 	class FixedCharLine : public LineBaseParameter // FESTKENNLINIE
 	{
@@ -356,6 +410,10 @@ namespace DCM
 		{
 			if (this->type != other.type)
 				return;
+			LineBaseParameter::copy(other);
+		}
+		void copyValue(const FixedCharLine& other)
+		{
 			LineBaseParameter::copy(other);
 		}
 	};
@@ -370,6 +428,10 @@ namespace DCM
 				return;
 			MapBaseParameter::copy(other);
 		}
+		void copyValue(const FixedCharMap& other)
+		{
+			MapBaseParameter::copy(other);
+		}
 	};
 	class Distribution : public LineBaseParameter
 	{
@@ -380,6 +442,10 @@ namespace DCM
 		{
 			if (this->type != other.type)
 				return;
+			LineBaseParameter::copy(other);
+		}
+		void copyValue(const Distribution& other)
+		{
 			LineBaseParameter::copy(other);
 		}
 	};
@@ -395,6 +461,10 @@ namespace DCM
 			if (this->type != other.type)
 				return;
 			this->dist_x = other.dist_x;
+			LineBaseParameter::copy(other);
+		}
+		void copyValue(const GroupCharLine& other)
+		{
 			LineBaseParameter::copy(other);
 		}
 		
@@ -414,6 +484,10 @@ namespace DCM
 				return;
 			this->dist_x = other.dist_x;
 			this->dist_y = other.dist_y;
+			MapBaseParameter::copy(other);
+		}
+		void copyValue(const GroupCharMap& other)
+		{
 			MapBaseParameter::copy(other);
 		}
 		
