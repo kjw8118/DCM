@@ -357,7 +357,12 @@ namespace DCM
 		std::string getRawString();
 
 		
-
+		std::vector<std::string> getRevisionList();
+		//void forkBranch();
+		void compareWith(DCM::Manager &otherDCM);
+		void compareWith(std::vector<Element*> &otherElements);
+		void compareWith(std::vector<BaseParameter*> &otherBaseParameters);
+		std::vector<std::pair<DCM::BaseParameter*, DCM::BaseParameter*>> pairBaseParametersWith(std::vector<BaseParameter*>& otherBaseParameters);
 		static bool test();
 
 		// Test Code

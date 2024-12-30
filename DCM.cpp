@@ -920,7 +920,6 @@ std::string DCM::Manager::rebuildUnknown(Unknown* unknown)
 	return oss.str();
 
 }
-
 std::string DCM::Manager::rebuildFunctions(Functions* functions)
 {
 	std::ostringstream oss;
@@ -937,7 +936,6 @@ std::string DCM::Manager::rebuildFunctions(Functions* functions)
 
 	return oss.str();
 }
-
 std::string DCM::Manager::rebuildComment(Comment* comment)
 {
 	std::ostringstream oss;
@@ -948,7 +946,6 @@ std::string DCM::Manager::rebuildComment(Comment* comment)
 
 	return oss.str();
 }
-
 std::string DCM::Manager::rebuildVariantCoding(VariantCoding* variantCoding)
 {
 	std::ostringstream oss;
@@ -967,7 +964,6 @@ std::string DCM::Manager::rebuildVariantCoding(VariantCoding* variantCoding)
 	oss << "END\n";
 	return oss.str();
 }
-
 std::string DCM::Manager::rebuildModuleHeader(ModuleHeader* moduleHeader)
 {
 	std::ostringstream oss;
@@ -981,7 +977,6 @@ std::string DCM::Manager::rebuildModuleHeader(ModuleHeader* moduleHeader)
 	oss << "END\n";
 	return oss.str();
 }
-
 std::string DCM::Manager::rebuildFormat(Format* format)
 {
 	std::ostringstream oss;
@@ -992,7 +987,6 @@ std::string DCM::Manager::rebuildFormat(Format* format)
 	oss << "KONSERVIERUNG_FORMAT " + format->version + "\n";
 	return oss.str();
 }
-
 std::string DCM::Manager::rebuildParameter(Parameter* parameter)
 {
 	std::ostringstream oss;
@@ -1042,7 +1036,6 @@ std::string DCM::Manager::rebuildBoolean(Boolean* boolean)
 	return oss.str();
 
 }
-
 std::string DCM::Manager::rebuildArray(Array* arr)
 {
 	std::ostringstream oss;
@@ -1115,8 +1108,6 @@ std::string DCM::Manager::rebuildMatrix(Matrix* matrix)
 
 	return oss.str();
 }
-
-
 std::string DCM::Manager::rebuildLineBaseParameter(LineBaseParameter* line)
 {
 	std::ostringstream oss;
@@ -1264,7 +1255,6 @@ std::string DCM::Manager::rebuildMapBaseParameter(MapBaseParameter* map)
 
 	return oss.str();
 }
-
 std::string DCM::Manager::rebuildDistribution(Distribution* dist)
 {
 	std::ostringstream oss;
@@ -1301,7 +1291,6 @@ std::string DCM::Manager::rebuildDistribution(Distribution* dist)
 
 	return oss.str();
 }
-
 std::string DCM::Manager::rebuildElement(Element* element)
 {
 	switch (element->type)
@@ -1450,6 +1439,46 @@ std::vector<DCM::MapBaseParameter*> DCM::Manager::collectMap()
 }
 
 
+std::vector<std::string> DCM::Manager::getRevisionList()
+{
+	return git->getLocalBranchList();
+}
+void DCM::Manager::compareWith(DCM::Manager &otherDCM)
+{
+	auto otherBaseParameters = otherDCM.collectAllTypeParameters();
+	compareWith(otherBaseParameters);
+}
+void DCM::Manager::compareWith(std::vector<DCM::Element*> &otherElements)
+{
+	std::vector<BaseParameter*> otherBaseParameters;
+	for (auto& element : otherElements)
+	{
+		switch (element->type)
+		{
+		case DCM::TYPE::PARAMETER:
+		case DCM::TYPE::BOOLEAN:
+		case DCM::TYPE::ARRAY:
+		case DCM::TYPE::MATRIX:			
+		case DCM::TYPE::CHARLINE:
+		case DCM::TYPE::CHARMAP:			
+		case DCM::TYPE::FIXEDCHARLINE:
+		case DCM::TYPE::FIXEDCHARMAP:
+		case DCM::TYPE::DISTRIBUTION:
+		case DCM::TYPE::GROUPCHARLINE:
+		case DCM::TYPE::GROUPCHARMAP:
+			otherBaseParameters.push_back((BaseParameter*)element);
+			break;
+		}
+	}
+	compareWith(otherBaseParameters);
+}
+void DCM::Manager::compareWith(std::vector<BaseParameter*> &otherBaseParameters)
+{
+	auto thisBaseParameters = collectAllTypeParameters();
+	std::set<std::string> thisParaNames;
+	for (auto thisPara : thisBaseParameters)
+		thisParaNames.insert(thisPara->name);
+}
 
 bool DCM::Manager::test()
 {
