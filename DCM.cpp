@@ -1513,7 +1513,30 @@ void DCM::Manager::copyWith(std::vector<DCM::BaseParameter*>& otherBaseParameter
 	{
 		auto myPara = paraPair.first;
 		auto otherPara = paraPair.second;
-		
+		switch (myPara->type)
+		{
+		case TYPE::PARAMETER:
+			((Parameter*)myPara)->copyValue(*(Parameter*)otherPara);
+			break;
+		case TYPE::BOOLEAN:
+			((Boolean*)myPara)->copyValue(*(Boolean*)otherPara);
+			break;
+		case TYPE::ARRAY:
+		case TYPE::MATRIX:
+			((ArrayBaseParameter*)myPara)->copyValue(*(ArrayBaseParameter*)otherPara);
+			break;
+		case TYPE::CHARLINE:		
+		case TYPE::FIXEDCHARLINE:
+		case TYPE::DISTRIBUTION:
+		case TYPE::GROUPCHARLINE:
+			((LineBaseParameter*)myPara)->copyValue(*(LineBaseParameter*)otherPara);
+			break;
+		case TYPE::CHARMAP:
+		case TYPE::FIXEDCHARMAP:
+		case TYPE::GROUPCHARMAP:
+			((MapBaseParameter*)myPara)->copyValue(*(MapBaseParameter*)otherPara);
+			break;
+		}		
 	}
 }
 bool DCM::Manager::test()
