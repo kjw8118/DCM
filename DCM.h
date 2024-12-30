@@ -68,6 +68,12 @@ namespace DCM
 		Unknown(int lineIndex, int &lineOrder, std::string text);
 		std::string text;
 		Unknown(const Unknown& other) : Element(other), text(other.text) {};
+		void copy(const Unknown& other)
+		{
+			if (this->type != other.type)
+				return;
+			this->text = other.text;
+		}
 	};
 	class Comment: public Element
 	{
@@ -75,6 +81,12 @@ namespace DCM
 		Comment(int lineIndex, int &lineOrder, std::string text);
 		std::string text;
 		Comment(const Comment& other) : Element(other), text(other.text) {};
+		void copy(const Comment& other)
+		{
+			if (this->type != other.type)
+				return;
+			this->text = other.text;
+		}
 	};
 	class Format : public Element
 	{
@@ -82,6 +94,12 @@ namespace DCM
 		Format(int lineIndex, int &lineOrder, std::string version);
 		std::string version;
 		Format(const Format& other) : Element(other), version(other.version) {};
+		void copy(const Format& other)
+		{
+			if (this->type != other.type)
+				return;
+			this->version = other.version;
+		}
 	};
 	class Function
 	{
@@ -91,6 +109,12 @@ namespace DCM
 		std::string version;
 		std::string longname;
 		Function(const Function& other) : name(other.name), version(other.version), longname(other.longname) {};
+		void copy(const Function& other)
+		{
+			this->name = other.name;			
+			this->version = other.version;
+			this->longname = other.longname;
+		}
 	};
 	class Functions : public Element
 	{
@@ -98,6 +122,12 @@ namespace DCM
 		Functions(int lineIndex, int &lineOrder);
 		std::vector<Function> functions;
 		Functions(const Functions& other) : Element(other), functions(other.functions) {};
+		void copy(const Functions& other)
+		{
+			if (this->type != other.type)
+				return;
+			this->functions = other.functions;
+		}
 	};
 	class Variant
 	{
@@ -106,6 +136,11 @@ namespace DCM
 		std::string name;
 		std::vector<std::string> values;
 		Variant(const Variant& other) : name(other.name), values(other.values) {};
+		void copy(const Variant& other)
+		{
+			this->name = other.name;
+			this->values = other.values;
+		}
 	};
 	class VariantCoding : public Element
 	{
@@ -113,6 +148,12 @@ namespace DCM
 		VariantCoding(int lineIndex, int &lineOrder);
 		std::vector<Variant> variants;
 		VariantCoding(const VariantCoding& other) : Element(other), variants(other.variants) {};
+		void copy(const VariantCoding& other)
+		{
+			if (this->type != other.type)
+				return;
+			this->variants = other.variants;
+		}
 	};
 	class ModuleHeader : public Element
 	{
@@ -121,6 +162,13 @@ namespace DCM
 		std::string name;
 		std::vector<std::string> texts;
 		ModuleHeader(const ModuleHeader& other) : Element(other), name(other.name), texts(other.texts) {};
+		void copy(const ModuleHeader& other)
+		{
+			if (this->type != other.type)
+				return;
+			this->name = other.name;
+			this->texts = other.texts;
+		}
 	};
 	class BaseParameter : public Element
 	{
@@ -138,6 +186,17 @@ namespace DCM
 		BaseParameter(const BaseParameter& other)
 			:Element(other), name(other.name), langname(other.langname), displayname(other.displayname),
 			variant(other.variant), function(other.function), unit(other.unit) {};
+		void copy(const BaseParameter& other)
+		{
+			if (this->type != other.type)
+				return;
+			this->name = other.name;
+			this->langname = other.langname;
+			this->displayname = other.displayname;
+			this->variant = other.variant;
+			this->function = other.function;
+			this->unit = other.unit;
+		}
 		
 	};
 	class ArrayBaseParameter : public BaseParameter
@@ -151,7 +210,16 @@ namespace DCM
 		std::vector<int> dec_values;
 		ArrayBaseParameter(const ArrayBaseParameter& other)
 			: BaseParameter(other), size_x(other.size_x), size_y(other.size_y), values(other.values), dec_values(other.dec_values) {};
-
+		void copy(const ArrayBaseParameter& other)
+		{
+			if (this->type != other.type)
+				return;
+			BaseParameter::copy(other);
+			this->size_x = other.size_x;
+			this->size_y = other.size_y;
+			this->values = other.values;
+			this->dec_values = other.dec_values;			
+		}
 		
 	};
 	class LineBaseParameter : public BaseParameter
@@ -167,6 +235,18 @@ namespace DCM
 		LineBaseParameter(const LineBaseParameter& other)
 			: BaseParameter(other), size_x(other.size_x), unit_x(other.unit_x), point_x(other.point_x), values(other.values),
 			dec_point_x(other.dec_point_x), dec_values(other.dec_values) {};
+		void copy(const LineBaseParameter& other)
+		{
+			if (this->type != other.type)
+				return;
+			BaseParameter::copy(other);
+			this->size_x = other.size_x;
+			this->unit_x = other.unit_x;
+			this->point_x = other.point_x;
+			this->values = other.values;
+			this->dec_point_x = other.dec_point_x;
+			this->dec_values = other.dec_values;
+		}
 	};
 	class MapBaseParameter : public LineBaseParameter
 	{
@@ -178,6 +258,16 @@ namespace DCM
 		std::vector<int> dec_point_y;
 		MapBaseParameter(const MapBaseParameter& other)
 			: LineBaseParameter(other), size_y(other.size_y), unit_y(other.unit_y), point_y(other.point_y), dec_point_y(other.dec_point_y) {};
+		void copy(const MapBaseParameter& other)
+		{
+			if (this->type != other.type)
+				return;
+			LineBaseParameter::copy(other);
+			this->size_y = other.size_y;
+			this->unit_y = other.unit_y;
+			this->point_y = other.point_y;
+			this->dec_point_y = other.dec_point_y;			
+		}
 	};
 	class Parameter : public BaseParameter // FESTWERT
 	{
@@ -186,7 +276,14 @@ namespace DCM
 		double value;
 		int dec_value;
 		Parameter(const Parameter& other) : BaseParameter(other), value(other.value), dec_value(other.dec_value) {};
-		
+		void copy(const Parameter& other)
+		{
+			if (this->type != other.type)
+				return;
+			BaseParameter::copy(other);
+			this->value = other.value;
+			this->dec_value = other.dec_value;			
+		}
 	};
 	class Boolean : public BaseParameter // FESTWERT
 	{
@@ -194,49 +291,97 @@ namespace DCM
 		Boolean(int lineIndex, int &lineOrder, std::string name);
 		std::string text;
 		Boolean(const Boolean& other) : BaseParameter(other), text(other.text) {};
+		void copy(const Boolean& other)
+		{
+			if (this->type != other.type)
+				return;
+			BaseParameter::copy(other);
+			this->text = other.text;			
+		}
 	};
 	class Array : public ArrayBaseParameter // FESTWERTEBLOCK
 	{
 	public:
 		Array(int lineIndex, int &lineOrder, std::string name, int size_x = 0);
 		Array(const Array& other) : ArrayBaseParameter(other) {};
-		
+		void copy(const Array& other)
+		{
+			if (this->type != other.type)
+				return;
+			ArrayBaseParameter::copy(other);
+		}
 	};
 	class Matrix : public ArrayBaseParameter // FESTWERTEBLOCK
 	{
 	public:
 		Matrix(int lineIndex, int &lineOrder, std::string name, int size_x = 0, int size_y = 0);
 		Matrix(const Matrix& other) : ArrayBaseParameter(other) {};
+		void copy(const Matrix& other)
+		{
+			if (this->type != other.type)
+				return;
+			ArrayBaseParameter::copy(other);
+		}
 	};
 	class CharLine : public LineBaseParameter // KENNLINIE
 	{
 	public:
 		CharLine(int lineIndex, int &lineOrder, std::string name, int size_x = 0);
 		CharLine(const CharLine& other) : LineBaseParameter(other) {};
+		void copy(const CharLine& other)
+		{
+			if (this->type != other.type)
+				return;
+			LineBaseParameter::copy(other);
+		}
 	};
 	class CharMap : public MapBaseParameter // KENNFELD
 	{
 	public:
 		CharMap(int lineIndex, int &lineOrder, std::string name, int size_x = 0, int size_y = 0);		
 		CharMap(const CharMap& other) : MapBaseParameter(other) {};
+		void copy(const CharMap& other)
+		{
+			if (this->type != other.type)
+				return;
+			MapBaseParameter::copy(other);
+		}
 	};
 	class FixedCharLine : public LineBaseParameter // FESTKENNLINIE
 	{
 	public:
 		FixedCharLine(int lineIndex, int &lineOrder, std::string name, int size_x = 0);
 		FixedCharLine(const FixedCharLine& other) : LineBaseParameter(other) {};
+		void copy(const FixedCharLine& other)
+		{
+			if (this->type != other.type)
+				return;
+			LineBaseParameter::copy(other);
+		}
 	};
 	class FixedCharMap : public MapBaseParameter // FESTKENNFELD
 	{
 	public:
 		FixedCharMap(int lineIndex, int &lineOrder, std::string name, int size_x = 0, int size_y = 0);
 		FixedCharMap(const FixedCharMap& other) : MapBaseParameter(other) {};
+		void copy(const FixedCharMap& other)
+		{
+			if (this->type != other.type)
+				return;
+			MapBaseParameter::copy(other);
+		}
 	};
 	class Distribution : public LineBaseParameter
 	{
 	public:
 		Distribution(int lineIndex, int &lineOrder, std::string name, int size_x = 0);
 		Distribution(const Distribution& other) : LineBaseParameter(other) {};
+		void copy(const Distribution& other)
+		{
+			if (this->type != other.type)
+				return;
+			LineBaseParameter::copy(other);
+		}
 	};
 	class GroupCharLine : public LineBaseParameter
 	{
@@ -245,6 +390,13 @@ namespace DCM
 		//Distrubution* dist_x = nullptr;
 		std::string dist_x = "";
 		GroupCharLine(const GroupCharLine& other) : LineBaseParameter(other), dist_x(other.dist_x) {};
+		void copy(const GroupCharLine& other)
+		{
+			if (this->type != other.type)
+				return;
+			this->dist_x = other.dist_x;
+			LineBaseParameter::copy(other);
+		}
 		
 	};
 	class GroupCharMap : public MapBaseParameter
@@ -256,6 +408,14 @@ namespace DCM
 		//Distrubution* dist_y = nullptr;
 		std::string dist_y = "";
 		GroupCharMap(const GroupCharMap& other) : MapBaseParameter(other), dist_x(other.dist_x), dist_y(other.dist_y) {};
+		void copy(const GroupCharMap& other)
+		{
+			if (this->type != other.type)
+				return;
+			this->dist_x = other.dist_x;
+			this->dist_y = other.dist_y;
+			MapBaseParameter::copy(other);
+		}
 		
 	};
 
@@ -338,6 +498,7 @@ namespace DCM
 
 		int calcEndIndex(Element* element);
 
+		
 	public:
 		Manager();
 		void open(std::string _fPath);
@@ -383,9 +544,8 @@ namespace DCM
 		
 		std::vector<std::string> getRevisionList();
 		//void forkBranch();
-		void compareWith(DCM::Manager &otherDCM);
-		void compareWith(std::vector<Element*> &otherElements);
-		void compareWith(std::vector<BaseParameter*> &otherBaseParameters);
+		std::vector<std::pair<bool, std::pair<BaseParameter*, BaseParameter*>>> compareWith(std::vector<BaseParameter*> &otherBaseParameters);
+		void copyWith(std::vector<BaseParameter*>& otherBaseParameters);
 		std::vector<std::pair<DCM::BaseParameter*, DCM::BaseParameter*>> pairBaseParametersWith(std::vector<BaseParameter*>& otherBaseParameters);
 		static bool test();
 

@@ -734,6 +734,9 @@ std::vector<DCM::Element*> DCM::Manager::findElements(std::string name, bool exa
 	std::string name_trnsf = name;
 	if (!exactmatch)
 		std::transform(name_trnsf.begin(), name_trnsf.end(), name_trnsf.begin(), [](unsigned char c) {return std::tolower(c); });
+
+	
+
 }
 int DCM::Manager::calcEndIndex(Element* element)
 {
@@ -1447,52 +1450,45 @@ std::vector<std::string> DCM::Manager::getRevisionList()
 std::vector<std::pair<DCM::BaseParameter*, DCM::BaseParameter*>> DCM::Manager::pairBaseParametersWith(std::vector<DCM::BaseParameter*>& otherBaseParameters)
 {	
 	std::vector<std::pair<DCM::BaseParameter*, DCM::BaseParameter*>> baseParameterPairs;
-	auto baseParameters = collectAllTypeParameters();
+	auto myBaseParameters = collectAllTypeParameters();
 	
 	std::vector<DCM::BaseParameter*> filteredBaseParameters;
 	for (auto otherPara : otherBaseParameters)
 	{
-		//if (std::find_if(baseParameters.begin(), baseParameters.end(), [=](DCM::BaseParameter* basePara) {return basePara->name == otherPara->name; });
+		auto myPara = std::find_if(myBaseParameters.begin(), myBaseParameters.end(), [=](DCM::BaseParameter* myPara) {return myPara->name == otherPara->name; });
+		if (myPara != myBaseParameters.end())					
+			baseParameterPairs.push_back({ *myPara, otherPara });
+		
 	}
 	return baseParameterPairs;
 }
-void DCM::Manager::compareWith(DCM::Manager &otherDCM)
-{
-	auto otherBaseParameters = otherDCM.collectAllTypeParameters();
-	compareWith(otherBaseParameters);
-}
-void DCM::Manager::compareWith(std::vector<DCM::Element*> &otherElements)
-{
-	std::vector<BaseParameter*> otherBaseParameters;
-	for (auto& element : otherElements)
-	{
-		switch (element->type)
-		{
-		case DCM::TYPE::PARAMETER:
-		case DCM::TYPE::BOOLEAN:
-		case DCM::TYPE::ARRAY:
-		case DCM::TYPE::MATRIX:			
-		case DCM::TYPE::CHARLINE:
-		case DCM::TYPE::CHARMAP:			
-		case DCM::TYPE::FIXEDCHARLINE:
-		case DCM::TYPE::FIXEDCHARMAP:
-		case DCM::TYPE::DISTRIBUTION:
-		case DCM::TYPE::GROUPCHARLINE:
-		case DCM::TYPE::GROUPCHARMAP:
-			otherBaseParameters.push_back((BaseParameter*)element);
-			break;
-		}
-	}
-	compareWith(otherBaseParameters);
-}
-void DCM::Manager::compareWith(std::vector<BaseParameter*> &otherBaseParameters)
-{
-	//auto thisBaseParameters = collectAllTypeParameters();
-	//std::vector<DCM::Element*> 
-	//for (auto thisPara : thisBaseParameters)
-	//	thisParaNames.insert(thisPara->name);
-}
 
+std::vector<std::pair<bool, std::pair<DCM::BaseParameter*, DCM::BaseParameter*>>> DCM::Manager::compareWith(std::vector<BaseParameter*> &otherBaseParameters)
+{	
+	auto baseParameterPairs = pairBaseParametersWith(otherBaseParameters);
+	std::vector<std::pair<bool, std::pair<DCM::BaseParameter*, DCM::BaseParameter*>>> comparedParameters;
+	for (auto paraPair : baseParameterPairs)
+	{
+		auto myParaString = rebuildElement((Element*)paraPair.first);
+		auto otherParaString = rebuildElement((Element*)paraPair.second);
+		if (myParaString == otherParaString)
+			comparedParameters.push_back({ true, paraPair });
+		else
+			comparedParameters.push_back({ false, paraPair });
+	}
+
+	return comparedParameters;
+}
+void DCM::Manager::copyWith(std::vector<DCM::BaseParameter*>& otherBaseParameters)
+{
+	auto baseParameterPairs = pairBaseParametersWith(otherBaseParameters);
+	for (auto paraPair : baseParameterPairs)
+	{
+		auto myPara = paraPair.first;
+		auto otherPara = paraPair.second;
+		
+	}
+}
 bool DCM::Manager::test()
 {
 	bool ret = true;
