@@ -625,7 +625,7 @@ void DCM::Manager::openWithRepo(std::string _fPath)
 	std::string dirPath = std::filesystem::path(fPathAbs).parent_path().string();
 	std::string fName = std::filesystem::path(fPathAbs).filename().string();
 	bool isRepoExist = GIT::isRepoExist(dirPath);
-	git = new GIT(dirPath, "Jinwon", "kjw8118@gmail.com");
+	git = new GIT(dirPath);
 	if (!isRepoExist)
 	{
 		std::string ignoreName = "!" + fName;
