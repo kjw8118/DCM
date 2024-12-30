@@ -6,7 +6,7 @@
 #include <vector>
 #include <map>
 
-#include "GIT.h"
+#include "GIT.h" // From github.com/kjw8118/GITwrap.git
 
 namespace DCM
 {
