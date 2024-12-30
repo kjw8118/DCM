@@ -19,7 +19,10 @@ void GIT::getLastError(std::string info)
 	else
 		printErrorAndShutdown(info + "Unknown error messasge");
 }
+void GIT::clearGitIgnore()
+{
 
+}
 void GIT::appendGitIgnore(const std::vector<std::string>& ignorePatterns)
 {
 	std::string gitIgnorePath = repoPath + "/.gitignore";
@@ -107,13 +110,13 @@ std::string GIT::printRepoStatus(const GIT::FileStatus& fileStatus)
 	return oss.str();
 }
 
-void GIT::addUntrackedFilesToIndex(const GIT::FileStatus& fileStatus)
+void GIT::stagingFiles(std::vector<std::string> filesPath)
 {
 	git_index* index = nullptr;
 	if (git_repository_index(&index, repo) < 0)
 		getLastError("get_repository_index failed: ");
 
-	for (const auto& filePath : fileStatus.untracked)
+	for (const auto& filePath : filesPath)
 	{
 		if (git_index_add_bypath(index, filePath.c_str()) < 0)
 			getLastError("git_index_add_bypath failed at " + filePath + ": ");
@@ -130,12 +133,28 @@ void GIT::addUntrackedFilesToIndex(const GIT::FileStatus& fileStatus)
 		getLastError("git_index_write failed: ");
 		break;
 	}
-
 }
-void GIT::addAllUntrackedFilesToIndex()
+void GIT::stagingAllUntrackedFiles()
 {
-	auto fileStatus = collectRepoStatus();	
-	addUntrackedFilesToIndex(fileStatus);
+	auto fileStatus = collectRepoStatus();
+	stagingFiles(fileStatus.untracked);
+}
+void GIT::stagingAllModifiedFiles()
+{
+	auto fileStatus = collectRepoStatus();
+	stagingFiles(fileStatus.modified);
+}
+void GIT::stagingAllDeletedFiles()
+{
+	auto fileStatus = collectRepoStatus();
+	stagingFiles(fileStatus.deleted);
+}
+void GIT::stagingAll()
+{
+	auto fileStatus = collectRepoStatus();
+	stagingFiles(fileStatus.untracked);
+	stagingFiles(fileStatus.modified);
+	stagingFiles(fileStatus.deleted);
 }
 
 void GIT::commitCurrentStage(std::string commit_message)
@@ -202,11 +221,10 @@ GIT::GIT(std::string repoPath, std::string userName, std::string userEmail)
 			getLastError("git_repository_init failed: ");
 		std::cout << "git_repository_init success" << std::endl;
 
+		clearGitIgnore();
 		appendGitIgnore(ignorePreset);
 
-		auto fileStatus = collectRepoStatus();
-		std::cout << printRepoStatus(fileStatus) << std::endl;
-		addUntrackedFilesToIndex(fileStatus);
+		stagingAll();
 
 
 

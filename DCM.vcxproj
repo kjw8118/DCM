@@ -144,6 +144,7 @@
     <ClInclude Include="GIT.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include=".gitignore" />
     <None Include="commentTest.dcm" />
     <None Include="formatTest.dcm" />
     <None Include="functionsTest.dcm" />
