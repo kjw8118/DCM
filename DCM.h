@@ -573,6 +573,7 @@ namespace DCM
 		int calcEndIndex(Element* element);
 
 		
+		
 	public:
 		Manager();
 		void open(std::string _fPath);
@@ -580,6 +581,16 @@ namespace DCM
 		
 		void createDCM();
 		void parse();
+
+		struct EditHistory
+		{
+			std::chrono::system_clock::time_point date;
+			std::string message;
+			std::string id;
+			// Content from GIT::DiffHunk or std::vector<std::string> ?
+			EditHistory(std::chrono::system_clock::time_point date, std::string message, std::string id)
+				: date(date), message(message), id(id) {};
+		};
 
 		std::vector<BaseParameter*> collectAllTypeParameters();
 		std::vector<Distribution*> collectAxispoint();
@@ -616,7 +627,14 @@ namespace DCM
 		std::string getRawString();
 
 		
+		std::vector<EditHistory> getEditHistoryList();
 		std::vector<std::string> getRevisionList();
+
+		std::string getContentsAtHistory(EditHistory editHistory);
+		std::string getContentsAtHistory(std::string editHistory_id);
+
+		std::string getContentsAtRevision(std::string revision);
+
 		//void forkBranch();
 		std::vector<std::pair<bool, std::pair<BaseParameter*, BaseParameter*>>> compareWith(std::vector<BaseParameter*> &otherBaseParameters);
 		void copyWith(std::vector<BaseParameter*>& otherBaseParameters);

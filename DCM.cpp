@@ -1468,10 +1468,49 @@ std::vector<DCM::MapBaseParameter*> DCM::Manager::collectMap()
 	return ret;
 }
 
+std::vector<DCM::Manager::EditHistory> DCM::Manager::getEditHistoryList()
+{
+	std::vector<DCM::Manager::EditHistory> editHistoryList;
+	if (git == nullptr)
+		return editHistoryList;
 
+	auto gitLog = git->gitLog();
+	for (auto log : gitLog)
+	{
+		editHistoryList.emplace_back(
+			std::chrono::system_clock::time_point(std::chrono::seconds(log.author.when.time)), // Date
+			log.message, // Commit message
+			log.oid_str // ID
+		);
+		// Date, Commit message, oid, Content		
+	}
+
+	return editHistoryList;
+}
 std::vector<std::string> DCM::Manager::getRevisionList()
 {
+	if (git == nullptr)
+		return std::vector<std::string>();
+
 	return git->getLocalBranchList();
+}
+std::string DCM::Manager::getContentsAtHistory(EditHistory editHistory)
+{	
+	return getContentsAtHistory(editHistory.id);
+}
+std::string DCM::Manager::getContentsAtHistory(std::string editHistory_id)
+{	
+	if (git == nullptr)
+		return "";
+
+	return git->getContentsAtCommit(fPath, editHistory_id);	
+}
+std::string DCM::Manager::getContentsAtRevision(std::string revision)
+{
+	if (git == nullptr)
+		return "";
+
+	return git->getContentsAtBranch(fPath, revision);
 }
 
 std::vector<std::pair<DCM::BaseParameter*, DCM::BaseParameter*>> DCM::Manager::pairBaseParametersWith(std::vector<DCM::BaseParameter*>& otherBaseParameters)
