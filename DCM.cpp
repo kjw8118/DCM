@@ -762,6 +762,15 @@ std::vector<DCM::Element*> DCM::Manager::findElements(std::string name, bool exa
 		});
 	if (itr == elements.end())
 		return ret;*/
+	// impl
+
+	return ret;
+}
+std::vector<DCM::BaseParameter*> DCM::Manager::findBaseParameters(std::string name, bool exactmatch)
+{
+	std::vector<DCM::BaseParameter*> ret;
+
+	// impl
 
 	return ret;
 }
@@ -1479,8 +1488,8 @@ std::vector<DCM::Manager::EditHistory> DCM::Manager::getEditHistoryList()
 	{
 		editHistoryList.emplace_back(
 			std::chrono::system_clock::time_point(std::chrono::seconds(log.author.when.time)), // Date
-			log.message, // Commit message
-			log.oid_str // ID
+			GIT::u8utf8ToLocal(log.message), // Commit message
+			GIT::u8utf8ToLocal(log.oid_str) // ID
 		);
 		// Date, Commit message, oid, Content		
 	}

@@ -588,6 +588,7 @@ namespace DCM
 			std::string message;
 			std::string id;
 			// Content from GIT::DiffHunk or std::vector<std::string> ?
+			EditHistory() {};
 			EditHistory(std::chrono::system_clock::time_point date, std::string message, std::string id)
 				: date(date), message(message), id(id) {};
 		};
@@ -620,12 +621,13 @@ namespace DCM
 		void saveAsDCM(std::string fname);
 		
 		void clear();
+		std::string getFileName() { return fPath; };
 
 		std::vector<Element*> getElements();
 		Element* findElement(std::string name, bool exactmatch=false);
 		std::vector<Element*> findElements(std::string name, bool exactmatch = false);
 		std::string getRawString();
-
+		std::vector<BaseParameter*> findBaseParameters(std::string name, bool exactmatch = false);
 		
 		std::vector<EditHistory> getEditHistoryList();
 		std::vector<std::string> getRevisionList();
