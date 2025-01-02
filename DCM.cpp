@@ -640,8 +640,12 @@ void DCM::Manager::open(std::string _fPath)
 	if (isOpened)
 		return;
 
-	fPath = std::filesystem::absolute(_fPath).string();	
-	file.open(fPath.c_str());
+	fPath = std::filesystem::absolute(_fPath).string();		
+	if(!file.is_open())
+		file.open(fPath, std::ios::in | std::ios::out | std::ios::app);
+	else if(!file.is_open())
+		file.open(fPath, std::ios::in);
+
 	isOpened = file.is_open();
 }
 
