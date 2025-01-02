@@ -616,16 +616,16 @@ DCM::Manager::Manager()
 {
 
 }
-void DCM::Manager::openWithRepo(std::string _fPath)
+void DCM::Manager::openWithRepo(std::string _fPath, std::string _gitName, std::string _gitEmail)
 {
 	if (isOpened)
-		return;
+		return;	
 
 	std::string fPathAbs = std::filesystem::absolute(_fPath).string();
 	std::string dirPath = std::filesystem::path(fPathAbs).parent_path().string();
 	std::string fName = std::filesystem::path(fPathAbs).filename().string();
 	bool isRepoExist = GIT::isRepoExist(dirPath);
-	git = new GIT(dirPath);
+	git = new GIT(dirPath, _gitName, _gitEmail);
 	if (!isRepoExist)
 	{
 		std::string ignoreName = "!" + fName;
@@ -633,7 +633,12 @@ void DCM::Manager::openWithRepo(std::string _fPath)
 		git->commitCurrentStage("Init");
 	}
 	open(_fPath);
-	
+
+	if (isOpened)
+	{
+		gitName = _gitName;
+		gitEmail = _gitEmail;
+	}
 }
 void DCM::Manager::open(std::string _fPath)
 {

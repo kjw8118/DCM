@@ -501,6 +501,8 @@ namespace DCM
 	{
 	private:
 		GIT* git = nullptr;
+		std::string gitName = "";
+		std::string gitEmail = "";
 
 		bool isOpened = false;
 
@@ -576,8 +578,9 @@ namespace DCM
 		
 	public:
 		Manager();
-		void open(std::string _fPath);
-		void openWithRepo(std::string _fPath);
+		void open(std::string _fPath);		
+		void openWithRepo(std::string _fPath, std::string gitName, std::string gitEmail);
+		void openWithRepo(std::string _fPath) { return openWithRepo(_fPath, gitName, gitEmail); };
 		
 		void createDCM();
 		void parse();
