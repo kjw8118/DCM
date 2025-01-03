@@ -10,7 +10,212 @@
 
 namespace DCM
 {
-	
+	class LineIndex
+	{
+	private:
+		LineIndex* prev = nullptr;
+		LineIndex* next = nullptr;
+		int index;
+		int length;
+		int order;
+
+		void updateIndex()
+		{
+			if (prev != nullptr)
+				index = prev->getEndIndex() + 1;
+			else
+				index = 0;
+		}
+		void updateOrder()
+		{
+			if (prev != nullptr)
+				order = prev->getOrder() + 1;
+			else
+				order = 0;
+		}
+		void update()
+		{
+			updateIndex();
+			updateOrder();
+
+			if (index < 0 || length < 0) // 아직 정보가 없는 상태
+				return;
+
+			//int curIndex = index + length;
+			//int curOrder = order + 1;
+			auto itr = next;
+			while (itr != nullptr)
+			{
+				//itr->index = curIndex;
+				//itr->order = curOrder;
+				//curIndex += itr->length;
+				//curOrder += 1;
+				itr->updateIndex();
+				itr->updateOrder();
+
+				itr = itr->next;
+			}
+		}
+	public:
+		LineIndex(int index = 0, int length = 1)
+			: index(index), length(length), order(0), prev(nullptr), next(nullptr) {};
+		LineIndex(LineIndex* _prev, LineIndex* next = nullptr)
+			: prev(_prev), next(nullptr)
+		{
+			updateIndex();
+			updateOrder();
+
+			if (next != nullptr)
+#ifndef max
+				length = std::max(1, next->getIndex() - index);
+#else
+				length = max(1, next->getIndex() - index);
+#endif
+			else
+				length = 1;
+
+			attachPrev(prev);
+			attachNext(next);
+		}
+		int getIndex()
+		{
+			updateIndex();
+			return index;
+		};
+		int getEndIndex()
+		{
+			return getIndex() + length - 1;
+		}
+		int getOrder()
+		{
+			updateOrder();
+			return order;
+		}
+		void putLength(int len)
+		{
+			length = len;
+			update();
+		}
+		void putEndIndex(int endIndex)
+		{
+			length = endIndex - getIndex() + 1;
+			update();
+		}
+		/* attch와 detach는 하나의 연결리스트만 존재한다고 가정하고 작동한다 */
+		/* 현재의 prev를 until까지 떼어내고 없앤다 즉 until 이전까지는 없애지 않는다 왜냐하면 새로운 prev가 될 수 있으므로 */
+		void detachPrev(LineIndex* until = nullptr)
+		{
+			if (prev != nullptr)
+			{
+				std::list<LineIndex*> trashBin;
+				auto itr = prev;
+				while (itr != until && itr != nullptr && itr != this)
+				{
+					trashBin.push_front(itr);
+					itr = itr->prev;
+				}
+				for (auto trash : trashBin)
+					delete trash;
+				prev = nullptr;
+
+				updateIndex();
+				updateOrder();
+
+				//update();
+			}
+		}
+		/* 현재의 prev를 detach하고 새로운 _prev를 붙인다 */
+		void attachPrev(LineIndex* _prev)
+		{
+			if (_prev == prev)
+				return;
+
+			detachPrev(_prev);
+			prev = _prev;
+			if (prev != nullptr)
+			{
+				prev->attachNext(this);
+				update();
+			}
+		}
+		void detachNext(LineIndex* until = nullptr)
+		{
+			std::list<LineIndex*> trashBin;
+			auto itr = next;
+			while (itr != until && itr != nullptr && itr != this)
+			{
+				trashBin.push_front(itr);
+				itr = itr->next;
+			}
+			for (auto trash : trashBin)
+				delete trash;
+			next = nullptr;
+			//update();
+		}
+		void attachNext(LineIndex* _next)
+		{
+			if (_next == next)
+				return;
+
+			detachNext(_next);
+			next = _next;
+			if (next != nullptr)
+			{
+				next->attachPrev(this);
+				update();
+			}
+		}
+		/*  */
+		void attach(LineIndex* _prev, LineIndex* _next)
+		{
+			//prev = _prev;
+			//next = _next;
+			attachPrev(_prev);
+			attachNext(_next);
+		}
+		void detach(LineIndex* _prev, LineIndex* _next)
+		{
+			detachPrev(_prev);
+			detachNext(_next);
+		}
+
+		void independent()
+		{
+			prev->detachNext(this); // 삭제 없이 연결만 끊기 prev->next = nullptr
+			next->detachPrev(this); // 자신과 연결 안끊고 attach하면 자신이 삭제될 수 있음
+
+			prev->attachNext(next); //
+			next->attachPrev(prev); // prev->attachNext(next)에 next->attachPrev 있어서 사실상 중복
+
+			prev = nullptr;
+			next = nullptr;
+
+			updateIndex();
+			updateOrder();
+		}
+		void resetIndex()
+		{
+			if (prev == nullptr)
+				index = 0;
+			update();
+		}
+		LineIndex(const LineIndex& other)
+			: index(other.index), length(other.length), order(other.order), prev(other.prev), next(other.next) {};
+		LineIndex& operator=(const LineIndex& other)
+		{
+			if (this != &other)
+			{
+				index = other.index;
+				length = other.length;
+				order = other.order;
+				prev = other.prev; // 기존 연결관계를 어떻게 할지 안 정함
+				next = other.next;
+			}
+			return *this;
+		}
+
+	};
+
 	enum TYPE
 	{
 		UNKNOWN = 0,
@@ -53,36 +258,34 @@ namespace DCM
 	class Element
 	{
 	public:
-		int lineIndex = -1;
-		int lineOrder = -1;
-		int endIndex = -1;
+		LineIndex* lineIndex = nullptr;
 		int type = -1;
-		
-		Element(int lineIndex, int& lineOrder, int type) : lineIndex(lineIndex), lineOrder(lineOrder), type(type), endIndex(lineIndex)
+	
+	protected:
+		Element(int type, Element* prev) : type(type)
 		{
-			lineOrder++;
+			if (prev != nullptr) lineIndex = new LineIndex(prev->lineIndex);
+			else lineIndex = new LineIndex();
 		};
 		Element(const Element& other)
-			: lineIndex(other.lineIndex), lineOrder(other.lineOrder), endIndex(other.endIndex), type(other.type) {};
+			: type(other.type), lineIndex(other.lineIndex) {};
 		Element& operator=(const Element& other)
 		{
 			if (this != &other)
 			{
 				lineIndex = other.lineIndex;
-				lineOrder = other.lineOrder;
-				endIndex = other.endIndex;
 				type = other.type;
 			}
 			return *this;
-		}
+		}	
 	};
 	class Unknown : public Element
 	{
 	public:
 		std::string text;
 
-		Unknown(int lineIndex, int &lineOrder, std::string text) 
-			: Element(lineIndex, lineOrder, TYPE::UNKNOWN), text(text) {};
+		Unknown(std::string text, Element* prev=nullptr) 
+			: Element(TYPE::UNKNOWN, prev), text(text) {};
 		Unknown(const Unknown& other)
 			: Element(other), text(other.text) {};
 		Unknown& operator=(const Unknown& other)
@@ -105,8 +308,8 @@ namespace DCM
 	public:
 		std::string text;
 
-		Comment(int lineIndex, int &lineOrder, std::string text)
-			: Element(lineIndex, lineOrder, TYPE::COMMENT), text(text) {};
+		Comment(std::string text, Element* prev = nullptr)
+			: Element(TYPE::COMMENT, prev), text(text) {};
 		Comment(const Comment& other)
 			: Element(other), text(other.text) {};
 		Comment& operator=(const Comment& other)
@@ -129,8 +332,8 @@ namespace DCM
 	public:
 		std::string version;
 		
-		Format(int lineIndex, int &lineOrder, std::string version)
-			: Element(lineIndex, lineOrder, TYPE::FORMAT), version(version) {};
+		Format(std::string version, Element* prev = nullptr)
+			: Element(TYPE::FORMAT, prev), version(version) {};
 		Format(const Format& other) 
 			: Element(other), version(other.version) {};
 		Format& operator=(const Format& other)
@@ -181,8 +384,8 @@ namespace DCM
 	public:
 		std::vector<Function> functions;
 		
-		Functions(int lineIndex, int &lineOrder)
-			: Element(lineIndex, lineOrder, TYPE::FUNCTIONS) {};
+		Functions(Element* prev = nullptr)
+			: Element(TYPE::FUNCTIONS, prev) {};
 		Functions(const Functions& other)
 			: Element(other), functions(other.functions) {};
 		Functions& operator=(const Functions& other)
@@ -230,8 +433,8 @@ namespace DCM
 	public:
 		std::vector<Variant> variants;
 		
-		VariantCoding(int lineIndex, int &lineOrder)
-			: Element(lineIndex, lineOrder, TYPE::VARIANTCODING) {};
+		VariantCoding(Element* prev = nullptr)
+			: Element(TYPE::VARIANTCODING, prev) {};
 		VariantCoding(const VariantCoding& other)
 			: Element(other), variants(other.variants) {};
 		VariantCoding& operator=(const VariantCoding& other)
@@ -255,8 +458,8 @@ namespace DCM
 		std::string name;
 		std::vector<std::string> texts;
 
-		ModuleHeader(int lineIndex, int &lineOrder, std::string name)
-			: Element(lineIndex, lineOrder, TYPE::MODULEHEADER), name(name) {};
+		ModuleHeader(std::string name, Element* prev = nullptr)
+			: Element(TYPE::MODULEHEADER, prev), name(name) {};
 		ModuleHeader(const ModuleHeader& other)
 			: Element(other), name(other.name), texts(other.texts) {};
 		ModuleHeader& operator=(const ModuleHeader& other)
@@ -289,8 +492,21 @@ namespace DCM
 		std::string function;
 		std::string unit = "";
 
-		BaseParameter(int lineIndex, int &lineOrder, int type, std::string name)
-			: Element(lineIndex, lineOrder, type), name(name) {};
+		void copy(const BaseParameter& other)
+		{
+			if (this->type != other.type)
+				return;
+			this->name = other.name;
+			this->langname = other.langname;
+			this->displayname = other.displayname;
+			this->variant = other.variant;
+			this->function = other.function;
+			this->unit = other.unit;
+		}
+
+	protected:
+		BaseParameter(int type, std::string name, Element* prev)
+			: Element(type, prev), name(name) {};
 		BaseParameter(const BaseParameter& other)
 			:Element(other), name(other.name), langname(other.langname), displayname(other.displayname),
 			variant(other.variant), function(other.function), unit(other.unit) {};
@@ -307,17 +523,7 @@ namespace DCM
 			}
 			return *this;
 		}
-		void copy(const BaseParameter& other)
-		{
-			if (this->type != other.type)
-				return;
-			this->name = other.name;
-			this->langname = other.langname;
-			this->displayname = other.displayname;
-			this->variant = other.variant;
-			this->function = other.function;
-			this->unit = other.unit;
-		}		
+			
 		
 	};
 	class ArrayBaseParameter : public BaseParameter
@@ -329,8 +535,28 @@ namespace DCM
 		std::vector<double> values;
 		std::vector<int> dec_values;
 
-		ArrayBaseParameter(int lineIndex, int &lineOrder, int type, std::string name, int size_x, int size_y)
-			: BaseParameter(lineIndex, lineOrder, type, name), size_x(size_x), size_y(size_y) {};
+		void copy(const ArrayBaseParameter& other)
+		{
+			if (this->type != other.type)
+				return;
+			BaseParameter::copy(other);
+			this->size_x = other.size_x;
+			this->size_y = other.size_y;
+			this->values = other.values;
+			this->dec_values = other.dec_values;
+		}
+		void copyValue(const ArrayBaseParameter& other)
+		{
+			if (this->type != other.type)
+				return;
+			if (this->values.size() != other.values.size())
+				return;
+			std::copy(other.values.begin(), other.values.end(), this->values.begin());
+		}
+
+	protected:
+		ArrayBaseParameter(int type, std::string name, int size_x, int size_y, Element* prev)
+			: BaseParameter(type, name, prev), size_x(size_x), size_y(size_y) {};
 		ArrayBaseParameter(const ArrayBaseParameter& other)
 			: BaseParameter(other), size_x(other.size_x), size_y(other.size_y), values(other.values), dec_values(other.dec_values) {};
 		ArrayBaseParameter& operator=(const ArrayBaseParameter& other)
@@ -344,24 +570,7 @@ namespace DCM
 			}
 			return *this;
 		}
-		void copy(const ArrayBaseParameter& other)
-		{
-			if (this->type != other.type)
-				return;
-			BaseParameter::copy(other);
-			this->size_x = other.size_x;
-			this->size_y = other.size_y;
-			this->values = other.values;
-			this->dec_values = other.dec_values;			
-		}
-		void copyValue(const ArrayBaseParameter& other)
-		{
-			if (this->type != other.type)
-				return;
-			if (this->values.size() != other.values.size())
-				return;
-			std::copy(other.values.begin(), other.values.end(), this->values.begin());
-		}
+		
 		
 	};
 	class LineBaseParameter : public BaseParameter
@@ -374,24 +583,6 @@ namespace DCM
 		std::vector<int> dec_point_x;
 		std::vector<int> dec_values;
 
-		LineBaseParameter(int lineIndex, int& lineOrder, int type, std::string name, int size_x)
-			: BaseParameter(lineIndex, lineOrder, type, name), size_x(size_x) {};
-		LineBaseParameter(const LineBaseParameter& other)
-			: BaseParameter(other), size_x(other.size_x), unit_x(other.unit_x), point_x(other.point_x), values(other.values),
-			dec_point_x(other.dec_point_x), dec_values(other.dec_values) {};
-		LineBaseParameter& operator=(const LineBaseParameter& other)
-		{
-			if (this != &other)
-			{
-				size_x = other.size_x;
-				unit_x = other.unit_x;
-				point_x = other.point_x;
-				values = other.values;
-				dec_point_x = other.dec_point_x;
-				dec_values = other.dec_values;
-			}
-			return *this;
-		}
 		void copy(const LineBaseParameter& other)
 		{
 			if (this->type != other.type)
@@ -413,6 +604,27 @@ namespace DCM
 			std::copy(other.point_x.begin(), other.point_x.end(), this->point_x.begin());
 			std::copy(other.values.begin(), other.values.end(), this->values.begin());
 		}
+
+	protected:
+		LineBaseParameter(int type, std::string name, int size_x, Element* prev)
+			: BaseParameter(type, name, prev), size_x(size_x) {};
+		LineBaseParameter(const LineBaseParameter& other)
+			: BaseParameter(other), size_x(other.size_x), unit_x(other.unit_x), point_x(other.point_x), values(other.values),
+			dec_point_x(other.dec_point_x), dec_values(other.dec_values) {};
+		LineBaseParameter& operator=(const LineBaseParameter& other)
+		{
+			if (this != &other)
+			{
+				size_x = other.size_x;
+				unit_x = other.unit_x;
+				point_x = other.point_x;
+				values = other.values;
+				dec_point_x = other.dec_point_x;
+				dec_values = other.dec_values;
+			}
+			return *this;
+		}
+		
 	};
 	class MapBaseParameter : public LineBaseParameter
 	{
@@ -422,8 +634,29 @@ namespace DCM
 		std::vector<double> point_y;
 		std::vector<int> dec_point_y;
 
-		MapBaseParameter(int lineIndex, int &lineOrder, int type, std::string name, int size_x, int size_y)
-			: LineBaseParameter(lineIndex, lineOrder, type, name, size_x), size_y(size_y) {};
+		void copy(const MapBaseParameter& other)
+		{
+			if (this->type != other.type)
+				return;
+			LineBaseParameter::copy(other);
+			this->size_y = other.size_y;
+			this->unit_y = other.unit_y;
+			this->point_y = other.point_y;
+			this->dec_point_y = other.dec_point_y;
+		}
+		void copyValue(const MapBaseParameter& other)
+		{
+			if (this->type != other.type)
+				return;
+			LineBaseParameter::copyValue(other);
+			if (this->point_y.size() != other.point_y.size())
+				return;
+			std::copy(other.point_y.begin(), other.point_y.end(), this->point_y.begin());
+		}
+
+	protected:
+		MapBaseParameter(int type, std::string name, int size_x, int size_y, Element* prev)
+			: LineBaseParameter(type, name, size_x, prev), size_y(size_y) {};
 		MapBaseParameter(const MapBaseParameter& other)
 			: LineBaseParameter(other), size_y(other.size_y), unit_y(other.unit_y), point_y(other.point_y), dec_point_y(other.dec_point_y) {};
 		MapBaseParameter& operator=(const MapBaseParameter& other)
@@ -437,25 +670,7 @@ namespace DCM
 			}
 			return *this;
 		}
-		void copy(const MapBaseParameter& other)
-		{
-			if (this->type != other.type)
-				return;
-			LineBaseParameter::copy(other);
-			this->size_y = other.size_y;
-			this->unit_y = other.unit_y;
-			this->point_y = other.point_y;
-			this->dec_point_y = other.dec_point_y;			
-		}
-		void copyValue(const MapBaseParameter& other)
-		{
-			if (this->type != other.type)
-				return;
-			LineBaseParameter::copyValue(other);
-			if (this->point_y.size() != other.point_y.size())
-				return;
-			std::copy(other.point_y.begin(), other.point_y.end(), this->point_y.begin());			
-		}
+		
 	};
 	class Parameter : public BaseParameter // FESTWERT
 	{
@@ -463,8 +678,8 @@ namespace DCM
 		double value;
 		int dec_value;
 
-		Parameter(int lineIndex, int &lineOrder, std::string name)
-			: BaseParameter(lineIndex, lineOrder, TYPE::PARAMETER, name), value(0), dec_value(0) {};
+		Parameter(std::string name, Element* prev = nullptr)
+			: BaseParameter(TYPE::PARAMETER, name, prev), value(0), dec_value(0) {};
 		Parameter(const Parameter& other) : BaseParameter(other), value(other.value), dec_value(other.dec_value) {};
 		Parameter& operator=(const Parameter& other)
 		{
@@ -495,9 +710,10 @@ namespace DCM
 	public:
 		std::string text;
 
-		Boolean(int lineIndex, int &lineOrder, std::string name)
-			: BaseParameter(lineIndex, lineOrder, TYPE::BOOLEAN, name), text("") {};
+		Boolean(std::string name, Element* prev = nullptr)
+			: BaseParameter(TYPE::BOOLEAN, name, prev), text("") {};
 		Boolean(const Boolean& other) : BaseParameter(other), text(other.text) {};
+		Boolean(const Parameter& other) : BaseParameter(other), text("") { type = TYPE::BOOLEAN; };
 		Boolean& operator=(const Boolean& other)
 		{
 			if (this != &other)
@@ -523,8 +739,8 @@ namespace DCM
 	class Array : public ArrayBaseParameter // FESTWERTEBLOCK
 	{
 	public:
-		Array(int lineIndex, int &lineOrder, std::string name, int size_x = 0)
-			: ArrayBaseParameter(lineIndex, lineOrder, TYPE::ARRAY, name, size_x, 0) {};
+		Array(std::string name, Element* prev = nullptr)
+			: ArrayBaseParameter(TYPE::ARRAY, name, 0, 0, prev) {};
 		Array(const Array& other) : ArrayBaseParameter(other) {};
 		Array& operator=(const Array& other)
 		{
@@ -548,8 +764,8 @@ namespace DCM
 	class Matrix : public ArrayBaseParameter // FESTWERTEBLOCK
 	{
 	public:
-		Matrix(int lineIndex, int &lineOrder, std::string name, int size_x = 0, int size_y = 0)
-			: ArrayBaseParameter(lineIndex, lineOrder, TYPE::MATRIX, name, size_x, size_y) {};
+		Matrix(std::string name, Element* prev = nullptr)
+			: ArrayBaseParameter(TYPE::MATRIX, name, 0, 0, prev) {};
 		Matrix(const Matrix& other) : ArrayBaseParameter(other) {};
 		Matrix& operator=(const Matrix& other)
 		{
@@ -573,8 +789,8 @@ namespace DCM
 	class CharLine : public LineBaseParameter // KENNLINIE
 	{
 	public:
-		CharLine(int lineIndex, int &lineOrder, std::string name, int size_x = 0)
-			: LineBaseParameter(lineIndex, lineOrder, TYPE::CHARLINE, name, size_x) {};
+		CharLine(std::string name, Element* prev = nullptr)
+			: LineBaseParameter(TYPE::CHARLINE, name, 0, prev) {};
 		CharLine(const CharLine& other) : LineBaseParameter(other) {};
 		CharLine& operator=(const CharLine& other)
 		{
@@ -598,8 +814,8 @@ namespace DCM
 	class CharMap : public MapBaseParameter // KENNFELD
 	{
 	public:
-		CharMap(int lineIndex, int &lineOrder, std::string name, int size_x = 0, int size_y = 0)
-			: MapBaseParameter(lineIndex, lineOrder, TYPE::CHARMAP, name, size_x, size_y) {};
+		CharMap(std::string name, Element* prev = nullptr)
+			: MapBaseParameter(TYPE::CHARMAP, name, 0, 0, prev) {};
 		CharMap(const CharMap& other) : MapBaseParameter(other) {};
 		CharMap& operator=(const CharMap& other)
 		{
@@ -623,8 +839,8 @@ namespace DCM
 	class FixedCharLine : public LineBaseParameter // FESTKENNLINIE
 	{
 	public:
-		FixedCharLine(int lineIndex, int &lineOrder, std::string name, int size_x = 0)
-			: LineBaseParameter(lineIndex, lineOrder, TYPE::FIXEDCHARLINE, name, size_x) {};
+		FixedCharLine(std::string name, Element* prev = nullptr)
+			: LineBaseParameter(TYPE::FIXEDCHARLINE, name, 0, prev) {};
 		FixedCharLine(const FixedCharLine& other) : LineBaseParameter(other) {};
 		FixedCharLine& operator=(const FixedCharLine& other)
 		{
@@ -648,8 +864,8 @@ namespace DCM
 	class FixedCharMap : public MapBaseParameter // FESTKENNFELD
 	{
 	public:
-		FixedCharMap(int lineIndex, int &lineOrder, std::string name, int size_x = 0, int size_y = 0)
-			: MapBaseParameter(lineIndex, lineOrder, TYPE::FIXEDCHARMAP, name, size_x, size_y) {};
+		FixedCharMap(std::string name, Element* prev = nullptr)
+			: MapBaseParameter(TYPE::FIXEDCHARMAP, name, 0, 0, prev) {};
 		FixedCharMap(const FixedCharMap& other) : MapBaseParameter(other) {};
 		FixedCharMap& operator=(const FixedCharMap& other)
 		{
@@ -673,8 +889,8 @@ namespace DCM
 	class Distribution : public LineBaseParameter
 	{
 	public:
-		Distribution(int lineIndex, int &lineOrder, std::string name, int size_x = 0)
-			: LineBaseParameter(lineIndex, lineOrder, TYPE::DISTRIBUTION, name, size_x) {};
+		Distribution(std::string name, Element* prev = nullptr)
+			: LineBaseParameter(TYPE::DISTRIBUTION, name, 0, prev) {};
 		Distribution(const Distribution& other) : LineBaseParameter(other) {};
 		Distribution& operator=(const Distribution& other)
 		{
@@ -701,8 +917,8 @@ namespace DCM
 		//Distrubution* dist_x = nullptr;
 		std::string dist_x = "";
 
-		GroupCharLine(int lineIndex, int &lineOrder, std::string name, int size_x = 0)
-			: LineBaseParameter(lineIndex, lineOrder, TYPE::GROUPCHARLINE, name, size_x) {};
+		GroupCharLine(std::string name, Element* prev = nullptr)
+			: LineBaseParameter(TYPE::GROUPCHARLINE, name, 0, prev) {};
 		GroupCharLine(const GroupCharLine& other) : LineBaseParameter(other), dist_x(other.dist_x) {};
 		GroupCharLine& operator=(const GroupCharLine& other)
 		{
@@ -733,8 +949,8 @@ namespace DCM
 		//Distrubution* dist_y = nullptr;
 		std::string dist_y = "";
 		
-		GroupCharMap(int lineIndex, int &lineOrder, std::string name, int size_x = 0, int size_y = 0)
-			: MapBaseParameter(lineIndex, lineOrder, TYPE::GROUPCHARMAP, name, size_x, size_y) {};
+		GroupCharMap(std::string name, Element* prev = nullptr)
+			: MapBaseParameter(TYPE::GROUPCHARMAP, name, 0, 0, prev) {};
 		GroupCharMap(const GroupCharMap& other) : MapBaseParameter(other), dist_x(other.dist_x), dist_y(other.dist_y) {};
 		GroupCharMap& operator=(const GroupCharMap& other)
 		{

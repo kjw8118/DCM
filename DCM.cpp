@@ -175,7 +175,7 @@ void DCM::Manager::parseHeader(std::vector<std::string> lineStrip)
 		//lineString = lineStrip.at(0);
 		//for (int i = 1; i < lineStrip.size(); i++)
 		//	lineString += " " + lineStrip.at(i);
-		pCurrentElement = new Unknown(currentIndex, currentOrder, lineHistory.back());
+		pCurrentElement = new Unknown(lineHistory.back(), (elements.empty() ? nullptr : elements.back()));
 		putElement(pCurrentElement);
 		pCurrentElement = nullptr;
 		break;
@@ -186,33 +186,33 @@ void DCM::Manager::parseHeader(std::vector<std::string> lineStrip)
 		//lineComment += lineStrip.at(0);
 		//for (int i = 1; i < lineStrip.size(); i++)
 		//	lineComment += " " + lineStrip.at(i);
-		pCurrentElement = new Comment(currentIndex, currentOrder, lineHistory.back());
+		pCurrentElement = new Comment(lineHistory.back(), (elements.empty() ? nullptr : elements.back()));
 		putElement(pCurrentElement);
 		pCurrentElement = nullptr;
 		break;
 	}
 	case TYPE::FORMAT:
 	{
-		pCurrentElement = new Format(currentIndex, currentOrder, lineStrip.at(1));
+		pCurrentElement = new Format(lineStrip.at(1), (elements.empty() ? nullptr : elements.back()));
 		putElement(pCurrentElement);
 		pCurrentElement = nullptr;
 		break;
 	}
 	case TYPE::FUNCTIONS:
 	{
-		pCurrentElement = new Functions(currentIndex, currentOrder);
+		pCurrentElement = new Functions((elements.empty() ? nullptr : elements.back()));
 		break;
 	}
 	case TYPE::VARIANTCODING:
 	{
-		pCurrentElement = new VariantCoding(currentIndex, currentOrder);
+		pCurrentElement = new VariantCoding((elements.empty() ? nullptr : elements.back()));
 		break;
 	}
 	case TYPE::MODULEHEADER:
 	{
 		if (lineStrip.size() > 2)
 		{
-			pCurrentElement = new ModuleHeader(currentIndex, currentOrder, lineStrip.at(1));
+			pCurrentElement = new ModuleHeader(lineStrip.at(1), (elements.empty() ? nullptr : elements.back()));
 			((ModuleHeader*)pCurrentElement)->texts.push_back(lineStrip.at(2));
 			moduleHeaders.push_back((ModuleHeader*)pCurrentElement);
 			pCurrentElement = nullptr;
@@ -225,7 +225,7 @@ void DCM::Manager::parseHeader(std::vector<std::string> lineStrip)
 			}
 			else
 			{
-				pCurrentElement = new ModuleHeader(currentIndex, currentOrder, lineStrip.at(1));
+				pCurrentElement = new ModuleHeader(lineStrip.at(1), (elements.empty() ? nullptr : elements.back()));
 				moduleHeaders.push_back((ModuleHeader*)pCurrentElement);
 			}
 			pCurrentElement = nullptr;
@@ -234,7 +234,7 @@ void DCM::Manager::parseHeader(std::vector<std::string> lineStrip)
 	}
 	case TYPE::PARAMETER:
 	{
-		pCurrentElement = new Parameter(currentIndex, currentOrder, lineStrip.at(1));
+		pCurrentElement = new Parameter(lineStrip.at(1), (elements.empty() ? nullptr : elements.back()));
 		break;
 	}
 	case TYPE::ARRAY:
@@ -242,27 +242,27 @@ void DCM::Manager::parseHeader(std::vector<std::string> lineStrip)
 		
 		if (lineStrip.size() > 4)
 		{
-			pCurrentElement = new Matrix(currentIndex, currentOrder, lineStrip.at(1));
+			pCurrentElement = new Matrix(lineStrip.at(1), (elements.empty() ? nullptr : elements.back()));
 			((Matrix*)pCurrentElement)->size_x = std::stoi(lineStrip.at(2));
 			((Matrix*)pCurrentElement)->size_y = std::stoi(lineStrip.at(4)); // have @
 		}
 		else if (lineStrip.size() > 2)
 		{
-			pCurrentElement = new Array(currentIndex, currentOrder, lineStrip.at(1));
+			pCurrentElement = new Array(lineStrip.at(1), (elements.empty() ? nullptr : elements.back()));
 			((Array*)pCurrentElement)->size_x = std::stoi(lineStrip.at(2));
 		}
 		break;
 	}	
 	case TYPE::CHARLINE:
 	{
-		pCurrentElement = new CharLine(currentIndex, currentOrder, lineStrip.at(1));
+		pCurrentElement = new CharLine(lineStrip.at(1), (elements.empty() ? nullptr : elements.back()));
 		if (lineStrip.size() > 2)
 			((CharLine*)pCurrentElement)->size_x = std::stoi(lineStrip.at(2));
 		break;
 	}
 	case TYPE::CHARMAP:
 	{
-		pCurrentElement = new CharMap(currentIndex, currentOrder, lineStrip.at(1));
+		pCurrentElement = new CharMap(lineStrip.at(1), (elements.empty() ? nullptr : elements.back()));
 		if (lineStrip.size() > 3)
 		{
 			((CharMap*)pCurrentElement)->size_x = std::stoi(lineStrip.at(2));
@@ -272,14 +272,14 @@ void DCM::Manager::parseHeader(std::vector<std::string> lineStrip)
 	}
 	case TYPE::FIXEDCHARLINE:
 	{
-		pCurrentElement = new FixedCharLine(currentIndex, currentOrder, lineStrip.at(1));
+		pCurrentElement = new FixedCharLine(lineStrip.at(1), (elements.empty() ? nullptr : elements.back()));
 		if (lineStrip.size() > 2)
 			((FixedCharLine*)pCurrentElement)->size_x = std::stoi(lineStrip.at(2));
 		break;
 	}
 	case TYPE::FIXEDCHARMAP:
 	{
-		pCurrentElement = new FixedCharMap(currentIndex, currentOrder, lineStrip.at(1));
+		pCurrentElement = new FixedCharMap(lineStrip.at(1), (elements.empty() ? nullptr : elements.back()));
 		if (lineStrip.size() > 3)
 		{
 			((FixedCharMap*)pCurrentElement)->size_x = std::stoi(lineStrip.at(2));
@@ -289,14 +289,14 @@ void DCM::Manager::parseHeader(std::vector<std::string> lineStrip)
 	}
 	case TYPE::GROUPCHARLINE:
 	{
-		pCurrentElement = new GroupCharLine(currentIndex, currentOrder, lineStrip.at(1));
+		pCurrentElement = new GroupCharLine(lineStrip.at(1), (elements.empty() ? nullptr : elements.back()));
 		if (lineStrip.size() > 2)
 			((GroupCharLine*)pCurrentElement)->size_x = std::stoi(lineStrip.at(2));
 		break;
 	}
 	case TYPE::GROUPCHARMAP:
 	{
-		pCurrentElement = new GroupCharMap(currentIndex, currentOrder, lineStrip.at(1));
+		pCurrentElement = new GroupCharMap(lineStrip.at(1), (elements.empty() ? nullptr : elements.back()));
 		if (lineStrip.size() > 3)
 		{
 			((GroupCharMap*)pCurrentElement)->size_x = std::stoi(lineStrip.at(2));
@@ -306,7 +306,7 @@ void DCM::Manager::parseHeader(std::vector<std::string> lineStrip)
 	}
 	case TYPE::DISTRIBUTION:
 	{
-		pCurrentElement = new Distribution(currentIndex, currentOrder, lineStrip.at(1));
+		pCurrentElement = new Distribution(lineStrip.at(1), (elements.empty() ? nullptr : elements.back()));
 		if (lineStrip.size() > 2)
 			((Distribution*)pCurrentElement)->size_x = std::stoi(lineStrip.at(2));
 		break;
@@ -477,13 +477,7 @@ void DCM::Manager::parseComponent(std::vector<std::string> lineStrip)
 		{
 		case TYPE::PARAMETER:
 		{
-			auto pCurrentParameter = (Parameter*)pCurrentElement;
-			auto pCurrentBoolean = new Boolean(pCurrentParameter->lineIndex, pCurrentParameter->lineOrder, pCurrentParameter->name);
-			pCurrentBoolean->displayname = pCurrentParameter->displayname;
-			pCurrentBoolean->function = pCurrentParameter->function;
-			pCurrentBoolean->langname = pCurrentParameter->langname;
-			pCurrentBoolean->unit = pCurrentParameter->unit;
-			pCurrentBoolean->variant = pCurrentParameter->variant;
+			auto pCurrentBoolean = new Boolean(*(Parameter*)pCurrentElement);
 			pCurrentBoolean->text = lineStrip.at(1);
 			delete pCurrentElement;
 			pCurrentElement = (Element*)pCurrentBoolean;			
@@ -528,7 +522,7 @@ void DCM::Manager::parseComponent(std::vector<std::string> lineStrip)
 	}
 	case TYPE::END:
 	{
-		pCurrentElement->endIndex = currentIndex;
+		pCurrentElement->lineIndex->putEndIndex(currentIndex);
 		putElement(pCurrentElement);		
 		pCurrentElement = nullptr;
 		break;
@@ -541,7 +535,7 @@ void DCM::Manager::parseLine(std::string lineRaw)
 
 	if (lineStrip.empty())
 	{
-		pCurrentElement = new Unknown(currentIndex, currentOrder, lineHistory.back());
+		pCurrentElement = new Unknown(lineHistory.back(), (elements.empty() ? nullptr : elements.back()));
 		putElement(pCurrentElement);
 		pCurrentElement = nullptr;
 		return;
@@ -606,14 +600,14 @@ void DCM::Manager::createDCM()
 	std::tm localTime;
 	std::time_t now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());  localtime_s(&localTime, &now);
 	std::ostringstream oss;	oss << std::put_time(&localTime, "%Y-%m-%d %H:%M:%S");
-	putElement((Element*)(new Comment(currentIndex++, currentOrder, "* encoding=\"euc-kr\"")));
-	putElement((Element*)(new Comment(currentIndex++, currentOrder, "* DAMOS format")));
-	putElement((Element*)(new Comment(currentIndex++, currentOrder, "* Created by DCM Manager")));
-	putElement((Element*)(new Comment(currentIndex++, currentOrder, "* Creation date: " + oss.str())));
-	putElement((Element*)(new Comment(currentIndex++, currentOrder, "*")));
-	putElement((Element*)(new Unknown(currentIndex++, currentOrder, "")));
-	putElement((Element*)(new Format(currentIndex++, currentOrder, "2.0")));
-	putElement((Element*)(new Unknown(currentIndex++, currentOrder, "")));
+	putElement((Element*)(new Comment("* encoding=\"euc-kr\"", (elements.empty() ? nullptr : elements.back()))));
+	putElement((Element*)(new Comment("* DAMOS format", (elements.empty() ? nullptr : elements.back()))));
+	putElement((Element*)(new Comment("* Created by DCM Manager", (elements.empty() ? nullptr : elements.back()))));
+	putElement((Element*)(new Comment("* Creation date: " + oss.str(), (elements.empty() ? nullptr : elements.back()))));
+	putElement((Element*)(new Comment("*", (elements.empty() ? nullptr : elements.back()))));
+	putElement((Element*)(new Unknown("", (elements.empty() ? nullptr : elements.back()))));
+	putElement((Element*)(new Format("2.0", (elements.empty() ? nullptr : elements.back()))));
+	putElement((Element*)(new Unknown("", (elements.empty() ? nullptr : elements.back()))));
 
 	
 }
@@ -731,7 +725,7 @@ std::vector<DCM::BaseParameter*> DCM::Manager::findBaseParameters(std::string na
 }
 int DCM::Manager::calcEndIndex(Element* element)
 {
-	auto endIndex = element->lineIndex;
+	auto endIndex = element->lineIndex->getIndex();
 
 	switch (element->type)
 	{
@@ -839,22 +833,26 @@ void DCM::Manager::putElement(Element* element)
 	if (!elements.empty())
 	{
 		auto lastElement = elements.back();
-		auto lastIndex = lastElement->endIndex;
-		auto lastOrder = lastElement->lineOrder;
+		//auto lastIndex = lastElement->endIndex;
+		//auto lastOrder = lastElement->lineOrder;
 
-		element->lineIndex = lastIndex + 1;
-		element->lineOrder = lastOrder + 1;				
+		//element->lineIndex = lastIndex + 1;
+		//element->lineOrder = lastOrder + 1;
+		element->lineIndex->attachPrev(lastElement->lineIndex);
 	}
 	else
 	{
-		element->lineIndex = 0;
-		element->lineOrder = 0;
+		//element->lineIndex = 0;
+		//element->lineOrder = 0;
+		element->lineIndex->detachPrev();
 	}
-	auto endIndex = calcEndIndex(element);
-	element->endIndex = endIndex;
+	//auto endIndex = calcEndIndex(element);
+	//element->endIndex = endIndex;
 
-	currentIndex = endIndex + 1;
-	currentOrder = element->lineOrder + 1;
+	//currentIndex = endIndex + 1;
+	currentIndex = element->lineIndex->getEndIndex() + 1;
+	//currentOrder = element->lineOrder + 1;
+	currentOrder = element->lineIndex->getOrder() + 1;
 
 	elements.push_back(element);	
 	switch (element->type)
@@ -1260,7 +1258,7 @@ std::string DCM::Manager::rebuildDistribution(Distribution* dist)
 	if (dist->size_x)
 		oss << std::to_string(dist->size_x);
 	oss << "\n";
-	oss << "*SST\n";
+	//oss << "*SST\n";
 	if (!dist->langname.empty())
 		oss << "   LANGNAME " + dist->langname + " \n";
 	if (!dist->displayname.empty())

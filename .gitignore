@@ -363,5 +363,3 @@ MigrationBackup/
 FodyWeavers.xsd
 /GIT.cpp
 /GIT.h
-/LineIndex.h
-/LineIndex.cpp

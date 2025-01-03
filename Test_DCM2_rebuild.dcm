@@ -18,117 +18,116 @@
 KONSERVIERUNG_FORMAT 2.0
 
 FESTWERTEBLOCK array 4
-   LANGNAME "sample temperatures"
+   LANGNAME "sample temperatures" 
    EINHEIT_W "¡ÆC"
-   WERT   0.75   -0.25   0.5   1.5
+   WERT   0.75   -0.25   0.5   1.5   
 END
 
-FESTWERT cont
-   LANGNAME "speed"
+FESTWERT cont 
+   LANGNAME "speed" 
    EINHEIT_W "m / s"
    WERT 3.1415
 END
 
 STUETZSTELLENVERTEILUNG distrib 3
-*SST
-   LANGNAME "object length"
+   LANGNAME "object length" 
    EINHEIT_X ""
-   ST/X   1.0   2.0   3.0
+   ST/X   1.0   2.0   3.0   
 END
 
-FESTWERT enum_1
-   LANGNAME ""
+FESTWERT enum_1 
+   LANGNAME "" 
    EINHEIT_W ""
    TEXT "first"
 END
 
-FESTWERT log
-   LANGNAME ""
+FESTWERT log 
+   LANGNAME "" 
    EINHEIT_W ""
    TEXT "false"
 END
 
 FESTWERTEBLOCK matrix 5 @ 3
-   LANGNAME ""
+   LANGNAME "" 
    EINHEIT_W ""
-   WERT   0.0   0.25   0.5   0.75   1.0
-   WERT   1.0   1.25   1.5   1.75   2.0
-   WERT   2.0   2.25   2.5   2.75   3.0
+   WERT   0.0   0.25   0.5   0.75   1.0   
+   WERT   1.0   1.25   1.5   1.75   2.0   
+   WERT   2.0   2.25   2.5   2.75   3.0   
 END
 
 KENNLINIE One_D 4
-   LANGNAME ""
+   LANGNAME "" 
    EINHEIT_X ""
    EINHEIT_W ""
-   ST/X   0.0   1.0   2.0   3.0
-   WERT   0.0   0.0   0.0   0.0
+   ST/X   0.0   1.0   2.0   3.0   
+   WERT   0.0   0.0   0.0   0.0   
 END
 
 FESTKENNLINIE One_D_fix 3
-   LANGNAME ""
+   LANGNAME "" 
    EINHEIT_X ""
    EINHEIT_W ""
-   ST/X   0.0   1.0   2.0
-   WERT   -1.0   1.25   3.0
+   ST/X   0.0   1.0   2.0   
+   WERT   -1.0   1.25   3.0   
 END
 
 GRUPPENKENNLINIE One_D_group 3
-   LANGNAME ""
+   LANGNAME "" 
    EINHEIT_X ""
    EINHEIT_W ""
 *SSTX	distrib\Module_Block_Diagram
-   ST/X   1.0   2.0   3.0
-   WERT   -10.0   1.0   5.937
+   ST/X   1.0   2.0   3.0   
+   WERT   -10.0   1.0   5.937   
 END
 
-FESTWERT sdisc
-   LANGNAME ""
+FESTWERT sdisc 
+   LANGNAME "" 
    EINHEIT_W ""
    WERT -98
 END
 
 KENNFELD Two_D 3 2
-   LANGNAME "voltage"
+   LANGNAME "voltage" 
    EINHEIT_X ""
    EINHEIT_Y ""
    EINHEIT_W "V"
-   ST/X   0.0   1.0   2.0
+   ST/X   0.0   1.0   2.0   
    ST/Y   0.0
-   WERT    0.0    0.4    0.8
+   WERT   0.0   0.4   0.8   
    ST/Y   1.0
-   WERT    1.0    2.0    3.0
+   WERT   1.0   2.0   3.0   
 END
 
 FESTKENNFELD Two_D_fix 3 2
-   LANGNAME ""
+   LANGNAME "" 
    EINHEIT_X ""
    EINHEIT_Y ""
    EINHEIT_W ""
-   ST/X   0.0   1.0   2.0
+   ST/X   0.0   1.0   2.0   
    ST/Y   0.0
-   WERT    0.0    10.0    1000.0
+   WERT   0.0   10.0   1000.0   
    ST/Y   1.0
-   WERT    -1.0    9.0    999.0
+   WERT   -1.0   9.0   999.0   
 END
 
 GRUPPENKENNFELD Two_D_group 3 3
-   LANGNAME ""
+   LANGNAME "" 
    EINHEIT_X ""
    EINHEIT_Y ""
    EINHEIT_W ""
 *SSTX	distrib\Module_Block_Diagram
 *SSTY	distrib\Module_Block_Diagram
-   ST/X   1.0   2.0   3.0
+   ST/X   1.0   2.0   3.0   
    ST/Y   1.0
-   WERT    1.0    2.0    3.0
+   WERT   1.0   2.0   3.0   
    ST/Y   2.0
-   WERT    2.0    4.0    6.0
+   WERT   2.0   4.0   6.0   
    ST/Y   3.0
-   WERT    3.0    6.0    9.0
+   WERT   3.0   6.0   9.0   
 END
 
-FESTWERT udisc_1
-   LANGNAME ""
+FESTWERT udisc_1 
+   LANGNAME "" 
    EINHEIT_W ""
    WERT 876
 END
