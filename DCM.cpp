@@ -48,60 +48,6 @@ namespace DCM {
 
 }
 
-DCM::Element::Element(int lineIndex, int& lineOrder, int type)
-	: lineIndex(lineIndex), lineOrder(lineOrder), type(type), endIndex(lineIndex)
-{
-	lineOrder++;
-};	
-DCM::Unknown::Unknown(int lineIndex, int &lineOrder, std::string text)
-	: Element(lineIndex, lineOrder, TYPE::UNKNOWN), text(text) {};
-DCM::Comment::Comment(int lineIndex, int &lineOrder, std::string text)
-	: Element(lineIndex, lineOrder, TYPE::COMMENT), text(text) {};
-DCM::Format::Format(int lineIndex, int &lineOrder, std::string version)
-	: Element(lineIndex, lineOrder, TYPE::FORMAT), version(version) {};
-DCM::Function::Function(std::string name, std::string version, std::string longname)
-	: name(name), version(version), longname(longname) {};
-DCM::Functions::Functions(int lineIndex, int &lineOrder)
-	: Element(lineIndex, lineOrder, TYPE::FUNCTIONS) {};
-DCM::Variant::Variant(std::string name)
-	: name(name) {};	
-DCM::VariantCoding::VariantCoding(int lineIndex, int &lineOrder)
-	: Element(lineIndex, lineOrder, TYPE::VARIANTCODING) {};
-DCM::ModuleHeader::ModuleHeader(int lineIndex, int &lineOrder, std::string name)
-	: Element(lineIndex, lineOrder, TYPE::MODULEHEADER), name(name) {};	
-DCM::BaseParameter::BaseParameter(int lineIndex, int &lineOrder, int type, std::string name)
-	: Element(lineIndex, lineOrder, type), name(name) {};
-DCM::ArrayBaseParameter::ArrayBaseParameter(int lineIndex, int &lineOrder, int type, std::string name, int size_x, int size_y)
-	: BaseParameter(lineIndex, lineOrder, type, name), size_x(size_x), size_y(size_y) {};	
-DCM::LineBaseParameter::LineBaseParameter(int lineIndex, int &lineOrder, int type, std::string name, int size_x)
-	: BaseParameter(lineIndex, lineOrder, type, name), size_x(size_x) {};
-DCM::MapBaseParameter::MapBaseParameter(int lineIndex, int &lineOrder, int type, std::string name, int size_x, int size_y)
-	: LineBaseParameter(lineIndex, lineOrder, type, name, size_x), size_y(size_y) {};
-DCM::Parameter::Parameter(int lineIndex, int &lineOrder, std::string name)
-	: BaseParameter(lineIndex, lineOrder, TYPE::PARAMETER, name), value(0), dec_value(0) {};
-DCM::Boolean::Boolean(int lineIndex, int &lineOrder, std::string name)
-	: BaseParameter(lineIndex, lineOrder, TYPE::BOOLEAN, name), text("") {};
-DCM::Array::Array(int lineIndex, int &lineOrder, std::string name, int size_x)
-	: ArrayBaseParameter(lineIndex, lineOrder, TYPE::ARRAY, name, size_x, 0) {};
-DCM::Matrix::Matrix(int lineIndex, int &lineOrder, std::string name, int size_x, int size_y)
-	: ArrayBaseParameter(lineIndex, lineOrder, TYPE::MATRIX, name, size_x, size_y) {};	
-DCM::CharLine::CharLine(int lineIndex, int &lineOrder, std::string name, int size_x)
-	: LineBaseParameter(lineIndex, lineOrder, TYPE::CHARLINE, name, size_x) {};	
-DCM::CharMap::CharMap(int lineIndex, int &lineOrder, std::string name, int size_x, int size_y)
-	: MapBaseParameter(lineIndex, lineOrder, TYPE::CHARMAP, name, size_x, size_y) {};	
-DCM::FixedCharLine::FixedCharLine(int lineIndex, int &lineOrder, std::string name, int size_x)
-	: LineBaseParameter(lineIndex, lineOrder, TYPE::FIXEDCHARLINE, name, size_x) {};	
-DCM::FixedCharMap::FixedCharMap(int lineIndex, int &lineOrder, std::string name, int size_x, int size_y)
-	: MapBaseParameter(lineIndex, lineOrder, TYPE::FIXEDCHARMAP, name, size_x, size_y) {};	
-DCM::Distribution::Distribution(int lineIndex, int &lineOrder, std::string name, int size_x)
-	: LineBaseParameter(lineIndex, lineOrder, TYPE::DISTRIBUTION, name, size_x) {};	
-DCM::GroupCharLine::GroupCharLine(int lineIndex, int &lineOrder, std::string name, int size_x)
-	: LineBaseParameter(lineIndex, lineOrder, TYPE::GROUPCHARLINE, name, size_x) {};	
-DCM::GroupCharMap::GroupCharMap(int lineIndex, int &lineOrder, std::string name, int size_x, int size_y)
-	: MapBaseParameter(lineIndex, lineOrder, TYPE::GROUPCHARMAP, name, size_x, size_y) {};
-		
-
-
 	
 std::vector<std::string> DCM::stripLine(std::string lineRaw)
 {

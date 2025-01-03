@@ -52,22 +52,37 @@ namespace DCM
 	//std::map<std::string, int> Header;
 	class Element
 	{
-	public:		
-		Element(int lineIndex, int &lineOrder, int type);
-		int lineIndex = -1;
-		int lineOrder = -1;
-		int endIndex = -1;
-		int type = 0;
+	public:
+		int lineIndex;
+		int lineOrder;
+		int endIndex;
+		int type;
+		Element(int lineIndex, int& lineOrder, int type) : lineIndex(lineIndex), lineOrder(lineOrder), type(type), endIndex(lineIndex)
+		{
+			lineOrder++;
+		};
 		Element(const Element& other)
 			: lineIndex(other.lineIndex), lineOrder(other.lineOrder), endIndex(other.endIndex), type(other.type) {};
-
+		Element& operator=(const Element& other)
+		{
+			if (this != &other)
+			{
+				lineIndex = other.lineIndex;
+				lineOrder = other.lineOrder;
+				endIndex = other.endIndex;
+				type = other.type;
+			}
+			return *this;
+		}
 	};
 	class Unknown : public Element
 	{
 	public:
-		Unknown(int lineIndex, int &lineOrder, std::string text);
+		Unknown(int lineIndex, int &lineOrder, std::string text) 
+			: Element(lineIndex, lineOrder, TYPE::UNKNOWN), text(text) {};
 		std::string text;
-		Unknown(const Unknown& other) : Element(other), text(other.text) {};
+		Unknown(const Unknown& other)
+			: Element(other), text(other.text) {};
 		void copy(const Unknown& other)
 		{
 			if (this->type != other.type)
@@ -78,9 +93,11 @@ namespace DCM
 	class Comment: public Element
 	{
 	public:
-		Comment(int lineIndex, int &lineOrder, std::string text);
+		Comment(int lineIndex, int &lineOrder, std::string text)
+			: Element(lineIndex, lineOrder, TYPE::COMMENT), text(text) {};
 		std::string text;
-		Comment(const Comment& other) : Element(other), text(other.text) {};
+		Comment(const Comment& other)
+			: Element(other), text(other.text) {};
 		void copy(const Comment& other)
 		{
 			if (this->type != other.type)
@@ -91,9 +108,11 @@ namespace DCM
 	class Format : public Element
 	{
 	public:
-		Format(int lineIndex, int &lineOrder, std::string version);
+		Format(int lineIndex, int &lineOrder, std::string version) 
+			: Element(lineIndex, lineOrder, TYPE::FORMAT), version(version) {};
 		std::string version;
-		Format(const Format& other) : Element(other), version(other.version) {};
+		Format(const Format& other) 
+			: Element(other), version(other.version) {};
 		void copy(const Format& other)
 		{
 			if (this->type != other.type)
@@ -104,11 +123,13 @@ namespace DCM
 	class Function
 	{
 	public:
-		Function(std::string name, std::string version, std::string longname);
+		Function(std::string name, std::string version, std::string longname)
+			: name(name), version(version), longname(longname) {};
 		std::string name;
 		std::string version;
 		std::string longname;
-		Function(const Function& other) : name(other.name), version(other.version), longname(other.longname) {};
+		Function(const Function& other) 
+			: name(other.name), version(other.version), longname(other.longname) {};
 		void copy(const Function& other)
 		{
 			this->name = other.name;			
@@ -119,9 +140,11 @@ namespace DCM
 	class Functions : public Element
 	{
 	public:
-		Functions(int lineIndex, int &lineOrder);
+		Functions(int lineIndex, int &lineOrder)
+			: Element(lineIndex, lineOrder, TYPE::FUNCTIONS) {};
 		std::vector<Function> functions;
-		Functions(const Functions& other) : Element(other), functions(other.functions) {};
+		Functions(const Functions& other)
+			: Element(other), functions(other.functions) {};
 		void copy(const Functions& other)
 		{
 			if (this->type != other.type)
@@ -132,10 +155,12 @@ namespace DCM
 	class Variant
 	{
 	public:
-		Variant(std::string name);
+		Variant(std::string name)
+			: name(name) {};
 		std::string name;
 		std::vector<std::string> values;
-		Variant(const Variant& other) : name(other.name), values(other.values) {};
+		Variant(const Variant& other)
+			: name(other.name), values(other.values) {};
 		void copy(const Variant& other)
 		{
 			this->name = other.name;
@@ -145,9 +170,11 @@ namespace DCM
 	class VariantCoding : public Element
 	{
 	public:
-		VariantCoding(int lineIndex, int &lineOrder);
+		VariantCoding(int lineIndex, int &lineOrder)
+			: Element(lineIndex, lineOrder, TYPE::VARIANTCODING) {};
 		std::vector<Variant> variants;
-		VariantCoding(const VariantCoding& other) : Element(other), variants(other.variants) {};
+		VariantCoding(const VariantCoding& other)
+			: Element(other), variants(other.variants) {};
 		void copy(const VariantCoding& other)
 		{
 			if (this->type != other.type)
@@ -158,10 +185,12 @@ namespace DCM
 	class ModuleHeader : public Element
 	{
 	public:
-		ModuleHeader(int lineIndex, int &lineOrder, std::string name);
+		ModuleHeader(int lineIndex, int &lineOrder, std::string name)
+			: Element(lineIndex, lineOrder, TYPE::MODULEHEADER), name(name) {};
 		std::string name;
 		std::vector<std::string> texts;
-		ModuleHeader(const ModuleHeader& other) : Element(other), name(other.name), texts(other.texts) {};
+		ModuleHeader(const ModuleHeader& other)
+			: Element(other), name(other.name), texts(other.texts) {};
 		void copy(const ModuleHeader& other)
 		{
 			if (this->type != other.type)
@@ -173,7 +202,8 @@ namespace DCM
 	class BaseParameter : public Element
 	{
 	public:
-		BaseParameter(int lineIndex, int &lineOrder, int type, std::string name);
+		BaseParameter(int lineIndex, int &lineOrder, int type, std::string name)
+			: Element(lineIndex, lineOrder, type), name(name) {};
 		std::string name;
 		std::string langname = "";
 		std::string displayname = "";
@@ -202,7 +232,8 @@ namespace DCM
 	class ArrayBaseParameter : public BaseParameter
 	{
 	public:
-		ArrayBaseParameter(int lineIndex, int &lineOrder, int type, std::string name, int size_x, int size_y);
+		ArrayBaseParameter(int lineIndex, int &lineOrder, int type, std::string name, int size_x, int size_y)
+			: BaseParameter(lineIndex, lineOrder, type, name), size_x(size_x), size_y(size_y) {};
 		int size_x;
 		int size_y;
 		//std::vector<double> values;
@@ -233,7 +264,8 @@ namespace DCM
 	class LineBaseParameter : public BaseParameter
 	{
 	public:
-		LineBaseParameter(int lineIndex, int &lineOrder, int type, std::string name, int size_x);
+		LineBaseParameter(int lineIndex, int& lineOrder, int type, std::string name, int size_x)
+			: BaseParameter(lineIndex, lineOrder, type, name), size_x(size_x) {};
 		int size_x;
 		std::string unit_x = "";
 		std::vector<double> point_x;
@@ -268,7 +300,8 @@ namespace DCM
 	class MapBaseParameter : public LineBaseParameter
 	{
 	public:
-		MapBaseParameter(int lineIndex, int &lineOrder, int type, std::string name, int size_x, int size_y);
+		MapBaseParameter(int lineIndex, int &lineOrder, int type, std::string name, int size_x, int size_y)
+			: LineBaseParameter(lineIndex, lineOrder, type, name, size_x), size_y(size_y) {};
 		int size_y;
 		std::string unit_y = "";
 		std::vector<double> point_y;
@@ -298,7 +331,8 @@ namespace DCM
 	class Parameter : public BaseParameter // FESTWERT
 	{
 	public:
-		Parameter(int lineIndex, int &lineOrder, std::string name);
+		Parameter(int lineIndex, int &lineOrder, std::string name)
+			: BaseParameter(lineIndex, lineOrder, TYPE::PARAMETER, name), value(0), dec_value(0) {};
 		double value;
 		int dec_value;
 		Parameter(const Parameter& other) : BaseParameter(other), value(other.value), dec_value(other.dec_value) {};
@@ -320,7 +354,8 @@ namespace DCM
 	class Boolean : public BaseParameter // FESTWERT
 	{
 	public:
-		Boolean(int lineIndex, int &lineOrder, std::string name);
+		Boolean(int lineIndex, int &lineOrder, std::string name)
+			: BaseParameter(lineIndex, lineOrder, TYPE::BOOLEAN, name), text("") {};
 		std::string text;
 		Boolean(const Boolean& other) : BaseParameter(other), text(other.text) {};
 		void copy(const Boolean& other)
@@ -340,7 +375,8 @@ namespace DCM
 	class Array : public ArrayBaseParameter // FESTWERTEBLOCK
 	{
 	public:
-		Array(int lineIndex, int &lineOrder, std::string name, int size_x = 0);
+		Array(int lineIndex, int &lineOrder, std::string name, int size_x = 0)
+			: ArrayBaseParameter(lineIndex, lineOrder, TYPE::ARRAY, name, size_x, 0) {};
 		Array(const Array& other) : ArrayBaseParameter(other) {};
 		void copy(const Array& other)
 		{
@@ -356,7 +392,8 @@ namespace DCM
 	class Matrix : public ArrayBaseParameter // FESTWERTEBLOCK
 	{
 	public:
-		Matrix(int lineIndex, int &lineOrder, std::string name, int size_x = 0, int size_y = 0);
+		Matrix(int lineIndex, int &lineOrder, std::string name, int size_x = 0, int size_y = 0)
+			: ArrayBaseParameter(lineIndex, lineOrder, TYPE::MATRIX, name, size_x, size_y) {};
 		Matrix(const Matrix& other) : ArrayBaseParameter(other) {};
 		void copy(const Matrix& other)
 		{
@@ -372,7 +409,8 @@ namespace DCM
 	class CharLine : public LineBaseParameter // KENNLINIE
 	{
 	public:
-		CharLine(int lineIndex, int &lineOrder, std::string name, int size_x = 0);
+		CharLine(int lineIndex, int &lineOrder, std::string name, int size_x = 0)
+			: LineBaseParameter(lineIndex, lineOrder, TYPE::CHARLINE, name, size_x) {};
 		CharLine(const CharLine& other) : LineBaseParameter(other) {};
 		void copy(const CharLine& other)
 		{
@@ -388,7 +426,8 @@ namespace DCM
 	class CharMap : public MapBaseParameter // KENNFELD
 	{
 	public:
-		CharMap(int lineIndex, int &lineOrder, std::string name, int size_x = 0, int size_y = 0);		
+		CharMap(int lineIndex, int &lineOrder, std::string name, int size_x = 0, int size_y = 0)
+			: MapBaseParameter(lineIndex, lineOrder, TYPE::CHARMAP, name, size_x, size_y) {};
 		CharMap(const CharMap& other) : MapBaseParameter(other) {};
 		void copy(const CharMap& other)
 		{
@@ -404,7 +443,8 @@ namespace DCM
 	class FixedCharLine : public LineBaseParameter // FESTKENNLINIE
 	{
 	public:
-		FixedCharLine(int lineIndex, int &lineOrder, std::string name, int size_x = 0);
+		FixedCharLine(int lineIndex, int &lineOrder, std::string name, int size_x = 0)
+			: LineBaseParameter(lineIndex, lineOrder, TYPE::FIXEDCHARLINE, name, size_x) {};
 		FixedCharLine(const FixedCharLine& other) : LineBaseParameter(other) {};
 		void copy(const FixedCharLine& other)
 		{
@@ -420,7 +460,8 @@ namespace DCM
 	class FixedCharMap : public MapBaseParameter // FESTKENNFELD
 	{
 	public:
-		FixedCharMap(int lineIndex, int &lineOrder, std::string name, int size_x = 0, int size_y = 0);
+		FixedCharMap(int lineIndex, int &lineOrder, std::string name, int size_x = 0, int size_y = 0)
+			: MapBaseParameter(lineIndex, lineOrder, TYPE::FIXEDCHARMAP, name, size_x, size_y) {};
 		FixedCharMap(const FixedCharMap& other) : MapBaseParameter(other) {};
 		void copy(const FixedCharMap& other)
 		{
@@ -436,7 +477,8 @@ namespace DCM
 	class Distribution : public LineBaseParameter
 	{
 	public:
-		Distribution(int lineIndex, int &lineOrder, std::string name, int size_x = 0);
+		Distribution(int lineIndex, int &lineOrder, std::string name, int size_x = 0)
+			: LineBaseParameter(lineIndex, lineOrder, TYPE::DISTRIBUTION, name, size_x) {};
 		Distribution(const Distribution& other) : LineBaseParameter(other) {};
 		void copy(const Distribution& other)
 		{
@@ -452,7 +494,8 @@ namespace DCM
 	class GroupCharLine : public LineBaseParameter
 	{
 	public:
-		GroupCharLine(int lineIndex, int &lineOrder, std::string name, int size_x = 0);
+		GroupCharLine(int lineIndex, int &lineOrder, std::string name, int size_x = 0)
+			: LineBaseParameter(lineIndex, lineOrder, TYPE::GROUPCHARLINE, name, size_x) {};
 		//Distrubution* dist_x = nullptr;
 		std::string dist_x = "";
 		GroupCharLine(const GroupCharLine& other) : LineBaseParameter(other), dist_x(other.dist_x) {};
@@ -472,7 +515,8 @@ namespace DCM
 	class GroupCharMap : public MapBaseParameter
 	{
 	public:
-		GroupCharMap(int lineIndex, int &lineOrder, std::string name, int size_x = 0, int size_y = 0);
+		GroupCharMap(int lineIndex, int &lineOrder, std::string name, int size_x = 0, int size_y = 0)
+			: MapBaseParameter(lineIndex, lineOrder, TYPE::GROUPCHARMAP, name, size_x, size_y) {};
 		//Distrubution* dist_x = nullptr;
 		std::string dist_x = "";
 		//Distrubution* dist_y = nullptr;
