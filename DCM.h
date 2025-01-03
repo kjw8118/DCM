@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <list>
 
 #include "GIT.h" // From github.com/kjw8118/GITwrap.git
 
