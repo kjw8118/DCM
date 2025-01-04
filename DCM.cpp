@@ -570,7 +570,7 @@ void DCM::Manager::openWithRepo(std::string _fPath, std::string _gitName, std::s
 	{
 		std::string ignoreName = "!" + fName;
 		git->appendGitIgnore({ "*", ignoreName });
-		git->commitCurrentStage("Init");
+		git->gitCommit("Init");
 	}
 	open(_fPath);
 
@@ -593,7 +593,37 @@ void DCM::Manager::open(std::string _fPath)
 
 	isOpened = file.is_open();
 }
+void DCM::Manager::cloneFromRepo(std::string _remotePath, std::string _localPath, std::string _gitName, std::string _gitEmail)
+{
+	if (isOpened)
+		return;
 
+	bool isRemoteExist = GIT::isRepoExist(_remotePath);
+	if (!isRemoteExist)
+		return;
+	auto localPathAbs_fs = std::filesystem::absolute(_localPath);
+	auto localPathAbs = localPathAbs_fs.string();
+	git = GIT::cloneFromRemote(_remotePath, localPathAbs, gitName, gitEmail);
+	
+	std::vector<std::string> fileList;
+	for (const auto& entry : std::filesystem::directory_iterator(localPathAbs))
+	{
+		if (std::filesystem::is_regular_file(entry.status()) && entry.path().extension() == ".dcm" || entry.path().extension() == ".DCM")
+			fileList.push_back(entry.path().string());
+	}
+	if (fileList.size() != 1)
+		return;
+
+	auto filePath = (localPathAbs_fs / fileList.back()).string();
+	open(filePath);
+	if (isOpened)
+	{
+		gitName = _gitName;
+		gitEmail = _gitEmail;
+	}
+
+
+}
 void DCM::Manager::createDCM()
 {
 	clear();

@@ -1065,7 +1065,8 @@ namespace DCM
 		void open(std::string _fPath);		
 		void openWithRepo(std::string _fPath, std::string gitName, std::string gitEmail);
 		void openWithRepo(std::string _fPath) { return openWithRepo(_fPath, gitName, gitEmail); };
-		
+		void cloneFromRepo(std::string _remotePath, std::string _localPath, std::string _gitName, std::string _gitEmail);
+
 		void createDCM();
 		void parse();
 
