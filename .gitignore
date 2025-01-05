@@ -363,3 +363,5 @@ MigrationBackup/
 FodyWeavers.xsd
 /GIT.cpp
 /GIT.h
+/git2.dll
+/git2d.dll

@@ -148,6 +148,8 @@
     <None Include="commentTest.dcm" />
     <None Include="formatTest.dcm" />
     <None Include="functionsTest.dcm" />
+    <None Include="git2.dll" />
+    <None Include="git2d.dll" />
     <None Include="headerTest.dcm" />
     <None Include="quotationMarksTest.dcm" />
     <None Include="test.dcm" />
