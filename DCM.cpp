@@ -561,15 +561,18 @@ void DCM::Manager::openWithRepo(std::string _fPath, std::string _gitName, std::s
 	if (isOpened)
 		return;	
 
-	std::string fPathAbs = std::filesystem::absolute(_fPath).string();
-	std::string dirPath = std::filesystem::path(fPathAbs).parent_path().string();
-	std::string fName = std::filesystem::path(fPathAbs).filename().string();
-	bool isRepoExist = GIT::isRepoExist(dirPath);
-	git = new GIT(dirPath, _gitName, _gitEmail);
+	std::string _fPathAbs = std::filesystem::absolute(_fPath).string();
+	std::string _dirPath = std::filesystem::path(_fPathAbs).parent_path().string();
+	std::string _fName = std::filesystem::path(_fPathAbs).filename().string();
+	
+	bool isRepoExist = GIT::isRepoExist(_dirPath);
+	git = new GIT(_dirPath, _gitName, _gitEmail);	
 	if (!isRepoExist)
 	{
-		std::string ignoreName = "!" + fName;
-		git->appendGitIgnore({ "*", ignoreName });
+		
+		std::string _ignoreName = "!" + _fName;
+		git->appendGitIgnore({ "*", _ignoreName });
+		git->stagingAll();
 		git->gitCommit("Init");
 	}
 	open(_fPath);
@@ -585,7 +588,10 @@ void DCM::Manager::open(std::string _fPath)
 	if (isOpened)
 		return;
 
-	fPath = std::filesystem::absolute(_fPath).string();		
+	std::string _fPathAbs = std::filesystem::absolute(_fPath).string();
+	std::string _fName = std::filesystem::path(_fPathAbs).filename().string();
+	fPath = _fPathAbs;
+	fName = _fName;
 	if(!file.is_open())
 		file.open(fPath, std::ios::in | std::ios::out | std::ios::app);
 	else if(!file.is_open())
@@ -1503,6 +1509,20 @@ std::string DCM::Manager::getContentsAtRevision(std::string revision)
 		return "";
 
 	return git->getContentsAtBranch(fPath, revision);
+}
+
+
+std::vector<GIT::DiffResult> DCM::Manager::getDiffWithCurrent()
+{
+
+	if (git == nullptr)
+		return {};
+	auto rawLines = getRawString();
+	auto newLines = rebuild();
+	auto diffResults = git->gitDiffHeadToMemory(fName, newLines);
+	git->printDiffResults(diffResults);
+
+	return diffResults;
 }
 
 std::vector<std::pair<DCM::BaseParameter*, DCM::BaseParameter*>> DCM::Manager::pairBaseParametersWith(std::vector<DCM::BaseParameter*>& otherBaseParameters)

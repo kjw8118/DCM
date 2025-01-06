@@ -1005,6 +1005,7 @@ namespace DCM
 		std::vector<BaseParameter*> parameters;
 
 		std::string fPath = "";
+		std::string fName = "";
 		std::fstream file;
 		
 		std::map<std::string, Element*> elementIndex;
@@ -1080,7 +1081,7 @@ namespace DCM
 			EditHistory(std::chrono::system_clock::time_point date, std::string message, std::string id)
 				: date(date), message(message), id(id) {};
 		};
-
+		std::vector<GIT::DiffResult> getDiffWithCurrent();
 		std::vector<BaseParameter*> collectAllTypeParameters();
 		std::vector<Distribution*> collectAxispoint();
 		std::vector<Array*> collectValueBlock();
@@ -1124,6 +1125,9 @@ namespace DCM
 		std::string getContentsAtHistory(std::string editHistory_id);
 
 		std::string getContentsAtRevision(std::string revision);
+
+
+		
 
 		//void forkBranch();
 		std::vector<std::pair<bool, std::pair<BaseParameter*, BaseParameter*>>> compareWith(std::vector<BaseParameter*> &otherBaseParameters);
