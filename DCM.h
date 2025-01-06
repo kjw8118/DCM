@@ -61,7 +61,7 @@ namespace DCM
 		LineIndex(int index = 0, int length = 1)
 			: index(index), length(length), order(0), prev(nullptr), next(nullptr) {};
 		LineIndex(LineIndex* _prev, LineIndex* next = nullptr)
-			: prev(_prev), next(nullptr)
+			: prev(_prev), next(next)
 		{
 			updateIndex();
 			updateOrder();
@@ -200,6 +200,18 @@ namespace DCM
 				index = 0;
 			update();
 		}
+		LineIndex* findIndex(int line)
+		{
+			int curEndIndex = getEndIndex();
+			int curIndex = getIndex();
+
+			if (line < curIndex)
+				return prev->findIndex(line);
+			else if (line >= curIndex && line <= curEndIndex)
+				return this;
+			else
+				return next->findIndex(line);
+		}
 		LineIndex(const LineIndex& other)
 			: index(other.index), length(other.length), order(other.order), prev(other.prev), next(other.next) {};
 		LineIndex& operator=(const LineIndex& other)
@@ -266,7 +278,7 @@ namespace DCM
 		Element(int type, Element* prev) : type(type)
 		{
 			if (prev != nullptr) lineIndex = new LineIndex(prev->lineIndex);
-			else lineIndex = new LineIndex();
+			else lineIndex = new LineIndex(nullptr);
 		};
 		Element(const Element& other)
 			: type(other.type), lineIndex(other.lineIndex) {};

@@ -13,8 +13,47 @@ int main()
     manager->parse();
     //manager->saveAsDCM("repo\\Test_DCM2.dcm");
     auto element = (DCM::GroupCharMap*)manager->findElement("Two_D_group", true);
+    std::cout << element->lineIndex->getIndex() << std::endl;
+    int order = element->lineIndex->findIndex(92)->getOrder();
+    auto element92 = manager->getElements().at(order);
+    std::cout << manager->rebuildElement(element92) << std::endl;
+    
+    return 0;
     std::transform(element->values.begin(), element->values.end(), element->values.begin(), [&](const double& value)->double {return value * 2; });
-    manager->getDiffWithCurrent();
+    auto diffResults = manager->getDiffWithCurrent();
+    for (auto &diffResult : diffResults)
+    {
+        for (auto &hunk : diffResult.diffHunks)
+        {
+            auto oldStart = hunk.hunk.old_start;
+            auto oldLine = hunk.hunk.old_lines;
+            auto newStart = hunk.hunk.new_start;
+            auto newLine = hunk.hunk.new_lines;
+
+            std::u8string old_text, new_text;
+            for (auto line : hunk.diffLines)
+            {
+                switch (line.type)
+                {
+                case line.CONTEXT:
+                    new_text += line.line;
+                    old_text += line.line;
+                    break;
+                case line.ADDED:                    
+                    new_text += line.line;
+                    break;
+                case line.DELETED:
+                    old_text += line.line;
+                    break;
+                }
+            }
+
+            std::cout << "Old Text" << std::endl;
+            std::cout << GIT::u8utf8ToLocal(old_text) << std::endl;
+            std::cout << "New Text" << std::endl;
+            std::cout << GIT::u8utf8ToLocal(new_text) << std::endl;
+        }
+    }
     manager->saveAsDCM("repo\\Test_DCM2.dcm");
     //std::cout << "Hello World!\n";
     

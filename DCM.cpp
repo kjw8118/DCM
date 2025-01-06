@@ -522,7 +522,7 @@ void DCM::Manager::parseComponent(std::vector<std::string> lineStrip)
 	}
 	case TYPE::END:
 	{
-		pCurrentElement->lineIndex->putEndIndex(currentIndex);
+		pCurrentElement->lineIndex->putEndIndex(currentIndex-1);
 		putElement(pCurrentElement);		
 		pCurrentElement = nullptr;
 		break;
