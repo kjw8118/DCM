@@ -1129,7 +1129,8 @@ namespace DCM
 		std::vector<Element*> findElements(std::string name, bool exactmatch = false);
 		std::string getRawString();
 		std::vector<BaseParameter*> findBaseParameters(std::string name, bool exactmatch = false);
-		
+		std::vector<std::string> getRawStringList() { return lineHistory; };
+
 		std::vector<EditHistory> getEditHistoryList();
 		std::vector<std::string> getRevisionList();
 
