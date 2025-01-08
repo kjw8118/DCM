@@ -1439,23 +1439,16 @@ std::vector<std::string> DCM::Manager::rebuildListFromEdit(std::string edit_id)
 {
 	if (git == nullptr)
 		return {};
-	std::vector<std::string> lineList;
-	auto contents = git->getContentsAtCommit(fPath, edit_id);
-	std::istringstream ss(contents);
-	std::string line;
-	while (std::getline(ss, line))
-	{
-		lineList.push_back(line);
-	}
-	return lineList;
+	auto diffResults = git->gitDiffWithCommit(fPath, edit_id);
+	return rebuildListFromDiff(diffResults);
 }
 
 std::string DCM::Manager::rebuildFromEdit(std::string edit_id)
 {
 	if (git == nullptr)
 		return "";
-
-	return git->getContentsAtCommit(fPath, edit_id);
+	auto diffResults = git->gitDiffWithCommit(fPath, edit_id);
+	return rebuildFromDiff(diffResults);
 }
 
 void DCM::Manager::saveAsDCM(std::string fname)
@@ -1592,14 +1585,14 @@ std::string DCM::Manager::getContentsAtHistory(std::string editHistory_id)
 	if (git == nullptr)
 		return "";
 
-	return git->getContentsAtCommit(fPath, editHistory_id);	
+	return git->gitShowFromCommit(fPath, editHistory_id);	
 }
 std::string DCM::Manager::getContentsAtRevision(std::string revision)
 {
 	if (git == nullptr)
 		return "";
 
-	return git->getContentsAtBranch(fPath, revision);
+	return git->gitShowFromBranch(fPath, revision);
 }
 
 
