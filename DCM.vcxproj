@@ -136,12 +136,16 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="DCM.cpp" />
+    <ClCompile Include="Element.cpp" />
     <ClCompile Include="GIT.cpp" />
+    <ClCompile Include="LineIndex.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DCM.h" />
+    <ClInclude Include="Element.h" />
     <ClInclude Include="GIT.h" />
+    <ClInclude Include="LineIndex.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />

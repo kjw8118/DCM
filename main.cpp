@@ -13,15 +13,13 @@ int main()
     manager->parse();
     //manager->saveAsDCM("repo\\Test_DCM2.dcm");
     auto element = (DCM::GroupCharMap*)manager->findElement("Two_D_group", true);
-    std::cout << element->lineIndex->getIndex() << std::endl;
-    int order = element->lineIndex->findIndex(92)->getOrder();
-    auto element92 = manager->getElements().at(order);
-    std::cout << manager->rebuildElement(element92) << std::endl;
     
-    return 0;
+    manager->removeElement(19);
+    manager->removeElement(24);
+    
     std::transform(element->values.begin(), element->values.end(), element->values.begin(), [&](const double& value)->double {return value * 2; });
     auto diffResults = manager->getDiffWithCurrent();
-    for (auto &diffResult : diffResults)
+    /*for (auto& diffResult : diffResults)
     {
         for (auto &hunk : diffResult.diffHunks)
         {
@@ -54,7 +52,10 @@ int main()
             std::cout << GIT::u8utf8ToLocal(new_text) << std::endl;
         }
     }
-    manager->saveAsDCM("repo\\Test_DCM2.dcm");
+    auto diff = manager->getDiffWithCurrent();*/
+    auto rebuildString = manager->rebuildFromDiff(diffResults);
+    std::cout << rebuildString;
+    //manager->saveAsDCM("repo\\Test_DCM2.dcm");
     //std::cout << "Hello World!\n";
     
     //std::cout << "DCM Parser General Test\t" << (bool)DCM::Parser::test() << std::endl;

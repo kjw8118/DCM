@@ -478,8 +478,7 @@ void DCM::Manager::parseComponent(std::vector<std::string> lineStrip)
 		case TYPE::PARAMETER:
 		{
 			auto pCurrentBoolean = new Boolean(*(Parameter*)pCurrentElement);
-			pCurrentBoolean->text = lineStrip.at(1);
-			delete pCurrentElement;
+			pCurrentBoolean->text = lineStrip.at(1);			
 			pCurrentElement = (Element*)pCurrentBoolean;			
 			break;
 		}
@@ -1366,7 +1365,49 @@ std::string DCM::Manager::rebuild()
 
 	return oss.str();
 }
+std::vector<std::string> DCM::Manager::rebuildListFromDiff(std::vector<GIT::DiffResult> diffResults)
+{
+	auto originList = getRawStringList();
+	std::vector<std::string> rebuildList;
+	int currIndex = 0;
 
+	for (auto &diffResult : diffResults)
+	{
+		for (auto &diffHunk : diffResult.diffHunks)
+		{
+			int startIndex = diffHunk.hunk.old_start-1;
+			rebuildList.insert(rebuildList.end(), originList.begin() + currIndex, originList.begin() + startIndex);
+			currIndex = startIndex;
+			for (auto& diffLine : diffHunk.diffLines)
+			{
+				switch (diffLine.type)
+				{
+				case GIT::DiffLine::CONTEXT:
+					rebuildList.push_back(originList.at(currIndex++));
+					break;
+				case GIT::DiffLine::ADDED:
+					rebuildList.push_back(GIT::u8utf8ToLocal(diffLine.line));
+					break;
+				case GIT::DiffLine::DELETED:
+					currIndex++;
+					break;				
+				}
+			}
+		}
+	}
+	
+	rebuildList.insert(rebuildList.end(), originList.begin() + currIndex, originList.end());
+	return rebuildList;
+}
+std::string DCM::Manager::rebuildFromDiff(std::vector<GIT::DiffResult> diffResults)
+{
+	auto rebuildList = rebuildListFromDiff(diffResults);
+	std::ostringstream oss;
+	for (auto line : rebuildList)
+		oss << line << '\n';
+	return oss.str();
+
+}
 void DCM::Manager::saveAsDCM(std::string fname)
 {
 	std::fstream wfile;
@@ -1520,7 +1561,7 @@ std::vector<GIT::DiffResult> DCM::Manager::getDiffWithCurrent()
 	auto rawLines = getRawString();
 	auto newLines = rebuild();
 	auto diffResults = git->gitDiffHeadToMemory(fName, newLines);
-	git->printDiffResults(diffResults);
+	//git->printDiffResults(diffResults);
 
 	return diffResults;
 }
@@ -1590,6 +1631,40 @@ void DCM::Manager::copyWith(std::vector<DCM::BaseParameter*>& otherBaseParameter
 		}		
 	}
 }
+
+
+void DCM::Manager::removeElement(DCM::Element* element)
+{
+	int order = element->lineIndex->getOrder();
+	delete element;
+	elements.erase(elements.begin() + order);
+
+}
+void DCM::Manager::removeElement(int order)
+{
+	if (order < 0 || order >= elements.size())
+		return;
+
+	auto element = elements.at(order);
+	delete element;
+	elements.erase(elements.begin() + order);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 bool DCM::Manager::test()
 {
 	bool ret = true;
