@@ -14,10 +14,6 @@
 namespace DCM
 {
 	
-	
-	//std::map<std::string, int> Header;
-	
-
 	std::vector<std::string> stripLine(std::string lineRaw);
 	int countDecimalPlaces(const std::string& numberStr);
 	std::string toFixed(double value, int precision);
@@ -32,8 +28,11 @@ namespace DCM
 		bool isOpened = false;
 
 
-		std::string rawString = "";
-		std::vector<std::string> rawStringList;
+		const std::string* rawString = nullptr;
+		const std::vector<std::string>* rawStringList = nullptr;
+		std::string getRawString();
+		std::vector<std::string> getRawStringList();
+
 
 		std::vector<std::string> lineHistory;
 		int currentIndex = 0;
@@ -54,47 +53,7 @@ namespace DCM
 		std::fstream file;
 		
 		std::map<std::string, Element*> elementIndex;
-		
-
-	/*
-	
-	// Initial Header
-	Comment			: *
-	Format			: KONSERVIERUNG_FORMAT
-	Functions		: FUNKTIONEN
-	VariantCoding	: VARIANTENKODIERUNG
-	ModuleHeader	: MODULKOPF
-	Parameter		: FESTWERT
-	Array			: FESTWERTEBLOCK
-	Matrix			: FESTWERTEBLOCK
-	CharLine		: KENNLINIE
-	CharMap			: KENNFELD
-	FixedCharLine	: FESTKENNLINIE
-	FixedCharMap	: FESTKENNFELD
-	GroupCharLine	: GRUPPENKENNLINIE
-	GroupCharMap	: GRUPPENKENNFELD
-	Distribution	: STUETZSTELLENVERTEILUNG
-
-	// Component Header
-	Function		: FKT
-	Variant			: KRITERIUM
-	Langname		: LANGNAME
-	Displayname		: DISPLAYNAME
-	Variant			: VAR
-	Function		: FUNKTION
-	Unit X			: EINHEIT_X
-	Unit Y			: EINHEIT_Y
-	Unit Z			: EINHEIT_W
-	Point X			: ST/X
-	Point Y			: ST/Y
-	Value			: WERT
-
-	Distribution X	: *SSTX
-	Distribution Y	: *SSTY
-
-	End				: END
-
-	*/
+			
 		void parseHeader(std::vector<std::string> lineStrip);
 		void parseComponent(std::vector<std::string> lineStrip);
 		void parseLine(std::string lineRaw);	
@@ -105,7 +64,21 @@ namespace DCM
 		int calcEndIndex(Element* element);
 
 		
-		
+		std::string rebuildUnknown(Unknown* unknown);
+		std::string rebuildFunctions(Functions* functions);
+		std::string rebuildComment(Comment* comment);
+		std::string rebuildVariantCoding(VariantCoding* variantCoding);
+		std::string rebuildModuleHeader(ModuleHeader* moduleHeader);
+		std::string rebuildFormat(Format* format);
+		std::string rebuildParameter(Parameter* parameter);
+		std::string rebuildBoolean(Boolean* boolean);
+		std::string rebuildArray(Array* arr);
+		std::string rebuildMatrix(Matrix* matrix);
+		std::string rebuildLineBaseParameter(LineBaseParameter* line);
+		std::string rebuildMapBaseParameter(MapBaseParameter* map);
+		std::string rebuildDistribution(Distribution* dist);
+
+		std::string rebuildElement(Element* element);
 		
 	public:
 		Manager();
@@ -127,8 +100,8 @@ namespace DCM
 			EditHistory(std::chrono::system_clock::time_point date, std::string message, std::string id)
 				: date(date), message(message), id(id) {};
 		};
-		std::vector<GIT::DiffResult> getDiffWithCurrent();
-		std::vector<GIT::DiffResult> getDiffWithEdit(std::string edit_id);
+		
+		
 		std::vector<BaseParameter*> collectAllTypeParameters();
 		std::vector<Distribution*> collectAxispoint();
 		std::vector<Array*> collectValueBlock();
@@ -138,28 +111,27 @@ namespace DCM
 		std::vector<LineBaseParameter*> collectCurve();
 		std::vector<MapBaseParameter*> collectMap();
 
-		std::vector<std::string> rebuildListFromDiff(std::vector<GIT::DiffResult> diffResults);
-		std::string rebuildFromDiff(std::vector<GIT::DiffResult> diffResults);		
+		
 
-		std::string rebuildUnknown(Unknown* unknown);
-		std::string rebuildFunctions(Functions* functions);
-		std::string rebuildComment(Comment* comment);
-		std::string rebuildVariantCoding(VariantCoding* variantCoding);
-		std::string rebuildModuleHeader(ModuleHeader* moduleHeader);
-		std::string rebuildFormat(Format* format);
-		std::string rebuildParameter(Parameter* parameter);
-		std::string rebuildBoolean(Boolean* boolean);
-		std::string rebuildArray(Array* arr);
-		std::string rebuildMatrix(Matrix* matrix);
-		std::string rebuildLineBaseParameter(LineBaseParameter* line);
-		std::string rebuildMapBaseParameter(MapBaseParameter* map);
-		std::string rebuildDistribution(Distribution* dist);
+		
 
-		std::string rebuildElement(Element* element);
-		std::string rebuild();
+		std::vector<GIT::DiffResult> getDiffWithCurrent();							/* get difference between file and current elements*/
+		std::vector<GIT::DiffResult> getDiffWithEdit(std::string edit_id);			/* get difference between file and edit(commit) version elements */
 
-		std::vector<std::string> rebuildListFromEdit(std::string edit_id);
-		std::string rebuildFromEdit(std::string edit_id);
+		
+		std::string rebuildElements();												/* rebuild full text from current elements */
+		
+		//std::string rebuildFromDiff(std::vector<GIT::DiffResult> diffResults);	/* rebuild full text from file contents with diff */
+		//std::string rebuildFromEdit(std::string edit_id);							/* rebuild full text form file contents with commit diff */
+
+		
+		std::string getContentsFromFile();											/* get full text from file contents */	
+		std::string getContentsFromEditID(std::string edit_id);						/* get full text from commit contents */
+		std::string getContentsFromRevision(std::string revision);					/* get full text from branch contents */
+
+		void loadContents(std::string contents);									/* clear, re-parsing and apply from full text */
+		//void loadContentsFromFile();												/* clear, re-parsing and apply from file contents = loadContents(getContentsFromFile())*/
+		//void loadContentsFromEdit(std::string edit_id);							/* clear, re-parsing and apply from commit contents = loadContents(getContentsFromEditID()) */
 
 		void saveAsDCM(std::string fname);
 		
@@ -170,9 +142,8 @@ namespace DCM
 		std::vector<Element*> getElements();
 		Element* findElement(std::string name, bool exactmatch=false);
 		std::vector<Element*> findElements(std::string name, bool exactmatch = false);
-		std::string getRawString();
 		std::vector<BaseParameter*> findBaseParameters(std::string name, bool exactmatch = false);
-		std::vector<std::string> getRawStringList() { return lineHistory; };
+		
 
 		std::vector<EditHistory> getEditHistoryList();
 		std::vector<std::string> getRevisionList();
@@ -180,28 +151,13 @@ namespace DCM
 		void removeElement(Element* element);
 		void removeElement(int order);
 
-		std::string getContentsAtHistory(EditHistory editHistory);
-		std::string getContentsAtHistory(std::string editHistory_id);
+		//std::string getContentsAtHistory(EditHistory editHistory);
+		//std::string getContentsAtHistory(std::string editHistory_id);
 
-		std::string getContentsAtRevision(std::string revision);
-		std::string getContentsAtEdit(std::string edit_id)
-		{
-			if (git == nullptr)
-				return "";
-			return git->getContentsAtCommit(fPath, edit_id);
-		}
+		
+		
 
-		void loadContents(std::string contents);
-		void loadContentsFromFile()
-		{
-			parse();
-		}
-		void loadContentsFromEdit(std::string edit_id)
-		{
-			auto contents = rebuildFromEdit(edit_id);
-			loadContents(contents);
-
-		}
+		
 		
 		
 

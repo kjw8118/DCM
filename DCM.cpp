@@ -600,14 +600,16 @@ void DCM::Manager::open(std::string _fPath)
 
 	if (isOpened)
 	{
+		
 		std::ostringstream oss;
 		oss << file.rdbuf();
-		rawString = oss.str();
-		std::istringstream iss(rawString);
+		rawString = new std::string(oss.str());
+		std::istringstream iss(*rawString);
 		std::string line;
-		rawStringList.clear();
+		std::vector<std::string> rawStringListTemp;
 		while (std::getline(iss, line))
-			rawStringList.push_back(line);
+			rawStringListTemp.push_back(line);
+		rawStringList = new std::vector<std::string>(rawStringListTemp.begin(), rawStringListTemp.end());
 		
 	}
 }
@@ -675,7 +677,7 @@ void DCM::Manager::loadContents(std::string contents)
 }
 void DCM::Manager::parse()
 {	
-	loadContents(rawString);	
+	loadContents(*rawString);	
 }
 
 void DCM::Manager::clear()
@@ -705,8 +707,8 @@ void DCM::Manager::close()
 	isOpened = false;
 	if (file.is_open())
 		file.close();
-	rawString = "";
-	rawStringList.clear();
+	delete rawString; rawString = nullptr;
+	delete rawStringList; rawStringList = nullptr;
 
 }
 std::vector<DCM::Element*> DCM::Manager::getElements()
@@ -954,13 +956,14 @@ void DCM::Manager::putElement(Element* element)
 }
 
 std::string DCM::Manager::getRawString() 
+{	
+	return *rawString;
+}
+
+std::vector<std::string> DCM::Manager::getRawStringList()
 {
-	std::ostringstream oss;
-	//std::string text = "";
-	for (auto line : lineHistory)
-		oss << line + "\n";
-	return oss.str();
-};
+	return *rawStringList;
+}
 
 std::string DCM::Manager::rebuildUnknown(Unknown* unknown)
 {
@@ -1382,7 +1385,7 @@ std::string DCM::Manager::rebuildElement(Element* element)
 		return "";
 	}
 }
-std::string DCM::Manager::rebuild()
+std::string DCM::Manager::rebuildElements()
 {
 	std::ostringstream oss;
 	//std::string text = "";
@@ -1391,7 +1394,8 @@ std::string DCM::Manager::rebuild()
 
 	return oss.str();
 }
-std::vector<std::string> DCM::Manager::rebuildListFromDiff(std::vector<GIT::DiffResult> diffResults)
+
+/*std::vector<std::string> DCM::Manager::rebuildListFromDiff(std::vector<GIT::DiffResult> diffResults)
 {
 	auto originList = getRawStringList();
 	std::vector<std::string> rebuildList;
@@ -1449,7 +1453,7 @@ std::string DCM::Manager::rebuildFromEdit(std::string edit_id)
 		return "";
 	auto diffResults = git->gitDiffWithCommit(fPath, edit_id);
 	return rebuildFromDiff(diffResults);
-}
+}*/
 
 void DCM::Manager::saveAsDCM(std::string fname)
 {
@@ -1576,18 +1580,20 @@ std::vector<std::string> DCM::Manager::getRevisionList()
 
 	return git->getLocalBranchList();
 }
-std::string DCM::Manager::getContentsAtHistory(EditHistory editHistory)
-{	
-	return getContentsAtHistory(editHistory.id);
+
+std::string DCM::Manager::getContentsFromFile()
+{
+	return getRawString();
 }
-std::string DCM::Manager::getContentsAtHistory(std::string editHistory_id)
+
+std::string DCM::Manager::getContentsFromEditID(std::string edit_id)
 {	
 	if (git == nullptr)
 		return "";
 
-	return git->gitShowFromCommit(fPath, editHistory_id);	
+	return git->gitShowFromCommit(fPath, edit_id);	
 }
-std::string DCM::Manager::getContentsAtRevision(std::string revision)
+std::string DCM::Manager::getContentsFromRevision(std::string revision)
 {
 	if (git == nullptr)
 		return "";
@@ -1595,14 +1601,13 @@ std::string DCM::Manager::getContentsAtRevision(std::string revision)
 	return git->gitShowFromBranch(fPath, revision);
 }
 
-
 std::vector<GIT::DiffResult> DCM::Manager::getDiffWithCurrent()
 {
 
 	if (git == nullptr)
 		return {};
 	auto rawLines = getRawString();
-	auto newLines = rebuild();
+	auto newLines = rebuildElements();
 	auto diffResults = git->gitDiffHeadToMemory(fName, newLines);
 	//git->printDiffResults(diffResults);
 
@@ -1907,7 +1912,7 @@ bool DCM::Manager::parseDCM1Test()
 	auto manager = new Manager();
 	manager->open("Test_DCM1ex.dcm");
 
-	std::string result = manager->rebuild();
+	std::string result = manager->rebuildElements();
 	
 	std::cout << "\n\n\t\tRebuild\n\n";
 	std::cout << result << std::endl;
@@ -1920,7 +1925,7 @@ bool DCM::Manager::parseDCM2Test()
 	auto manager = new Manager();
 	manager->open("Test_DCM2.dcm");
 
-	std::string result = manager->rebuild();
+	std::string result = manager->rebuildElements();
 
 	std::cout << "\n\n\t\tRebuild\n\n";
 	std::cout << result << std::endl;

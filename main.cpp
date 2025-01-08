@@ -53,7 +53,7 @@ int main()
         }
     }
     auto diff = manager->getDiffWithCurrent();*/
-    auto rebuildString = manager->rebuildFromDiff(diffResults);
+    auto rebuildString = manager->rebuildElements();
     std::cout << rebuildString;
     //manager->saveAsDCM("repo\\Test_DCM2.dcm");
     //std::cout << "Hello World!\n";
