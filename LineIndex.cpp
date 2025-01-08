@@ -171,11 +171,15 @@ void DCM::LineIndex::detach(DCM::LineIndex* _prev, DCM::LineIndex* _next)
 
 void DCM::LineIndex::independent()
 {
-	prev->detachNext(this); // 삭제 없이 연결만 끊기 prev->next = nullptr
-	next->detachPrev(this); // 자신과 연결 안끊고 attach하면 자신이 삭제될 수 있음
+	if(prev != nullptr)
+		prev->detachNext(this); // 삭제 없이 연결만 끊기 prev->next = nullptr
+	if(next != nullptr)
+		next->detachPrev(this); // 자신과 연결 안끊고 attach하면 자신이 삭제될 수 있음
 
-	prev->attachNext(next); //
-	next->attachPrev(prev); // prev->attachNext(next)에 next->attachPrev 있어서 사실상 중복
+	if(prev != nullptr)
+		prev->attachNext(next); //
+	if(next != nullptr)
+		next->attachPrev(prev); // prev->attachNext(next)에 next->attachPrev 있어서 사실상 중복
 
 	prev = nullptr;
 	next = nullptr;
