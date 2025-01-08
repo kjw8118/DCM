@@ -1386,7 +1386,7 @@ std::vector<std::string> DCM::Manager::rebuildListFromDiff(std::vector<GIT::Diff
 					rebuildList.push_back(originList.at(currIndex++));
 					break;
 				case GIT::DiffLine::ADDED:
-					rebuildList.push_back(GIT::u8utf8ToLocal(diffLine.line));
+					rebuildList.push_back(diffLine.line);
 					break;
 				case GIT::DiffLine::DELETED:
 					currIndex++;
@@ -1408,6 +1408,30 @@ std::string DCM::Manager::rebuildFromDiff(std::vector<GIT::DiffResult> diffResul
 	return oss.str();
 
 }
+
+std::vector<std::string> DCM::Manager::rebuildListFromEdit(std::string edit_id)
+{
+	if (git == nullptr)
+		return {};
+	std::vector<std::string> lineList;
+	auto contents = git->getContentsAtCommit(fPath, edit_id);
+	std::istringstream ss(contents);
+	std::string line;
+	while (std::getline(ss, line))
+	{
+		lineList.push_back(line);
+	}
+	return lineList;
+}
+
+std::string DCM::Manager::rebuildFromEdit(std::string edit_id)
+{
+	if (git == nullptr)
+		return "";
+
+	return git->getContentsAtCommit(fPath, edit_id);
+}
+
 void DCM::Manager::saveAsDCM(std::string fname)
 {
 	std::fstream wfile;
@@ -1518,8 +1542,8 @@ std::vector<DCM::Manager::EditHistory> DCM::Manager::getEditHistoryList()
 	{
 		editHistoryList.emplace_back(
 			std::chrono::system_clock::time_point(std::chrono::seconds(log.author.when.time)), // Date
-			GIT::u8utf8ToLocal(log.message), // Commit message
-			GIT::u8utf8ToLocal(log.oid_str) // ID
+			log.message, // Commit message
+			log.oid_str // ID
 		);
 		// Date, Commit message, oid, Content		
 	}
@@ -1564,6 +1588,14 @@ std::vector<GIT::DiffResult> DCM::Manager::getDiffWithCurrent()
 	//git->printDiffResults(diffResults);
 
 	return diffResults;
+}
+
+std::vector<GIT::DiffResult> DCM::Manager::getDiffWithEdit(std::string edit_id)
+{
+	if (git == nullptr)
+		return {};
+	auto rawLines = getRawString();
+	return git->gitDiffWithCommit(fPath, edit_id);
 }
 
 std::vector<std::pair<DCM::BaseParameter*, DCM::BaseParameter*>> DCM::Manager::pairBaseParametersWith(std::vector<DCM::BaseParameter*>& otherBaseParameters)

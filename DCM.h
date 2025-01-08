@@ -123,6 +123,7 @@ namespace DCM
 				: date(date), message(message), id(id) {};
 		};
 		std::vector<GIT::DiffResult> getDiffWithCurrent();
+		std::vector<GIT::DiffResult> getDiffWithEdit(std::string edit_id);
 		std::vector<BaseParameter*> collectAllTypeParameters();
 		std::vector<Distribution*> collectAxispoint();
 		std::vector<Array*> collectValueBlock();
@@ -133,7 +134,7 @@ namespace DCM
 		std::vector<MapBaseParameter*> collectMap();
 
 		std::vector<std::string> rebuildListFromDiff(std::vector<GIT::DiffResult> diffResults);
-		std::string rebuildFromDiff(std::vector<GIT::DiffResult> diffResults);
+		std::string rebuildFromDiff(std::vector<GIT::DiffResult> diffResults);		
 
 		std::string rebuildUnknown(Unknown* unknown);
 		std::string rebuildFunctions(Functions* functions);
@@ -151,6 +152,10 @@ namespace DCM
 
 		std::string rebuildElement(Element* element);
 		std::string rebuild();
+
+		std::vector<std::string> rebuildListFromEdit(std::string edit_id);
+		std::string rebuildFromEdit(std::string edit_id);
+
 		void saveAsDCM(std::string fname);
 		
 		void clear();
