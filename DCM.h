@@ -31,6 +31,10 @@ namespace DCM
 
 		bool isOpened = false;
 
+
+		std::string rawString = "";
+		std::vector<std::string> rawStringList;
+
 		std::vector<std::string> lineHistory;
 		int currentIndex = 0;
 		int currentOrder = 0;
@@ -102,6 +106,7 @@ namespace DCM
 
 		
 		
+		
 	public:
 		Manager();
 		void open(std::string _fPath);		
@@ -159,6 +164,7 @@ namespace DCM
 		void saveAsDCM(std::string fname);
 		
 		void clear();
+		void close();
 		std::string getFileName() { return fPath; };
 
 		std::vector<Element*> getElements();
@@ -178,8 +184,25 @@ namespace DCM
 		std::string getContentsAtHistory(std::string editHistory_id);
 
 		std::string getContentsAtRevision(std::string revision);
+		std::string getContentsAtEdit(std::string edit_id)
+		{
+			if (git == nullptr)
+				return "";
+			return git->getContentsAtCommit(fPath, edit_id);
+		}
 
+		void loadContents(std::string contents);
+		void loadContentsFromFile()
+		{
+			parse();
+		}
+		void loadContentsFromEdit(std::string edit_id)
+		{
+			auto contents = rebuildFromEdit(edit_id);
+			loadContents(contents);
 
+		}
+		
 		
 
 		//void forkBranch();

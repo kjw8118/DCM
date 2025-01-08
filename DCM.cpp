@@ -597,6 +597,19 @@ void DCM::Manager::open(std::string _fPath)
 		file.open(fPath, std::ios::in);
 
 	isOpened = file.is_open();
+
+	if (isOpened)
+	{
+		std::ostringstream oss;
+		oss << file.rdbuf();
+		rawString = oss.str();
+		std::istringstream iss(rawString);
+		std::string line;
+		rawStringList.clear();
+		while (std::getline(iss, line))
+			rawStringList.push_back(line);
+		
+	}
 }
 void DCM::Manager::cloneFromRepo(std::string _remotePath, std::string _localPath, std::string _gitName, std::string _gitEmail)
 {
@@ -646,23 +659,23 @@ void DCM::Manager::createDCM()
 
 	
 }
-void DCM::Manager::parse()
+
+void DCM::Manager::loadContents(std::string contents)
 {
-	if (!isOpened)
-		return;
+	clear();
 
-	lineHistory.clear();
-	pCurrentElement = nullptr;
+	std::istringstream ss(contents);
 	std::string lineRaw = "";
-	currentIndex = 0;
-
-	while (std::getline(file, lineRaw))
+	while (std::getline(ss, lineRaw))
 	{
 		lineHistory.push_back(lineRaw);
 		parseLine(lineRaw);
 		currentIndex++;
 	}
-	
+}
+void DCM::Manager::parse()
+{	
+	loadContents(rawString);	
 }
 
 void DCM::Manager::clear()
@@ -678,9 +691,22 @@ void DCM::Manager::clear()
 	}
 	elements.clear();
 	moduleHeaders.clear();
+	comments.clear();
+	functions.clear();
+	unknowns.clear();
+	formats.clear();
+	variantCodings.clear();
+	parameters.clear();
+
+}
+void DCM::Manager::close()
+{
+	clear();
 	isOpened = false;
 	if (file.is_open())
 		file.close();
+	rawString = "";
+	rawStringList.clear();
 
 }
 std::vector<DCM::Element*> DCM::Manager::getElements()
