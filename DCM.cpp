@@ -1600,14 +1600,14 @@ std::string DCM::Manager::getContentsFromEditID(std::string edit_id)
 	if (git == nullptr)
 		return "";
 
-	return git->gitShowFromCommit(fPath, edit_id);	
+	return git->gitShowFromCommit(fName, edit_id);	
 }
 std::string DCM::Manager::getContentsFromRevision(std::string revision)
 {
 	if (git == nullptr)
 		return "";
 
-	return git->gitShowFromBranch(fPath, revision);
+	return git->gitShowFromBranch(fName, revision);
 }
 
 std::vector<GIT::DiffResult> DCM::Manager::getDiffWithCurrent()
@@ -1628,7 +1628,7 @@ std::vector<GIT::DiffResult> DCM::Manager::getDiffWithEdit(std::string edit_id)
 	if (git == nullptr)
 		return {};
 	auto rawLines = getRawString();
-	return git->gitDiffWithCommit(fPath, edit_id);
+	return git->gitDiffWithCommit(fName, edit_id);
 }
 
 std::vector<std::pair<DCM::BaseParameter*, DCM::BaseParameter*>> DCM::Manager::pairBaseParametersWith(std::vector<DCM::BaseParameter*>& otherBaseParameters)
