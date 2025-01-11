@@ -89,7 +89,7 @@ namespace DCM
 
 		void createDCM();
 		void parse();
-
+		bool isOpen() { return isOpened; };
 		struct EditHistory
 		{
 			std::chrono::system_clock::time_point date;

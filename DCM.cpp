@@ -8,6 +8,9 @@
 #include <iostream>
 #include <filesystem>
 
+#include <cerrno>
+#include <cstring>
+
 #define DCM_WERTDIV 6
 
 namespace DCM {
@@ -582,6 +585,7 @@ void DCM::Manager::openWithRepo(std::string _fPath, std::string _gitName, std::s
 		gitEmail = _gitEmail;
 	}
 }
+
 void DCM::Manager::open(std::string _fPath)
 {
 	if (isOpened)
@@ -593,7 +597,7 @@ void DCM::Manager::open(std::string _fPath)
 	fName = _fName;
 	if(!file.is_open())
 		file.open(fPath, std::ios::in | std::ios::out | std::ios::app);
-	else if(!file.is_open())
+	if(!file.is_open())
 		file.open(fPath, std::ios::in);
 
 	isOpened = file.is_open();
@@ -611,6 +615,11 @@ void DCM::Manager::open(std::string _fPath)
 			rawStringListTemp.push_back(line);
 		rawStringList = new std::vector<std::string>(rawStringListTemp.begin(), rawStringListTemp.end());
 		
+	}
+	else if (file.fail())
+	{
+		char buf[256] = { 0, };
+		std::cerr << "Failed to open file: " << strerror_s(buf, sizeof(buf), errno) << " (errno: " << errno << ")" << std::endl;
 	}
 }
 void DCM::Manager::cloneFromRepo(std::string _remotePath, std::string _localPath, std::string _gitName, std::string _gitEmail)
