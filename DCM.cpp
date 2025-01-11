@@ -716,6 +716,8 @@ void DCM::Manager::close()
 	isOpened = false;
 	if (file.is_open())
 		file.close();
+	if (git != nullptr)
+		delete git;
 	delete rawString; rawString = nullptr;
 	delete rawStringList; rawStringList = nullptr;
 

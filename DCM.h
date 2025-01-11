@@ -113,7 +113,22 @@ namespace DCM
 
 		
 
-		
+		void saveCurrentDCM()
+		{
+			if (file.is_open())
+			{
+				file.close();
+			}
+			std::ofstream outputFile(fPath, std::ios::trunc);
+			if (!outputFile.is_open())
+			{
+				std::cout << "Save file can not open" << std::endl;
+				return;
+			}
+			outputFile << rebuildElements();
+			outputFile.close();
+			std::cout << "Save finished " << fPath << std::endl;
+		}
 
 		std::vector<GIT::DiffResult> getDiffWithCurrent();							/* get difference between file and current elements*/
 		std::vector<GIT::DiffResult> getDiffWithEdit(std::string edit_id);			/* get difference between file and edit(commit) version elements */
