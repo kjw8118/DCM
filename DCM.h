@@ -6,6 +6,7 @@
 #include <vector>
 #include <map>
 #include <list>
+#include <algorithm>
 
 #include "GIT.h" // From github.com/kjw8118/GITwrap.git
 
@@ -137,6 +138,19 @@ namespace DCM
 				git->gitAdd(fName);
 				git->gitCommit(edit_message);
 				std::cout << "Commit done " << edit_message << std::endl;
+			}
+		}
+
+		void reviseContents(std::string revision_name_mixed)
+		{
+			if (git != nullptr)
+			{
+				auto revList = git->getAllBranchList();
+				if (std::find(revList.begin(), revList.end(), revision_name_mixed) == revList.end())
+				{
+					git->createBranch(revision_name_mixed);					
+				}
+				git->switchBranch(revision_name_mixed);
 			}
 		}
 
