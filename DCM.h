@@ -130,6 +130,16 @@ namespace DCM
 			std::cout << "Save finished " << fPath << std::endl;
 		}
 
+		void editContents(std::string edit_message)
+		{
+			if (git != nullptr)
+			{
+				git->gitAdd(fName);
+				git->gitCommit(edit_message);
+				std::cout << "Commit done " << edit_message << std::endl;
+			}
+		}
+
 		std::vector<GIT::DiffResult> getDiffWithCurrent();							/* get difference between file and current elements*/
 		std::vector<GIT::DiffResult> getDiffWithEdit(std::string edit_id);			/* get difference between file and edit(commit) version elements */
 
