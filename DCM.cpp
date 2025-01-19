@@ -1,3 +1,5 @@
+#include "pch.h"
+
 #include "DCM.h"
 
 
@@ -796,6 +798,28 @@ std::vector<DCM::BaseParameter*> DCM::Manager::findBaseParameters(std::string na
 	// impl
 
 	return ret;
+}
+DCM::Element* DCM::Manager::findElementFromIndex(int index)
+{
+	if (elements.empty())
+		return nullptr;
+
+	auto element = elements.front();
+	auto lineIndex = element->lineIndex->findIndex(index);
+	if (lineIndex == nullptr)
+		return nullptr;
+	
+	auto order = lineIndex->getOrder();
+	if (order >= elements.size())
+		return nullptr;
+
+	element = elements.at(order);
+	if (element->lineIndex->getIndex() <= index && index <= element->lineIndex->getEndIndex())
+		return element;
+
+	return nullptr;
+
+
 }
 int DCM::Manager::calcEndIndex(Element* element)
 {
@@ -1631,6 +1655,71 @@ std::vector<GIT::DiffResult> DCM::Manager::getDiffWithEdit(std::string edit_id)
 		return {};
 	auto rawLines = getRawString();
 	return git->gitDiffWithCommit(fName, edit_id);
+}
+
+std::string DCM::Manager::generateComment(std::string title)
+{
+	std::stringstream oss;
+	oss << title + "\n";
+
+	auto diffResults = getDiffWithCurrent();
+	std::set<int> diffElementOrders;
+	for (auto& diffResult : diffResults)
+	{
+		for (auto& diffHunks : diffResult.diffHunks)
+		{
+			for (auto& diffLine : diffHunks.diffLines)
+			{
+				switch (diffLine.type)
+				{
+				case diffLine.ADDED:					
+					auto element = findElementFromIndex(diffLine.newLineNum);
+					if (isParameter(element))
+					{
+						auto order = element->lineIndex->getOrder();
+						diffElementOrders.insert(order);
+					}
+					break;
+				}
+			}
+		}
+	}
+
+	for (auto& order : diffElementOrders)
+	{
+		auto baseParameter = (DCM::BaseParameter*)elements.at(order);
+		oss << "\n" + baseParameter->name;
+		
+	}
+
+	return oss.str();
+}
+
+bool DCM::Manager::isParameter(DCM::Element* element)
+{
+	if (element == nullptr)
+		return false;
+
+	switch (element->type)
+	{
+	case TYPE::PARAMETER:
+	case TYPE::BOOLEAN:
+	case TYPE::ARRAY:
+	case TYPE::MATRIX:
+	case TYPE::CHARLINE:
+	case TYPE::CHARMAP:
+	case TYPE::FIXEDCHARLINE:
+	case TYPE::FIXEDCHARMAP:
+	case TYPE::GROUPCHARLINE:
+	case TYPE::GROUPCHARMAP:
+	case TYPE::DISTRIBUTION:
+
+		return true;
+		break;
+	default:
+		return false;
+		break;
+	}
 }
 
 std::vector<std::pair<DCM::BaseParameter*, DCM::BaseParameter*>> DCM::Manager::pairBaseParametersWith(std::vector<DCM::BaseParameter*>& otherBaseParameters)

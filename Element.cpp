@@ -1,6 +1,6 @@
+#include "pch.h"
+
 #include "Element.h"
-
-
 
 DCM::Element::~Element() 
 {

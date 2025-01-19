@@ -1,4 +1,5 @@
 #pragma once
+#include "DCMExport.h"
 
 #include "LineIndex.h"
 
@@ -47,7 +48,7 @@ namespace DCM
 
 	};
 
-	class Element
+	class DCM_API Element
 	{
 	public:
 		LineIndex* lineIndex = nullptr;
@@ -58,7 +59,7 @@ namespace DCM
 		Element(const Element& other);
 		Element& operator=(const Element& other);
 	};
-	class Unknown : public Element
+	class DCM_API Unknown : public Element
 	{
 	public:
 		std::string text;
@@ -68,7 +69,7 @@ namespace DCM
 		Unknown& operator=(const Unknown& other);
 		void copy(const Unknown& other);
 	};
-	class Comment : public Element
+	class DCM_API Comment : public Element
 	{
 	public:
 		std::string text;
@@ -78,7 +79,7 @@ namespace DCM
 		Comment& operator=(const Comment& other);
 		void copy(const Comment& other);
 	};
-	class Format : public Element
+	class DCM_API Format : public Element
 	{
 	public:
 		std::string version;
@@ -88,7 +89,7 @@ namespace DCM
 		Format& operator=(const Format& other);
 		void copy(const Format& other);
 	};
-	class Function
+	class DCM_API Function
 	{
 	public:
 		std::string name;
@@ -100,7 +101,7 @@ namespace DCM
 		Function& operator=(const Function& other);
 		void copy(const Function& other);
 	};
-	class Functions : public Element
+	class DCM_API Functions : public Element
 	{
 	public:
 		std::vector<Function> functions;
@@ -110,7 +111,7 @@ namespace DCM
 		Functions& operator=(const Functions& other);
 		void copy(const Functions& other);
 	};
-	class Variant
+	class DCM_API Variant
 	{
 	public:
 		std::string name;
@@ -121,7 +122,7 @@ namespace DCM
 		Variant& operator=(const Variant& other);
 		void copy(const Variant& other);
 	};
-	class VariantCoding : public Element
+	class DCM_API VariantCoding : public Element
 	{
 	public:
 		std::vector<Variant> variants;
@@ -131,7 +132,7 @@ namespace DCM
 		VariantCoding& operator=(const VariantCoding& other);
 		void copy(const VariantCoding& other);
 	};
-	class ModuleHeader : public Element
+	class DCM_API ModuleHeader : public Element
 	{
 	public:
 		std::string name;
@@ -142,7 +143,7 @@ namespace DCM
 		ModuleHeader& operator=(const ModuleHeader& other);
 		void copy(const ModuleHeader& other);
 	};
-	class BaseParameter : public Element
+	class DCM_API BaseParameter : public Element
 	{
 	public:
 		std::string name;
@@ -164,7 +165,7 @@ namespace DCM
 
 
 	};
-	class ArrayBaseParameter : public BaseParameter
+	class DCM_API ArrayBaseParameter : public BaseParameter
 	{
 	public:
 		int size_x;
@@ -182,7 +183,7 @@ namespace DCM
 
 
 	};
-	class LineBaseParameter : public BaseParameter
+	class DCM_API LineBaseParameter : public BaseParameter
 	{
 	public:
 		int size_x;
@@ -201,7 +202,7 @@ namespace DCM
 		LineBaseParameter& operator=(const LineBaseParameter& other);
 
 	};
-	class MapBaseParameter : public LineBaseParameter
+	class DCM_API MapBaseParameter : public LineBaseParameter
 	{
 	public:
 		int size_y;
@@ -218,7 +219,7 @@ namespace DCM
 		MapBaseParameter& operator=(const MapBaseParameter& other);
 
 	};
-	class Parameter : public BaseParameter // FESTWERT
+	class DCM_API Parameter : public BaseParameter // FESTWERT
 	{
 	public:
 		double value;
@@ -230,7 +231,7 @@ namespace DCM
 		void copy(const Parameter& other);
 		void copyValue(const Parameter& other);
 	};
-	class Boolean : public BaseParameter // FESTWERT
+	class DCM_API Boolean : public BaseParameter // FESTWERT
 	{
 	public:
 		std::string text;
@@ -242,7 +243,7 @@ namespace DCM
 		void copy(const Boolean& other);
 		void copyValue(const Boolean& other);
 	};
-	class Array : public ArrayBaseParameter // FESTWERTEBLOCK
+	class DCM_API Array : public ArrayBaseParameter // FESTWERTEBLOCK
 	{
 	public:
 		Array(std::string name, Element* prev = nullptr);
@@ -251,7 +252,7 @@ namespace DCM
 		void copy(const Array& other);
 		void copyValue(const Array& other);
 	};
-	class Matrix : public ArrayBaseParameter // FESTWERTEBLOCK
+	class DCM_API Matrix : public ArrayBaseParameter // FESTWERTEBLOCK
 	{
 	public:
 		Matrix(std::string name, Element* prev = nullptr);
@@ -260,7 +261,7 @@ namespace DCM
 		void copy(const Matrix& other);
 		void copyValue(const Matrix& other);
 	};
-	class CharLine : public LineBaseParameter // KENNLINIE
+	class DCM_API CharLine : public LineBaseParameter // KENNLINIE
 	{
 	public:
 		CharLine(std::string name, Element* prev = nullptr);
@@ -269,7 +270,7 @@ namespace DCM
 		void copy(const CharLine& other);
 		void copyValue(const CharLine& other);
 	};
-	class CharMap : public MapBaseParameter // KENNFELD
+	class DCM_API CharMap : public MapBaseParameter // KENNFELD
 	{
 	public:
 		CharMap(std::string name, Element* prev = nullptr);
@@ -278,7 +279,7 @@ namespace DCM
 		void copy(const CharMap& other);
 		void copyValue(const CharMap& other);
 	};
-	class FixedCharLine : public LineBaseParameter // FESTKENNLINIE
+	class DCM_API FixedCharLine : public LineBaseParameter // FESTKENNLINIE
 	{
 	public:
 		FixedCharLine(std::string name, Element* prev = nullptr);
@@ -287,7 +288,7 @@ namespace DCM
 		void copy(const FixedCharLine& other);
 		void copyValue(const FixedCharLine& other);
 	};
-	class FixedCharMap : public MapBaseParameter // FESTKENNFELD
+	class DCM_API FixedCharMap : public MapBaseParameter // FESTKENNFELD
 	{
 	public:
 		FixedCharMap(std::string name, Element* prev = nullptr);
@@ -296,7 +297,7 @@ namespace DCM
 		void copy(const FixedCharMap& other);
 		void copyValue(const FixedCharMap& other);
 	};
-	class Distribution : public LineBaseParameter
+	class DCM_API Distribution : public LineBaseParameter
 	{
 	public:
 		Distribution(std::string name, Element* prev = nullptr);
@@ -305,7 +306,7 @@ namespace DCM
 		void copy(const Distribution& other);
 		void copyValue(const Distribution& other);
 	};
-	class GroupCharLine : public LineBaseParameter
+	class DCM_API GroupCharLine : public LineBaseParameter
 	{
 	public:
 		//Distrubution* dist_x = nullptr;
@@ -318,7 +319,7 @@ namespace DCM
 		void copyValue(const GroupCharLine& other);
 
 	};
-	class GroupCharMap : public MapBaseParameter
+	class DCM_API GroupCharMap : public MapBaseParameter
 	{
 	public:
 		//Distrubution* dist_x = nullptr;

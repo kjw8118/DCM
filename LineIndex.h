@@ -1,8 +1,9 @@
 #pragma once
+#include "DCMExport.h"
 
 namespace DCM
 {
-	class LineIndex
+	class DCM_API LineIndex
 	{
 	private:
 		LineIndex* prev = nullptr;

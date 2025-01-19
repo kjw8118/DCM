@@ -15,67 +15,40 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="DCM.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="GIT.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="LineIndex.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="Element.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="DCM.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="GIT.h">
+    <ClInclude Include="pch.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="LineIndex.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="DCM.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
     <ClInclude Include="Element.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="DCMExport.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="framework.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Test_DCM2.dcm">
-      <Filter>리소스 파일</Filter>
-    </None>
-    <None Include="headerTest.dcm">
-      <Filter>리소스 파일</Filter>
-    </None>
-    <None Include="quotationMarksTest.dcm">
-      <Filter>리소스 파일</Filter>
-    </None>
-    <None Include="unit_blank.dcm">
-      <Filter>리소스 파일</Filter>
-    </None>
-    <None Include="Test_DCM1ex.dcm">
-      <Filter>리소스 파일</Filter>
-    </None>
-    <None Include="commentTest.dcm" />
-    <None Include="functionsTest.dcm" />
-    <None Include="formatTest.dcm" />
-    <None Include="unknownTest.dcm" />
-    <None Include="test.dcm">
-      <Filter>리소스 파일</Filter>
-    </None>
-    <None Include=".gitignore">
-      <Filter>리소스 파일</Filter>
-    </None>
-    <None Include="git2.dll">
-      <Filter>리소스 파일</Filter>
-    </None>
-    <None Include="git2d.dll">
-      <Filter>리소스 파일</Filter>
-    </None>
+    <ClCompile Include="dllmain.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="pch.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="DCM.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Element.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="LineIndex.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

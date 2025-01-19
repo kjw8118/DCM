@@ -1,4 +1,5 @@
 #pragma once
+#include "DCMExport.h"
 
 #include <fstream>
 
@@ -8,18 +9,18 @@
 #include <list>
 #include <algorithm>
 
-#include "GIT.h" // From github.com/kjw8118/GITwrap.git
+#include <GIT.h> // From github.com/kjw8118/GITwrap.git
 
 #include "Element.h"
 
 namespace DCM
 {
 	
-	std::vector<std::string> stripLine(std::string lineRaw);
-	int countDecimalPlaces(const std::string& numberStr);
-	std::string toFixed(double value, int precision);
+	DCM_API std::vector<std::string> stripLine(std::string lineRaw);
+	DCM_API int countDecimalPlaces(const std::string& numberStr);
+	DCM_API std::string toFixed(double value, int precision);
 
-	class Manager
+	class DCM_API Manager
 	{
 	private:
 		GIT* git = nullptr;
@@ -183,6 +184,7 @@ namespace DCM
 		std::vector<Element*> findElements(std::string name, bool exactmatch = false);
 		std::vector<BaseParameter*> findBaseParameters(std::string name, bool exactmatch = false);
 		
+		Element* findElementFromIndex(int index);
 
 		std::vector<EditHistory> getEditHistoryList();
 		std::vector<std::string> getRevisionList();
@@ -195,9 +197,9 @@ namespace DCM
 
 		
 		
-
+		std::string generateComment(std::string title);
 		
-		
+		bool isParameter(Element* element);
 		
 
 		//void forkBranch();
